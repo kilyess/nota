@@ -19,14 +19,14 @@ export default function FloatingActions() {
           : "pointer-events-auto bg-transparent ring-0",
       )}
     >
-      <button
+      <div
         onClick={() => setOpen((s) => !s)}
         aria-expanded={open}
         aria-label={open ? "Close actions" : "Open actions"}
         className="transition-transform duration-200 ease-in-out"
       >
         <SidebarTrigger className="size-8" />
-      </button>
+      </div>
 
       <div className="flex items-center">
         <div

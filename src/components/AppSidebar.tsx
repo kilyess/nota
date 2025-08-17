@@ -5,6 +5,7 @@ import {
   SidebarGroup,
   SidebarHeader,
 } from "@/components/ui/sidebar";
+import { getUser } from "@/utils/supabase/server";
 import Link from "next/link";
 import Logo from "./Logo";
 import { NavUser } from "./NavUser";
@@ -15,12 +16,12 @@ const data = {
     firstName: "Ilyass",
     lastName: "Krichi",
     email: "personal.ilyasskrichi@gmail.com",
-    avatar: "/avatars/shadcn.jpg",
+    avatar: "/Profile Picture (cropped).JPG",
   },
 };
 
 async function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
-  const user = null;
+  const user = await getUser();
 
   return (
     <Sidebar variant="inset" {...props}>
@@ -42,10 +43,10 @@ async function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         ) : (
           <>
             <Button asChild>
-              <Link href="/sign-up">Sign up</Link>
+              <Link href="/signup">Sign up</Link>
             </Button>
             <Button asChild variant="outline">
-              <Link href="/log-in">Log in</Link>
+              <Link href="/login">Log in</Link>
             </Button>
           </>
         )}
