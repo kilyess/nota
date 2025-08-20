@@ -15,7 +15,7 @@ export default function FloatingActions() {
         "fixed top-4 left-4 z-30 rounded-lg p-1 transition-colors",
         "flex items-center space-x-1",
         open
-          ? "bg-card/95 ring-border ring-1 backdrop-blur-sm"
+          ? "bg-sidebar/50 backdrop-blur-sm"
           : "pointer-events-auto bg-transparent ring-0",
       )}
     >
