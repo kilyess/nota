@@ -56,6 +56,12 @@ function NoteEditor({ id }: { id: string }) {
       forceUpdate((prev) => prev + 1);
       console.log(editor.getHTML());
     },
+    onSelectionUpdate: () => {
+      forceUpdate((prev) => prev + 1);
+    },
+    onTransaction: () => {
+      forceUpdate((prev) => prev + 1);
+    },
   });
 
   return (

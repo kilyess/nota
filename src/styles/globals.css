@@ -273,7 +273,8 @@
     }
 
     mark {
-      background-color: #faf594 !important;
+      background-color: var(--primary) !important;
+      color: var(--primary-foreground) !important;
       border-radius: 0.4rem !important;
       box-decoration-break: clone !important;
       padding: 0.1rem 0.3rem !important;
@@ -302,6 +303,40 @@
       float: left !important;
       height: 0 !important;
       pointer-events: none !important;
+    }
+  }
+
+  ul[data-type="taskList"] {
+    list-style: none;
+    margin-left: 0;
+    padding: 0;
+
+    li {
+      align-items: flex-start;
+      display: flex;
+
+      > label {
+        flex: 0 0 auto;
+        margin-right: 0.5rem;
+        user-select: none;
+      }
+
+      > div {
+        flex: 1 1 auto;
+      }
+    }
+
+    input[type="checkbox"] {
+      cursor: pointer;
+      scale: 1.2;
+    }
+
+    input[type="checkbox"]:checked {
+      accent-color: var(--primary);
+    }
+
+    ul[data-type="taskList"] {
+      margin: 0;
     }
   }
 }

@@ -50,36 +50,65 @@ const MenuBar = ({ editor }: { editor: Editor }) => {
     {
       name: "Bold",
       icon: <Bold className="size-5" />,
-      onClick: () => editor.chain().focus().toggleBold().run(),
+      onClick: () => {
+        if (editor.isActive("bold")) {
+          editor.chain().focus().unsetBold().run();
+        } else {
+          editor.chain().focus().setBold().run();
+        }
+      },
       pressed: editor.isActive("bold"),
     },
     {
       name: "Italic",
       icon: <Italic className="size-5" />,
-      onClick: () => editor.chain().focus().toggleItalic().run(),
+      onClick: () => {
+        if (editor.isActive("italic")) {
+          editor.chain().focus().unsetItalic().run();
+        } else {
+          editor.chain().focus().setItalic().run();
+        }
+      },
       pressed: editor.isActive("italic"),
     },
     {
       name: "Strikethrough",
       icon: <Strikethrough className="size-5" />,
-      onClick: () => editor.chain().focus().toggleStrike().run(),
+      onClick: () => {
+        if (editor.isActive("strike")) {
+          editor.chain().focus().unsetStrike().run();
+        } else {
+          editor.chain().focus().setStrike().run();
+        }
+      },
       pressed: editor.isActive("strike"),
     },
     {
       name: "Inline Code",
       icon: <Code className="size-5" />,
-      onClick: () => editor.chain().focus().toggleCode().run(),
+      onClick: () => {
+        if (editor.isActive("code")) {
+          editor.chain().focus().unsetCode().run();
+        } else {
+          editor.chain().focus().setCode().run();
+        }
+      },
       pressed: editor.isActive("code"),
     },
     {
       name: "Highlight",
       icon: <Highlighter className="size-5" />,
-      onClick: () =>
-        editor
-          .chain()
-          .focus()
-          .toggleHighlight({ color: "var(--primary)" })
-          .run(),
+      onClick: () => {
+        if (editor.isActive("highlight")) {
+          editor.chain().focus().unsetHighlight().run();
+        } else {
+          editor
+            .chain()
+            .focus()
+            .setHighlight({ color: "var(--primary)" })
+            .run();
+        }
+      },
       pressed: editor.isActive("highlight"),
     },
   ];
