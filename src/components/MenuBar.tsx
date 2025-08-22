@@ -1,3 +1,4 @@
+import { User } from "@supabase/supabase-js";
 import { Editor } from "@tiptap/react";
 import {
   AlignCenter,
@@ -18,9 +19,15 @@ import {
   Strikethrough,
   Terminal,
 } from "lucide-react";
+import AskAIButton from "./AskAIButton";
 import { Toggle } from "./ui/toggle";
 
-const MenuBar = ({ editor }: { editor: Editor }) => {
+type Props = {
+  editor: Editor | null;
+  user: User | null;
+};
+
+const MenuBar = ({ editor, user }: Props) => {
   if (!editor) {
     return null;
   }
@@ -188,8 +195,8 @@ const MenuBar = ({ editor }: { editor: Editor }) => {
   );
 
   return (
-    <div className="bg-background border-border sticky top-0 z-50 border-b">
-      <div className="flex items-center gap-1 px-2 py-2">
+    <div className="bg-background border-accent sticky top-0 z-50 flex gap-1 border-b px-2 py-2">
+      <div className="flex items-center gap-1 overflow-x-auto">
         {headingOptions.map((option) => (
           <Toggle
             key={option.name}
@@ -244,6 +251,9 @@ const MenuBar = ({ editor }: { editor: Editor }) => {
             {option.icon}
           </Toggle>
         ))}
+      </div>
+      <div className="ml-auto">
+        <AskAIButton user={user} />
       </div>
     </div>
   );

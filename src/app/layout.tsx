@@ -2,17 +2,17 @@ import AppSidebar from "@/components/AppSidebar";
 import DarkModeToggle from "@/components/DarkModeToggle";
 import FloatingActions from "@/components/FloatingActions";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
+import NoteProvider from "@/providers/NoteProvider";
 import { ThemeProvider } from "@/providers/ThemeProvider";
 import "@/styles/globals.css";
 import type { Metadata } from "next";
-import { Inter, JetBrains_Mono } from "next/font/google";
+import { JetBrains_Mono } from "next/font/google";
+import localFont from "next/font/local";
 import { Toaster } from "sonner";
 
-const inter = Inter({
-  subsets: ["latin"],
-  variable: "--font-sans",
-  weight: ["100", "200", "300", "400", "500", "600", "700", "800", "900"],
-  display: "swap",
+const proxima = localFont({
+  src: "../../public/fonts/Proxima Vara-VF.ttf",
+  variable: "--font-proxima",
 });
 
 const jetbrains = JetBrains_Mono({
@@ -34,27 +34,29 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${inter.variable} ${jetbrains.variable}`}
+      className={`${jetbrains.variable} ${proxima.variable}`}
       suppressHydrationWarning
     >
-      <body>
+      <body className="h-[calc(100svh-2rem)] overflow-hidden">
         <ThemeProvider
           attribute="class"
           defaultTheme="system"
           enableSystem
           disableTransitionOnChange
         >
-          <SidebarProvider>
-            <AppSidebar />
-            <SidebarInset>
-              <main>
-                <FloatingActions />
-                <DarkModeToggle />
-                {children}
-              </main>
-            </SidebarInset>
-          </SidebarProvider>
-          <Toaster theme="system" richColors />
+          <NoteProvider>
+            <SidebarProvider>
+              <AppSidebar />
+              <SidebarInset>
+                <main className="flex h-[calc(100svh-2rem)] w-full flex-col overflow-hidden">
+                  <FloatingActions />
+                  <DarkModeToggle />
+                  <div className="min-h-0 flex-1 overflow-auto">{children}</div>
+                </main>
+              </SidebarInset>
+            </SidebarProvider>
+            <Toaster theme="system" richColors />
+          </NoteProvider>
         </ThemeProvider>
       </body>
     </html>

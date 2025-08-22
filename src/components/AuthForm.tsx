@@ -121,7 +121,7 @@ function AuthForm({ type }: Props) {
         </div>
       </CardContent>
       <CardFooter className="mt-6 flex-col gap-4">
-        <Button type="submit" className="w-full">
+        <Button type="submit" className="w-full" disabled={isPending}>
           {isPending ? (
             <Loader2 className="animate-spin" />
           ) : isLoginForm ? (

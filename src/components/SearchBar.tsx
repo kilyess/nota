@@ -5,7 +5,11 @@ import { useState } from "react";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 
-function SearchBar() {
+type Props = {
+  onSearch: (search: string) => void;
+};
+
+function SearchBar({ onSearch }: Props) {
   const [value, setValue] = useState("");
   const [hidden, setHidden] = useState(true);
 
@@ -13,7 +17,7 @@ function SearchBar() {
     <div className="flex items-center">
       <SearchIcon className="size-4 min-w-4" />
       <Input
-        className="!text-foreground placeholder:!text-muted-foreground/50 !w-full !border-none !bg-transparent py-2 !text-[0.8em] font-[450] placeholder:select-none focus:!ring-0"
+        className="!text-foreground placeholder:!text-muted-foreground/50 !w-full !border-none !bg-transparent py-2 !text-sm font-medium placeholder:select-none focus:!ring-0"
         role="searchbox"
         aria-label="Search notes"
         placeholder="Search your notes..."
@@ -21,6 +25,7 @@ function SearchBar() {
         onChange={(e) => {
           const v = e.target.value;
           setValue(v);
+          onSearch(v);
           setHidden(v === "");
         }}
       />
@@ -29,6 +34,7 @@ function SearchBar() {
         className="text-muted-foreground hover:bg-muted/40 ml-2 size-6 rounded-md p-1"
         onClick={() => {
           setValue("");
+          onSearch("");
           setHidden(true);
         }}
         hidden={hidden}

@@ -20,9 +20,7 @@ import {
 } from "@/components/ui/sidebar";
 import LogOutButton from "./LogOutButton";
 
-export function NavUser({
-  user,
-}: {
+type Props = {
   user: {
     id: string;
     createdAt: Date;
@@ -32,7 +30,9 @@ export function NavUser({
     email: string;
     avatar: string;
   } | null;
-}) {
+};
+
+export function NavUser({ user }: Props) {
   const { isMobile } = useSidebar();
 
   return (

@@ -4,10 +4,36 @@ import { Button } from "@/components/ui/button";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import clsx from "clsx";
 import { PlusIcon, SearchIcon } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 export default function FloatingActions() {
   const [open, setOpen] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768); // md breakpoint
+    };
+
+    checkMobile();
+    window.addEventListener("resize", checkMobile);
+
+    return () => window.removeEventListener("resize", checkMobile);
+  }, []);
+
+  useEffect(() => {
+    if (isMobile) {
+      setOpen(true);
+    } else {
+      setOpen(false);
+    }
+  }, [isMobile]);
+
+  const handleToggle = () => {
+    if (!isMobile) {
+      setOpen((s) => !s);
+    }
+  };
 
   return (
     <div
@@ -20,7 +46,7 @@ export default function FloatingActions() {
       )}
     >
       <div
-        onClick={() => setOpen((s) => !s)}
+        onClick={handleToggle}
         aria-expanded={open}
         aria-label={open ? "Close actions" : "Open actions"}
         className="transition-transform duration-200 ease-in-out"

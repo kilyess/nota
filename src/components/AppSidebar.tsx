@@ -10,8 +10,8 @@ import { Note, User } from "@prisma/client";
 import Link from "next/link";
 import Logo from "./Logo";
 import { NavUser } from "./NavUser";
-import SearchBar from "./SearchBar";
-import SidebarGroupContent from "./SidebarGroupContent";
+import NewNoteButton from "./NewNoteButton";
+import SidebarContentWrapper from "./SidebarContentWrapper";
 import { Button } from "./ui/button";
 
 async function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
@@ -37,14 +37,6 @@ async function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     });
   }
 
-  // const handleNewNote = () => {
-  //   if (!user) {
-  //     toast.warning("Not logged in", {
-  //       description: "Please login or sign up to create a new note.",
-  //     });
-  //   }
-  // };
-
   return (
     <Sidebar variant="inset" {...props}>
       <SidebarHeader className="flex h-14 w-full items-center justify-center py-4">
@@ -53,11 +45,8 @@ async function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         </Link>
       </SidebarHeader>
       <SidebarContent>
-        <Button className="w-56 self-center font-bold">New Note</Button>
-        <div className="border-card border-b px-3">
-          <SearchBar />
-        </div>
-        {user && <SidebarGroupContent notes={notes} />}
+        <NewNoteButton user={user} type="sidebar" />
+        {user && <SidebarContentWrapper notes={notes} />}
       </SidebarContent>
       <SidebarFooter>
         {user ? (
