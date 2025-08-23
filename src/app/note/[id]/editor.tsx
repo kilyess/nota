@@ -67,7 +67,7 @@ type Props = {
 function NoteEditor({ id, title, content, user }: Props) {
   const { id: noteId } = useParams();
   const [, forceUpdate] = useState(0);
-  const { noteTitle, setNoteTitle } = useNote();
+  const { noteTitle, setNoteTitle, setNoteUpdatedAt } = useNote();
   const [isSaving, setIsSaving] = useState(false);
 
   useEffect(() => {
@@ -98,6 +98,7 @@ function NoteEditor({ id, title, content, user }: Props) {
     extensions,
     onUpdate: ({ editor }) => {
       forceUpdate((prev) => prev + 1);
+      setNoteUpdatedAt(new Date());
       debouncedSave(noteTitle, editor.getHTML());
     },
     onSelectionUpdate: () => {
@@ -109,7 +110,7 @@ function NoteEditor({ id, title, content, user }: Props) {
   });
 
   return (
-    <div className="animate-in fade-in-50 zoom-in-95 mx-auto flex w-full max-w-[45vw] flex-col items-center justify-center gap-5 pt-30 max-sm:max-w-[90vw]">
+    <div className="animate-in fade-in-50 zoom-in-95 relative mx-auto flex w-full max-w-[45vw] flex-col items-center justify-center gap-5 pt-30 max-sm:max-w-[90vw]">
       <Button
         size="icon"
         variant="ghost"
@@ -129,6 +130,7 @@ function NoteEditor({ id, title, content, user }: Props) {
         onChange={(e) => {
           const newTitle = e.target.value;
           setNoteTitle(newTitle);
+          setNoteUpdatedAt(new Date());
           debouncedSave(newTitle, editor?.getHTML() || "");
         }}
       />

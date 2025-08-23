@@ -1,3 +1,5 @@
+"use client";
+
 import { User } from "@supabase/supabase-js";
 import { Editor } from "@tiptap/react";
 import {
@@ -19,6 +21,7 @@ import {
   Strikethrough,
   Terminal,
 } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
 import AskAIButton from "./AskAIButton";
 import { Toggle } from "./ui/toggle";
 
@@ -28,6 +31,33 @@ type Props = {
 };
 
 const MenuBar = ({ editor, user }: Props) => {
+  const scrollRef = useRef<HTMLDivElement | null>(null);
+  const [showLeftFade, setShowLeftFade] = useState(false);
+  const [showRightFade, setShowRightFade] = useState(false);
+
+  useEffect(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+
+    const update = () => {
+      const atLeft = el.scrollLeft <= 0;
+      const atRight =
+        Math.ceil(el.scrollLeft + el.clientWidth) >= el.scrollWidth;
+      setShowLeftFade(!atLeft);
+      setShowRightFade(!atRight);
+    };
+
+    update();
+    el.addEventListener("scroll", update, {
+      passive: true,
+    } as AddEventListenerOptions);
+    window.addEventListener("resize", update);
+    return () => {
+      el.removeEventListener("scroll", update as unknown as EventListener);
+      window.removeEventListener("resize", update);
+    };
+  }, [editor]);
+
   if (!editor) {
     return null;
   }
@@ -196,61 +226,74 @@ const MenuBar = ({ editor, user }: Props) => {
 
   return (
     <div className="bg-background border-accent sticky top-0 z-50 flex gap-1 border-b px-2 py-2">
-      <div className="flex items-center gap-1 overflow-x-auto">
-        {headingOptions.map((option) => (
-          <Toggle
-            key={option.name}
-            onPressedChange={option.onClick}
-            pressed={option.pressed}
-            className="cursor-pointer"
-          >
-            {option.icon}
-          </Toggle>
-        ))}
-        <Separator />
-        {formattingOptions.map((option) => (
-          <Toggle
-            key={option.name}
-            onPressedChange={option.onClick}
-            pressed={option.pressed}
-            className="cursor-pointer"
-          >
-            {option.icon}
-          </Toggle>
-        ))}
-        <Separator />
-        {blockOptions.map((option) => (
-          <Toggle
-            key={option.name}
-            onPressedChange={option.onClick}
-            pressed={option.pressed}
-            className="cursor-pointer"
-          >
-            {option.icon}
-          </Toggle>
-        ))}
-        <Separator />
-        {listOptions.map((option) => (
-          <Toggle
-            key={option.name}
-            onPressedChange={option.onClick}
-            pressed={option.pressed}
-            className="cursor-pointer"
-          >
-            {option.icon}
-          </Toggle>
-        ))}
-        <Separator />
-        {alignOptions.map((option) => (
-          <Toggle
-            key={option.name}
-            onPressedChange={option.onClick}
-            pressed={option.pressed}
-            className="cursor-pointer"
-          >
-            {option.icon}
-          </Toggle>
-        ))}
+      <div className="relative flex min-w-0 flex-1">
+        <div
+          ref={scrollRef}
+          className="flex items-center gap-1 overflow-x-auto max-sm:[scrollbar-width:none] max-sm:[&::-webkit-scrollbar]:hidden"
+        >
+          {headingOptions.map((option) => (
+            <Toggle
+              key={option.name}
+              onPressedChange={option.onClick}
+              pressed={option.pressed}
+              className="cursor-pointer"
+            >
+              {option.icon}
+            </Toggle>
+          ))}
+          <Separator />
+          {formattingOptions.map((option) => (
+            <Toggle
+              key={option.name}
+              onPressedChange={option.onClick}
+              pressed={option.pressed}
+              className="cursor-pointer"
+            >
+              {option.icon}
+            </Toggle>
+          ))}
+          <Separator />
+          {blockOptions.map((option) => (
+            <Toggle
+              key={option.name}
+              onPressedChange={option.onClick}
+              pressed={option.pressed}
+              className="cursor-pointer"
+            >
+              {option.icon}
+            </Toggle>
+          ))}
+          <Separator />
+          {listOptions.map((option) => (
+            <Toggle
+              key={option.name}
+              onPressedChange={option.onClick}
+              pressed={option.pressed}
+              className="cursor-pointer"
+            >
+              {option.icon}
+            </Toggle>
+          ))}
+          <Separator />
+          {alignOptions.map((option) => (
+            <Toggle
+              key={option.name}
+              onPressedChange={option.onClick}
+              pressed={option.pressed}
+              className="cursor-pointer"
+            >
+              {option.icon}
+            </Toggle>
+          ))}
+        </div>
+        <div
+          aria-hidden
+          className={`from-background pointer-events-none absolute inset-y-0 left-0 z-10 w-6 bg-gradient-to-r to-transparent transition-opacity duration-150 ${showLeftFade ? "opacity-100" : "opacity-0"}`}
+        />
+        <div
+          aria-hidden
+          className={`from-background pointer-events-none absolute inset-y-0 right-0 z-10 w-6 bg-gradient-to-l to-transparent transition-opacity duration-150 ${showRightFade ? "opacity-100" : "opacity-0"}`}
+        />
       </div>
       <div className="ml-auto">
         <AskAIButton user={user} />

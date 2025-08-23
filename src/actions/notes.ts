@@ -39,7 +39,12 @@ export const createNoteAction = async () => {
     }
 
     const note = await prisma.note.create({
-      data: { title: "", body: "", authorId: user.id, createdAt: new Date() },
+      data: {
+        title: "New Note",
+        body: "",
+        authorId: user.id,
+        createdAt: new Date(),
+      },
     });
 
     return { noteId: note.id, errorMessage: null };

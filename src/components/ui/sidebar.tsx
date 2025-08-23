@@ -353,7 +353,7 @@ function SidebarHeader({ className, ...props }: React.ComponentProps<"div">) {
     <div
       data-slot="sidebar-header"
       data-sidebar="header"
-      className={cn("flex flex-col gap-2 p-2", className)}
+      className={cn("flex flex-col gap-2 p-1", className)}
       {...props}
     />
   );
@@ -421,7 +421,7 @@ function SidebarGroupLabel({
       data-slot="sidebar-group-label"
       data-sidebar="group-label"
       className={cn(
-        "text-sidebar-foreground/70 ring-sidebar-ring flex h-8 shrink-0 items-center rounded-md px-3 text-xs font-medium outline-hidden transition-[margin,opacity] duration-200 ease-linear select-none focus-visible:ring-2 [&>svg]:size-4 [&>svg]:shrink-0",
+        "text-heading ring-sidebar-ring mt-2 flex h-6 shrink-0 items-center rounded-md px-3 text-xs font-semibold outline-hidden transition-[margin,opacity] duration-200 ease-linear select-none focus-visible:ring-2 [&>svg]:size-4 [&>svg]:shrink-0",
         "group-data-[collapsible=icon]:-mt-8 group-data-[collapsible=icon]:opacity-0",
         className,
       )}

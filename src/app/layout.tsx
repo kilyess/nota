@@ -2,9 +2,12 @@ import AppSidebar from "@/components/AppSidebar";
 import DarkModeToggle from "@/components/DarkModeToggle";
 import FloatingActions from "@/components/FloatingActions";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
+import { prisma } from "@/db/prisma";
 import NoteProvider from "@/providers/NoteProvider";
 import { ThemeProvider } from "@/providers/ThemeProvider";
 import "@/styles/globals.css";
+import { getUser } from "@/utils/supabase/server";
+import { Note, User } from "@prisma/client";
 import type { Metadata } from "next";
 import { JetBrains_Mono } from "next/font/google";
 import localFont from "next/font/local";
@@ -23,14 +26,35 @@ const jetbrains = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Nota",
+  title: "nota",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const user = await getUser();
+
+  let notes: Note[] = [];
+  let userdb: User | null = null;
+
+  if (user) {
+    notes = await prisma.note.findMany({
+      where: {
+        authorId: user.id,
+      },
+      orderBy: {
+        updatedAt: "desc",
+      },
+    });
+
+    userdb = await prisma.user.findUnique({
+      where: {
+        id: user.id,
+      },
+    });
+  }
   return (
     <html
       lang="en"
@@ -38,15 +62,10 @@ export default function RootLayout({
       suppressHydrationWarning
     >
       <body className="h-[calc(100svh-2rem)] overflow-hidden">
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="system"
-          enableSystem
-          disableTransitionOnChange
-        >
+        <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
           <NoteProvider>
             <SidebarProvider>
-              <AppSidebar />
+              <AppSidebar notes={notes} user={userdb} isLoggedIn={!!user} />
               <SidebarInset>
                 <main className="flex h-[calc(100svh-2rem)] w-full flex-col overflow-hidden">
                   <FloatingActions />

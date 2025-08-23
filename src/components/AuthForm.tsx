@@ -134,7 +134,7 @@ function AuthForm({ type }: Props) {
           {isLoginForm ? "Don't have an account?" : "Already have an account?"}{" "}
           <Link
             href={isLoginForm ? "signup" : "login"}
-            className={`text-blue-500 hover:underline ${isPending ? "pointer-events-none opacity-50" : ""}`}
+            className={`text-ring hover:underline ${isPending ? "pointer-events-none opacity-50" : ""}`}
           >
             {isLoginForm ? "Sign Up" : "Login"}
           </Link>

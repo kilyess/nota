@@ -38,18 +38,16 @@ export default function FloatingActions() {
   return (
     <div
       className={clsx(
-        "fixed top-4 left-4 z-30 rounded-lg p-1 transition-colors",
+        "pointer-events-none fixed top-4 left-4 z-30 rounded-lg p-1 transition-colors",
         "flex items-center space-x-1",
-        open
-          ? "bg-sidebar/50 backdrop-blur-sm"
-          : "pointer-events-auto bg-transparent ring-0",
+        open ? "bg-sidebar/50 backdrop-blur-sm" : "bg-transparent ring-0",
       )}
     >
       <div
         onClick={handleToggle}
         aria-expanded={open}
         aria-label={open ? "Close actions" : "Open actions"}
-        className="transition-transform duration-200 ease-in-out"
+        className="pointer-events-auto transition-transform duration-200 ease-in-out"
       >
         <SidebarTrigger className="size-8" />
       </div>
@@ -57,7 +55,7 @@ export default function FloatingActions() {
       <div className="flex items-center">
         <div
           className={clsx(
-            "origin-left transform transition-all duration-300 ease-in-out",
+            "pointer-events-auto origin-left transform transition-all duration-300 ease-in-out",
             open
               ? "translate-x-0 opacity-100"
               : "pointer-events-none -translate-x-2 opacity-0",
@@ -71,7 +69,7 @@ export default function FloatingActions() {
 
         <div
           className={clsx(
-            "origin-left transform transition-all duration-300 ease-in-out",
+            "pointer-events-auto origin-left transform transition-all duration-300 ease-in-out",
             open
               ? "translate-x-0 opacity-100"
               : "pointer-events-none -translate-x-2 opacity-0",

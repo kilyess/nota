@@ -1,7 +1,6 @@
 "use client";
 
 import { createNoteAction } from "@/actions/notes";
-import { User } from "@supabase/supabase-js";
 import { Loader2, Notebook } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -9,20 +8,21 @@ import { toast } from "sonner";
 import { Button } from "./ui/button";
 
 type Props = {
-  user: User | null;
+  isLoggedIn: boolean;
   type: "home" | "sidebar";
 };
 
-function NewNoteButton({ user, type }: Props) {
+function NewNoteButton({ isLoggedIn, type }: Props) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
 
   const handleNewNote = async () => {
     setLoading(true);
-    if (!user) {
+    if (!isLoggedIn) {
       toast.warning("Not logged in", {
         description: "Please login or sign up to create a new note.",
       });
+      setLoading(false);
       return;
     }
 
@@ -33,6 +33,7 @@ function NewNoteButton({ user, type }: Props) {
 
     if (note.errorMessage) {
       toast.error(note.errorMessage);
+      setLoading(false);
       return;
     }
 

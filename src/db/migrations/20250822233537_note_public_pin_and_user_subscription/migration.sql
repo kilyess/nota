@@ -1,8 +1,11 @@
 -- CreateTable
 CREATE TABLE "public"."Note" (
     "id" TEXT NOT NULL,
-    "text" TEXT NOT NULL,
+    "body" TEXT NOT NULL DEFAULT '',
+    "title" TEXT NOT NULL DEFAULT '',
     "authorId" TEXT NOT NULL,
+    "isPublic" BOOLEAN NOT NULL DEFAULT false,
+    "pinned" BOOLEAN NOT NULL DEFAULT false,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
@@ -16,6 +19,7 @@ CREATE TABLE "public"."User" (
     "lastName" TEXT NOT NULL,
     "email" TEXT NOT NULL,
     "avatar" TEXT NOT NULL DEFAULT '',
+    "subscription" TEXT NOT NULL DEFAULT 'free',
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
 

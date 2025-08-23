@@ -37,7 +37,7 @@ async function HomePage() {
                 : "Hey there, please login or sign up to create notes!"}
             </h2>
             <div className="flex flex-row gap-2.5 max-sm:flex-col max-sm:justify-evenly">
-              <NewNoteButton user={user} type="home" />
+              <NewNoteButton isLoggedIn={!!user} type="home" />
               <Button
                 variant="outline"
                 className="focus-visible:!ring-ring !text-foreground focus-visible:!border-ring hover:!text-accent-foreground flex !h-10 !w-40 !shrink-0 !gap-2 !rounded-full !border !font-semibold !shadow !outline-1 !backdrop-blur-xl !transition-colors !outline-none"
