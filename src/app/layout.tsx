@@ -1,8 +1,10 @@
 import AppSidebar from "@/components/AppSidebar";
+import AppToaster from "@/components/AppToaster";
 import DarkModeToggle from "@/components/DarkModeToggle";
 import FloatingActions from "@/components/FloatingActions";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 import { prisma } from "@/db/prisma";
+import { decryptString } from "@/lib/crypto";
 import NoteProvider from "@/providers/NoteProvider";
 import { ThemeProvider } from "@/providers/ThemeProvider";
 import "@/styles/globals.css";
@@ -11,7 +13,6 @@ import { Note, User } from "@prisma/client";
 import type { Metadata } from "next";
 import { JetBrains_Mono } from "next/font/google";
 import localFont from "next/font/local";
-import { Toaster } from "sonner";
 
 const proxima = localFont({
   src: "../../public/fonts/Proxima Vara-VF.ttf",
@@ -48,6 +49,13 @@ export default async function RootLayout({
         updatedAt: "desc",
       },
     });
+    notes = await Promise.all(
+      notes.map(async (n) => ({
+        ...n,
+        title: await decryptString(n.title as unknown as string),
+        body: await decryptString(n.body as unknown as string),
+      })),
+    );
 
     userdb = await prisma.user.findUnique({
       where: {
@@ -68,13 +76,13 @@ export default async function RootLayout({
               <AppSidebar notes={notes} user={userdb} isLoggedIn={!!user} />
               <SidebarInset>
                 <main className="flex h-[calc(100svh-2rem)] w-full flex-col overflow-hidden">
-                  <FloatingActions />
+                  <FloatingActions notes={notes} isLoggedIn={!!user} />
                   <DarkModeToggle />
                   <div className="min-h-0 flex-1 overflow-auto">{children}</div>
                 </main>
               </SidebarInset>
             </SidebarProvider>
-            <Toaster theme="system" richColors />
+            <AppToaster />
           </NoteProvider>
         </ThemeProvider>
       </body>

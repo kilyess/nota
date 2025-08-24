@@ -1,5 +1,5 @@
 import { deleteNoteAction } from "@/actions/notes";
-import { Loader2, Trash } from "lucide-react";
+import { Trash } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -32,27 +32,25 @@ function DeleteNoteButton({
   type = "sidebar",
 }: Props) {
   const [open, setOpen] = useState(false);
-  const [isDeleting, setIsDeleting] = useState(false);
   const router = useRouter();
+
   const handleDeleteNote = async (
     e: React.MouseEvent<HTMLButtonElement>,
     noteId: string,
   ) => {
     e.stopPropagation();
     e.preventDefault();
-    setIsDeleting(true);
-    const result = await deleteNoteAction(noteId);
-    if (result.errorMessage) {
-      toast.error(result.errorMessage);
-    } else {
-      toast.success("Note deleted successfully");
-      onDeleted?.(noteId);
-    }
-    setIsDeleting(false);
-
-    if (noteId === currentNoteId) {
-      router.replace("/");
-    }
+    toast.promise(deleteNoteAction(noteId), {
+      loading: "Deleting note...",
+      success: () => {
+        onDeleted?.(noteId);
+        if (noteId === currentNoteId) {
+          router.replace("/");
+        }
+        return "Note deleted successfully";
+      },
+      error: (error) => error.message,
+    });
     setOpen(false);
   };
 
@@ -107,15 +105,10 @@ function DeleteNoteButton({
             Cancel
           </AlertDialogCancel>
           <AlertDialogAction
-            disabled={isDeleting}
             className="font-bold"
             onClick={(e) => handleDeleteNote(e, noteId)}
           >
-            {isDeleting ? (
-              <Loader2 className="size-4 animate-spin" />
-            ) : (
-              "Delete"
-            )}
+            Delete
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>

@@ -1,11 +1,11 @@
 "use client";
 
-import useNote from "@/hooks/use-note";
+import { useScrollFade } from "@/hooks/useScrollFade";
 import { Note } from "@prisma/client";
-import { Pin, Trash } from "lucide-react";
+import { ChevronDown, Pin, PinOff } from "lucide-react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
 import DeleteNoteButton from "./DeleteNoteButton";
 import { Button } from "./ui/button";
 import {
@@ -14,129 +14,31 @@ import {
   ContextMenuItem,
   ContextMenuTrigger,
 } from "./ui/context-menu";
-import { SidebarGroupLabel } from "./ui/sidebar";
+import {
+  SidebarGroupContent as SidebarGroupContentBase,
+  SidebarGroupLabel,
+} from "./ui/sidebar";
 
 type Props = {
-  notes: Note[];
+  groupedNotes: { [label: string]: Note[] };
+  onDeleted: (id: string) => void;
+  onPinned: (id: string, newPinnedState: boolean) => void;
 };
 
-function SidebarGroupContent({ notes }: Props) {
-  const { id } = useParams();
-
-  const { noteTitle, noteUpdatedAt } = useNote();
-  const [groupedNotes, setGroupedNotes] = useState<{ [label: string]: Note[] }>(
-    {
-      Pinned: [],
-      Today: [],
-      Yesterday: [],
-      "Last 7 Days": [],
-      "Last 30 Days": [],
-      Older: [],
-    },
+function SidebarGroupContent({ groupedNotes, onDeleted, onPinned }: Props) {
+  const { id: currentNoteId } = useParams();
+  const { showTopFade, showBottomFade } = useScrollFade(
+    '[data-slot="sidebar-content"]',
   );
-  const [visibleNotes, setVisibleNotes] = useState<Note[]>(notes);
-  const scrollRef = useRef<HTMLElement | null>(null);
-  const [showTopFade, setShowTopFade] = useState(false);
-  const [showBottomFade, setShowBottomFade] = useState(false);
+  const [pinnedCollapsed, setPinnedCollapsed] = useState(false);
 
-  useEffect(() => {
-    setVisibleNotes(notes);
-  }, [notes]);
-
-  // Manage top/bottom gradient visibility based on scroll position
-  useEffect(() => {
-    const el = (document.querySelector(
-      '[data-slot="sidebar-content"]',
-    ) as HTMLElement | null)!;
-    scrollRef.current = el;
-    if (!el) return;
-
-    const update = () => {
-      const atTop = el.scrollTop <= 0;
-      const atBottom =
-        Math.ceil(el.scrollTop + el.clientHeight) >= el.scrollHeight;
-      setShowTopFade(!atTop);
-      setShowBottomFade(!atBottom);
-    };
-
-    update();
-    el.addEventListener("scroll", update, {
-      passive: true,
-    } as AddEventListenerOptions);
-    window.addEventListener("resize", update);
-    return () => {
-      el.removeEventListener("scroll", update as unknown as EventListener);
-      window.removeEventListener("resize", update);
-    };
-  }, [groupedNotes]);
-
-  useEffect(() => {
-    if (!id) return;
-    setVisibleNotes((prev) =>
-      prev.map((n) =>
-        n.id === (id as string)
-          ? {
-              ...n,
-              title: noteTitle ?? n.title,
-              updatedAt: noteUpdatedAt ?? n.updatedAt,
-            }
-          : n,
-      ),
-    );
-  }, [id, noteTitle, noteUpdatedAt]);
-
-  useEffect(() => {
-    const now = new Date();
-    const startOfToday = new Date(
-      now.getFullYear(),
-      now.getMonth(),
-      now.getDate(),
-    );
-    const startOfYesterday = new Date(startOfToday);
-    startOfYesterday.setDate(startOfYesterday.getDate() - 1);
-    const startOf7DaysAgo = new Date(startOfToday);
-    startOf7DaysAgo.setDate(startOf7DaysAgo.getDate() - 6);
-    const startOf30DaysAgo = new Date(startOfToday);
-    startOf30DaysAgo.setDate(startOf30DaysAgo.getDate() - 29);
-
-    const newGroups: { [label: string]: Note[] } = {
-      Pinned: [],
-      Today: [],
-      Yesterday: [],
-      "Last 7 Days": [],
-      "Last 30 Days": [],
-      Older: [],
-    };
-
-    visibleNotes.forEach((note) => {
-      const updatedAt = new Date(note.updatedAt);
-
-      if (updatedAt >= startOfToday) {
-        newGroups["Today"].push(note);
-      } else if (updatedAt >= startOfYesterday && updatedAt < startOfToday) {
-        newGroups["Yesterday"].push(note);
-      } else if (updatedAt >= startOf7DaysAgo && updatedAt < startOfYesterday) {
-        newGroups["Last 7 Days"].push(note);
-      } else if (updatedAt >= startOf30DaysAgo && updatedAt < startOf7DaysAgo) {
-        newGroups["Last 30 Days"].push(note);
-      } else {
-        newGroups["Older"].push(note);
-      }
-    });
-
-    Object.keys(newGroups).forEach((label) => {
-      newGroups[label].sort((a, b) => {
-        const dateA = new Date(a.updatedAt).getTime();
-        const dateB = new Date(b.updatedAt).getTime();
-        return dateB - dateA;
-      });
-    });
-
-    setGroupedNotes(newGroups);
-  }, [visibleNotes, noteTitle, noteUpdatedAt, id]);
-
-  const handleDeleted = (deletedId: string) => {
-    setVisibleNotes((prev) => prev.filter((n) => n.id !== deletedId));
+  const handlePinClick = (
+    e: React.MouseEvent<HTMLDivElement | HTMLButtonElement>,
+    note: Note,
+  ) => {
+    e.stopPropagation();
+    e.preventDefault();
+    onPinned(note.id, !note.pinned);
   };
 
   return (
@@ -145,65 +47,97 @@ function SidebarGroupContent({ notes }: Props) {
         aria-hidden
         className={`from-sidebar pointer-events-none sticky top-0 z-[70] -mt-4 h-5 bg-gradient-to-b to-transparent transition-opacity duration-150 ${showTopFade ? "opacity-100" : "opacity-0"}`}
       />
-      {Object.entries(groupedNotes).map(([label, groupNotes]) =>
-        groupNotes.length > 0 ? (
-          <div key={label}>
-            <SidebarGroupLabel>{label}</SidebarGroupLabel>
 
-            <div className="flex flex-col gap-0.5 px-2">
-              {groupNotes.map((note) => (
-                <ContextMenu key={note.id}>
-                  <ContextMenuTrigger>
-                    <Link
-                      className={`group/link relative flex w-full cursor-pointer items-center overflow-hidden rounded-lg px-3 py-2 text-left text-sm font-medium transition ${
-                        note.id === id
-                          ? "bg-sidebar-accent text-accent-foreground"
-                          : ""
-                      } hover:bg-sidebar-accent hover:text-sidebar-accent-foreground`}
-                      href={`/note/${note.id}`}
-                    >
-                      <div className="w-full truncate">
-                        {(note.id === id ? noteTitle : note.title) ||
-                          "New Note"}
-                      </div>
-                      <div className="text-muted-foreground group-hover/link:bg-sidebar-accent pointer-events-none absolute top-0 right-1 bottom-0 z-50 flex items-center justify-end opacity-0 transition-opacity delay-0 duration-200 group-hover/link:pointer-events-auto group-hover/link:opacity-100">
-                        <div className="from-sidebar-accent pointer-events-none absolute top-0 right-[100%] bottom-0 h-full w-8 bg-gradient-to-l to-transparent opacity-0 transition-opacity delay-0 duration-200 group-hover/link:opacity-100"></div>
-                        <Button
-                          variant="ghost"
-                          className="size-7 rounded-md p-1.5"
-                        >
-                          <Pin className="size-4" />
-                        </Button>
+      {Object.entries(groupedNotes).map(([label, notes]) =>
+        notes.length > 0 ? (
+          <div key={label}>
+            <SidebarGroupLabel>
+              {label === "Pinned" ? (
+                <div className="flex w-full items-center justify-between">
+                  <div className="flex items-center gap-1">
+                    <Pin className="size-3" />
+                    <span className="pb-0.5">Pinned</span>
+                  </div>
+                  <Button
+                    variant="ghost"
+                    className="size-7 rounded-md p-1.5"
+                    onClick={() => setPinnedCollapsed((prev) => !prev)}
+                  >
+                    <ChevronDown
+                      className={`size-4 transition-transform ${pinnedCollapsed ? "-rotate-180" : "rotate-0"}`}
+                    />
+                  </Button>
+                </div>
+              ) : (
+                label
+              )}
+            </SidebarGroupLabel>
+
+            <div
+              className={`grid transition-[grid-template-rows] duration-200 ${label === "Pinned" && pinnedCollapsed ? "grid-rows-[0fr]" : "grid-rows-[1fr]"}`}
+            >
+              <SidebarGroupContentBase className="flex flex-col gap-0.5 overflow-hidden px-2">
+                {notes.map((note) => (
+                  <ContextMenu key={note.id}>
+                    <ContextMenuTrigger>
+                      <Link
+                        className={`group/link relative flex w-full cursor-pointer items-center overflow-hidden rounded-lg px-3 py-2 text-left text-sm font-medium transition ${note.id === currentNoteId ? "bg-sidebar-accent text-accent-foreground" : ""} hover:bg-sidebar-accent hover:text-sidebar-accent-foreground`}
+                        href={`/note/${note.id}`}
+                      >
+                        <div className="w-full truncate">
+                          {note.title || "New Note"}
+                        </div>
+                        {/* Hover Actions */}
+                        <div className="text-muted-foreground group-hover/link:bg-sidebar-accent pointer-events-none absolute top-0 right-1 bottom-0 z-50 flex items-center justify-end opacity-0 transition-opacity group-hover/link:pointer-events-auto group-hover/link:opacity-100">
+                          <div className="from-sidebar-accent pointer-events-none absolute top-0 right-full h-full w-8 bg-gradient-to-l to-transparent group-hover/link:opacity-100"></div>
+                          <Button
+                            variant="ghost"
+                            className="size-7 rounded-md p-1.5"
+                            onClick={(e) => handlePinClick(e, note)}
+                            title={note.pinned ? "Unpin" : "Pin"}
+                          >
+                            {note.pinned ? (
+                              <PinOff className="size-4" />
+                            ) : (
+                              <Pin className="size-4" />
+                            )}
+                          </Button>
+                          <DeleteNoteButton
+                            noteId={note.id}
+                            currentNoteId={currentNoteId as string}
+                            noteTitle={note.title}
+                            onDeleted={onDeleted}
+                          />
+                        </div>
+                      </Link>
+                    </ContextMenuTrigger>
+                    <ContextMenuContent>
+                      <ContextMenuItem onClick={(e) => handlePinClick(e, note)}>
+                        {note.pinned ? (
+                          <PinOff className="mr-2 size-4" />
+                        ) : (
+                          <Pin className="mr-2 size-4" />
+                        )}
+                        <span>{note.pinned ? "Unpin" : "Pin"}</span>
+                      </ContextMenuItem>
+                      <ContextMenuItem onSelect={(e) => e.preventDefault()}>
                         <DeleteNoteButton
                           noteId={note.id}
-                          currentNoteId={id as string}
+                          currentNoteId={currentNoteId as string}
                           noteTitle={note.title}
-                          onDeleted={handleDeleted}
+                          onDeleted={onDeleted}
+                          type="context-menu"
                         />
-                      </div>
-                    </Link>
-                  </ContextMenuTrigger>
-                  <ContextMenuContent>
-                    <ContextMenuItem>
-                      <Pin className="text-accent-foreground size-4" />
-                      Pin
-                    </ContextMenuItem>
-                    <ContextMenuItem>
-                      <DeleteNoteButton
-                        noteId={note.id}
-                        currentNoteId={id as string}
-                        noteTitle={note.title}
-                        onDeleted={handleDeleted}
-                        type="context-menu"
-                      />
-                    </ContextMenuItem>
-                  </ContextMenuContent>
-                </ContextMenu>
-              ))}
+                      </ContextMenuItem>
+                    </ContextMenuContent>
+                  </ContextMenu>
+                ))}
+              </SidebarGroupContentBase>
             </div>
           </div>
         ) : null,
       )}
+
       <div
         aria-hidden
         className={`from-sidebar pointer-events-none sticky bottom-0 z-[70] -mb-4 h-5 bg-gradient-to-t to-transparent transition-opacity duration-150 ${showBottomFade ? "opacity-100" : "opacity-0"}`}

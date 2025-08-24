@@ -1,12 +1,14 @@
 "use client";
 
 import { updateNoteAction } from "@/actions/notes";
+import { CodeBlockExtension } from "@/components/extensions/CodeBlockExtension";
 import MenuBar from "@/components/MenuBar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import useNote from "@/hooks/use-note";
 import { User } from "@supabase/supabase-js";
 import Highlight from "@tiptap/extension-highlight";
+import Link from "@tiptap/extension-link";
 import Placeholder from "@tiptap/extension-placeholder";
 import TextAlign from "@tiptap/extension-text-align";
 import { EditorContent, useEditor } from "@tiptap/react";
@@ -18,6 +20,7 @@ import { useCallback, useEffect, useState } from "react";
 
 const extensions = [
   StarterKit.configure({
+    codeBlock: false, // disable default codeBlock to use our custom one
     bulletList: {
       HTMLAttributes: {
         class: "list-disc",
@@ -39,6 +42,7 @@ const extensions = [
       },
     },
   }),
+  CodeBlockExtension,
   Placeholder.configure({
     placeholder: "Write your note here...",
   }),
@@ -54,6 +58,13 @@ const extensions = [
   }),
   Highlight.configure({
     multicolor: true,
+  }),
+  Link.configure({
+    openOnClick: false,
+    HTMLAttributes: {
+      class:
+        "text-ring hover:!underline hover:text-ring/80 cursor-pointer a!no-underline",
+    },
   }),
 ];
 
@@ -91,7 +102,7 @@ function NoteEditor({ id, title, content, user }: Props) {
     editorProps: {
       attributes: {
         class:
-          "w-full min-h-[calc(100vh-25rem)] flex-1 selection:bg-primary placeholder:select-none self-stretch px-3 py-1 mb-20 resize-none outline-none",
+          "w-full min-h-[calc(100vh-25rem)] flex-1 selection:bg-primary placeholder:select-none self-stretch px-3 py-1 mb-20 resize-none outline-none font-medium",
         spellCheck: "true",
       },
     },
@@ -110,7 +121,7 @@ function NoteEditor({ id, title, content, user }: Props) {
   });
 
   return (
-    <div className="animate-in fade-in-50 zoom-in-95 relative mx-auto flex w-full max-w-[45vw] flex-col items-center justify-center gap-5 pt-30 max-sm:max-w-[90vw]">
+    <>
       <Button
         size="icon"
         variant="ghost"
@@ -122,23 +133,27 @@ function NoteEditor({ id, title, content, user }: Props) {
           <CloudCheck className="size-5" />
         )}
       </Button>
-
-      <Input
-        className="placeholder:!text-muted-foreground/50 !h-auto !min-h-0 w-full border-none !bg-transparent !text-5xl font-semibold placeholder:select-none focus:!ring-0"
-        placeholder="New Note"
-        value={noteTitle}
-        onChange={(e) => {
-          const newTitle = e.target.value;
-          setNoteTitle(newTitle);
-          setNoteUpdatedAt(new Date());
-          debouncedSave(newTitle, editor?.getHTML() || "");
-        }}
-      />
-      <div className="flex w-full flex-col gap-4 self-stretch">
-        <MenuBar editor={editor} user={user} />
-        <EditorContent editor={editor} className="w-full flex-1 px-2 sm:px-0" />
+      <div className="animate-in fade-in-50 zoom-in-95 relative mx-auto flex w-full max-w-[50vw] flex-col items-center justify-center gap-5 pt-30 max-sm:max-w-[90vw]">
+        <Input
+          className="placeholder:!text-muted-foreground/50 !h-auto !min-h-0 w-full border-none !bg-transparent !text-5xl font-semibold placeholder:select-none focus:!ring-0"
+          placeholder="New Note"
+          value={noteTitle}
+          onChange={(e) => {
+            const newTitle = e.target.value;
+            setNoteTitle(newTitle);
+            setNoteUpdatedAt(new Date());
+            debouncedSave(newTitle, editor?.getHTML() || "");
+          }}
+        />
+        <div className="flex w-full flex-col gap-4 self-stretch">
+          <MenuBar editor={editor} user={user} />
+          <EditorContent
+            editor={editor}
+            className="w-full flex-1 px-2 sm:px-0"
+          />
+        </div>
       </div>
-    </div>
+    </>
   );
 }
 

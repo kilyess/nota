@@ -23,6 +23,7 @@ import {
 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import AskAIButton from "./AskAIButton";
+import { LinkPopover } from "./LinkPopover";
 import { Toggle } from "./ui/toggle";
 
 type Props = {
@@ -263,6 +264,7 @@ const MenuBar = ({ editor, user }: Props) => {
               {option.icon}
             </Toggle>
           ))}
+          <LinkPopover editor={editor} />
           <Separator />
           {listOptions.map((option) => (
             <Toggle

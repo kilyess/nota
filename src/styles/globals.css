@@ -207,7 +207,7 @@
     ul,
     ol {
       padding: 0 1rem;
-      margin: 1.25rem 1rem 1.25rem 0.4rem;
+      margin: 0.25rem 1rem 0.25rem 0.4rem;
 
       li p {
         margin-top: 0.25em;
@@ -245,22 +245,21 @@
       font-size: 1rem;
     }
 
-    /* Code and preformatted text styles */
     code {
-      background-color: var(--popover) !important;
+      background-color: var(--card) !important;
       border-radius: 0.4rem !important;
-      color: var(--popover-foreground) !important;
+      color: var(--card-foreground) !important;
       font-size: 0.85rem !important;
       padding: 0.25em 0.3em !important;
+      font-family: var(--font-mono) !important;
+      font-weight: 600 !important;
     }
 
     pre {
-      background: var(--popover) !important;
+      background: none !important;
       border-radius: 0.5rem !important;
-      color: var(--popover-foreground) !important;
-      font-family: "JetBrainsMono", monospace;
-      margin: 1.5rem 0;
-      padding: 0.75rem 1rem;
+      color: var(--card-foreground) !important;
+      font-family: var(--font-mono) !important;
 
       code {
         background: none;
