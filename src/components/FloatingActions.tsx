@@ -30,6 +30,7 @@ export default function FloatingActions({ notes, isLoggedIn }: Props) {
   const [isMobile, setIsMobile] = useState(false);
   const [commandOpen, setCommandOpen] = useState(false);
   const [visibleNotes, setVisibleNotes] = useState<Note[]>([]);
+  const [loading, setLoading] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
@@ -89,11 +90,13 @@ export default function FloatingActions({ notes, isLoggedIn }: Props) {
   };
 
   const handleNewNote = async () => {
+    setLoading(true);
     setCommandOpen(true);
     if (!isLoggedIn) {
       toast.warning("Not logged in", {
         description: "Please login or sign up to create a new note.",
       });
+      setLoading(false);
       return;
     }
 
@@ -108,9 +111,11 @@ export default function FloatingActions({ notes, isLoggedIn }: Props) {
           if (data.noteId) {
             router.push(`/note/${data.noteId}`);
           }
+          setLoading(false);
           return "Note created";
         },
         error: (error) => {
+          setLoading(false);
           return error.message;
         },
       },
@@ -165,7 +170,13 @@ export default function FloatingActions({ notes, isLoggedIn }: Props) {
             )}
             style={{ transitionDelay: open ? "150ms" : "0ms" }}
           >
-            <Button variant="ghost" size="sm" aria-hidden={!open}>
+            <Button
+              disabled={loading}
+              onClick={handleNewNote}
+              variant="ghost"
+              size="sm"
+              aria-hidden={!open}
+            >
               <PlusIcon />
             </Button>
           </div>
