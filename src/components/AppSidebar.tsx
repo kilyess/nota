@@ -7,14 +7,15 @@ import {
   SidebarFooter,
   SidebarHeader,
 } from "@/components/ui/sidebar";
+import { useGroupedNotes } from "@/hooks/use-grouped-notes";
 import useNote from "@/hooks/use-note";
-import { useGroupedNotes } from "@/hooks/useGroupedNotes";
+import { useScrollFade } from "@/hooks/use-scroll-fade";
 import { Note, User } from "@prisma/client";
 import Fuse from "fuse.js";
 import { SearchIcon, XIcon } from "lucide-react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 import { NavUser } from "./NavUser";
 import NewNoteButton from "./NewNoteButton";
@@ -34,37 +35,32 @@ function AppSidebar({
   isLoggedIn,
   ...props
 }: React.ComponentProps<typeof Sidebar> & Props) {
-  const { id: currentNoteId } = useParams();
-  const { noteTitle, noteUpdatedAt } = useNote();
-
+  const { id: noteId } = useParams();
   const [allNotes, setAllNotes] = useState<Note[]>(initialNotes);
+  const { noteUpdated, setNoteUpdated, noteTitle } = useNote();
   const [searchValue, setSearchValue] = useState("");
-
+  const sidebarContentRef = useRef<HTMLDivElement>(null);
+  const { showTopFade, showBottomFade } = useScrollFade(
+    sidebarContentRef as React.RefObject<HTMLElement>,
+  );
   useEffect(() => {
     setAllNotes(initialNotes);
   }, [initialNotes]);
 
   useEffect(() => {
-    if (currentNoteId && (noteTitle != null || noteUpdatedAt != null)) {
-      setAllNotes((prevNotes) =>
-        prevNotes
+    if (noteUpdated) {
+      setNoteUpdated(false);
+      setAllNotes((prev) =>
+        prev
           .map((n) =>
-            n.id === currentNoteId
-              ? {
-                  ...n,
-                  title: noteTitle ?? n.title,
-                  updatedAt: noteUpdatedAt ?? n.updatedAt,
-                }
+            n.id === noteId
+              ? { ...n, title: noteTitle, updatedAt: new Date() }
               : n,
           )
-          .sort((a, b) => {
-            return (
-              new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
-            );
-          }),
+          .sort((a, b) => b.updatedAt.getTime() - a.updatedAt.getTime()),
       );
     }
-  }, [currentNoteId, noteTitle, noteUpdatedAt]);
+  }, [noteUpdated, setNoteUpdated]);
 
   const fuse = useMemo(
     () => new Fuse(allNotes, { keys: ["title"], threshold: 0.4 }),
@@ -78,7 +74,7 @@ function AppSidebar({
     return fuse.search(searchValue).map((result) => result.item);
   }, [allNotes, searchValue, fuse]);
 
-  const groupedNotes = useGroupedNotes(filteredNotes);
+  const groupedNotes = useGroupedNotes(filteredNotes as Note[]);
 
   const handleNoteDeleted = (deletedId: string) => {
     setAllNotes((prev) => prev.filter((n) => n.id !== deletedId));
@@ -139,11 +135,13 @@ function AppSidebar({
           </div>
         </div>
       </SidebarHeader>
-      <SidebarContent>
+      <SidebarContent ref={sidebarContentRef}>
         <SidebarGroupContent
           groupedNotes={groupedNotes}
           onDeleted={handleNoteDeleted}
           onPinned={handleNotePinned}
+          showTopFade={showTopFade}
+          showBottomFade={showBottomFade}
         />
       </SidebarContent>
       <SidebarFooter>

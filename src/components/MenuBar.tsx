@@ -15,6 +15,7 @@ import {
   Highlighter,
   Italic,
   List,
+  ListChecks,
   ListOrdered,
   Minus,
   Quote,
@@ -185,6 +186,12 @@ const MenuBar = ({ editor, user }: Props) => {
       onClick: () => editor.chain().focus().toggleOrderedList().run(),
       pressed: editor.isActive("orderedList"),
     },
+    {
+      name: "Task List",
+      icon: <ListChecks className="size-5" />,
+      onClick: () => editor.chain().focus().toggleTaskList().run(),
+      pressed: editor.isActive("taskList"),
+    },
   ];
 
   const alignOptions = [
@@ -298,7 +305,7 @@ const MenuBar = ({ editor, user }: Props) => {
         />
       </div>
       <div className="ml-auto">
-        <AskAIButton user={user} />
+        <AskAIButton user={user} type="note" />
       </div>
     </div>
   );

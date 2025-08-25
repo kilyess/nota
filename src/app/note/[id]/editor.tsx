@@ -8,7 +8,9 @@ import { Input } from "@/components/ui/input";
 import useNote from "@/hooks/use-note";
 import { User } from "@supabase/supabase-js";
 import Highlight from "@tiptap/extension-highlight";
+import Italic from "@tiptap/extension-italic";
 import Link from "@tiptap/extension-link";
+import { TaskItem, TaskList } from "@tiptap/extension-list";
 import Placeholder from "@tiptap/extension-placeholder";
 import TextAlign from "@tiptap/extension-text-align";
 import { EditorContent, useEditor } from "@tiptap/react";
@@ -20,7 +22,7 @@ import { useCallback, useEffect, useState } from "react";
 
 const extensions = [
   StarterKit.configure({
-    codeBlock: false, // disable default codeBlock to use our custom one
+    codeBlock: false,
     bulletList: {
       HTMLAttributes: {
         class: "list-disc",
@@ -59,13 +61,20 @@ const extensions = [
   Highlight.configure({
     multicolor: true,
   }),
+  Italic.configure({
+    HTMLAttributes: {
+      class: "italic",
+    },
+  }),
   Link.configure({
     openOnClick: false,
     HTMLAttributes: {
       class:
-        "text-ring hover:!underline hover:text-ring/80 cursor-pointer a!no-underline",
+        "text-ring hover:!underline hover:text-ring/80 cursor-pointer !no-underline",
     },
   }),
+  TaskList,
+  TaskItem,
 ];
 
 type Props = {
@@ -78,7 +87,7 @@ type Props = {
 function NoteEditor({ id, title, content, user }: Props) {
   const { id: noteId } = useParams();
   const [, forceUpdate] = useState(0);
-  const { noteTitle, setNoteTitle, setNoteUpdatedAt } = useNote();
+  const { noteTitle, setNoteTitle, setNoteUpdated } = useNote();
   const [isSaving, setIsSaving] = useState(false);
 
   useEffect(() => {
@@ -92,6 +101,7 @@ function NoteEditor({ id, title, content, user }: Props) {
       setIsSaving(true);
       await updateNoteAction(id, title, body);
       setIsSaving(false);
+      setNoteUpdated(true);
     }, 1000),
     [id],
   );
@@ -107,16 +117,10 @@ function NoteEditor({ id, title, content, user }: Props) {
       },
     },
     extensions,
+    autofocus: false,
     onUpdate: ({ editor }) => {
       forceUpdate((prev) => prev + 1);
-      setNoteUpdatedAt(new Date());
       debouncedSave(noteTitle, editor.getHTML());
-    },
-    onSelectionUpdate: () => {
-      forceUpdate((prev) => prev + 1);
-    },
-    onTransaction: () => {
-      forceUpdate((prev) => prev + 1);
     },
   });
 
@@ -141,7 +145,6 @@ function NoteEditor({ id, title, content, user }: Props) {
           onChange={(e) => {
             const newTitle = e.target.value;
             setNoteTitle(newTitle);
-            setNoteUpdatedAt(new Date());
             debouncedSave(newTitle, editor?.getHTML() || "");
           }}
         />

@@ -1,6 +1,6 @@
 "use client";
 
-import { useScrollFade } from "@/hooks/useScrollFade";
+import { useScrollFade } from "@/hooks/use-scroll-fade";
 import { Note } from "@prisma/client";
 import { ChevronDown, Pin, PinOff } from "lucide-react";
 import Link from "next/link";
@@ -23,13 +23,18 @@ type Props = {
   groupedNotes: { [label: string]: Note[] };
   onDeleted: (id: string) => void;
   onPinned: (id: string, newPinnedState: boolean) => void;
+  showTopFade: boolean;
+  showBottomFade: boolean;
 };
 
-function SidebarGroupContent({ groupedNotes, onDeleted, onPinned }: Props) {
+function SidebarGroupContent({
+  groupedNotes,
+  onDeleted,
+  onPinned,
+  showTopFade,
+  showBottomFade,
+}: Props) {
   const { id: currentNoteId } = useParams();
-  const { showTopFade, showBottomFade } = useScrollFade(
-    '[data-slot="sidebar-content"]',
-  );
   const [pinnedCollapsed, setPinnedCollapsed] = useState(false);
   const [disabledNoteId, setDisabledNoteId] = useState<string | null>(null);
 
@@ -50,7 +55,7 @@ function SidebarGroupContent({ groupedNotes, onDeleted, onPinned }: Props) {
     <div className="relative">
       <div
         aria-hidden
-        className={`from-sidebar pointer-events-none sticky top-0 z-[70] -mt-4 h-5 bg-gradient-to-b to-transparent transition-opacity duration-150 ${showTopFade ? "opacity-100" : "opacity-0"}`}
+        className={`from-sidebar pointer-events-none sticky top-0 z-[70] -mt-4 h-3 bg-gradient-to-b to-transparent transition-opacity duration-150 ${showTopFade ? "opacity-100" : "opacity-0"}`}
       />
 
       {Object.entries(groupedNotes).map(([label, notes]) =>
@@ -146,7 +151,7 @@ function SidebarGroupContent({ groupedNotes, onDeleted, onPinned }: Props) {
 
       <div
         aria-hidden
-        className={`from-sidebar pointer-events-none sticky bottom-0 z-[70] -mb-4 h-5 bg-gradient-to-t to-transparent transition-opacity duration-150 ${showBottomFade ? "opacity-100" : "opacity-0"}`}
+        className={`from-sidebar pointer-events-none sticky bottom-0 z-[70] -mb-4 h-3 bg-gradient-to-t to-transparent transition-opacity duration-150 ${showBottomFade ? "opacity-100" : "opacity-0"}`}
       />
     </div>
   );

@@ -1,36 +1,40 @@
+.bot-response {
+  font-weight: var(--font-weight-semibold);
+}
+
 .bot-response h1 {
   font-size: 1.8rem;
-  font-weight: bold;
+  font-weight: var(--font-weight-bold);
   margin: 0.5em 0;
 }
 
 .bot-response h2 {
   font-size: 1.6rem;
-  font-weight: bold;
+  font-weight: var(--font-weight-bold);
   margin: 0.5em 0;
 }
 
 .bot-response h3 {
   font-size: 1.4rem;
-  font-weight: bold;
+  font-weight: var(--font-weight-bold);
   margin: 0.5em 0;
 }
 
 .bot-response h4 {
   font-size: 1.2rem;
-  font-weight: bold;
+  font-weight: var(--font-weight-bold);
   margin: 0.5em 0;
 }
 
 .bot-response h5 {
   font-size: 1rem;
-  font-weight: bold;
+  font-weight: var(--font-weight-bold);
   margin: 0.5em 0;
 }
 
 .bot-response h6 {
   font-size: 0.9rem;
-  font-weight: bold;
+  font-weight: var(--font-weight-bold);
   margin: 0.5em 0;
 }
 
@@ -65,5 +69,14 @@
 }
 
 .bot-response u {
+  text-decoration: underline;
+}
+
+.bot-response a {
+  color: var(--color-ring);
+}
+
+.bot-response a:hover {
+  color: color-mix(in oklab, var(--color-ring) 80%, transparent);
   text-decoration: underline;
 }

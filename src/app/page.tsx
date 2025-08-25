@@ -1,9 +1,8 @@
+import AskAIButton from "@/components/AskAIButton";
 import NewNoteButton from "@/components/NewNoteButton";
 import SearchButton from "@/components/SearchButton";
-import { Button } from "@/components/ui/button";
 import { prisma } from "@/db/prisma";
 import { getUser } from "@/utils/supabase/server";
-import { Sparkles } from "lucide-react";
 
 async function HomePage() {
   const user = await getUser();
@@ -39,13 +38,7 @@ async function HomePage() {
             </h2>
             <div className="flex flex-row gap-2.5 max-sm:flex-col max-sm:justify-evenly">
               <NewNoteButton isLoggedIn={!!user} type="home" />
-              <Button
-                variant="outline"
-                className="focus-visible:!ring-ring !text-foreground focus-visible:!border-ring hover:!text-accent-foreground flex !h-10 !w-40 !shrink-0 !gap-2 !rounded-full !border !font-semibold !shadow !outline-1 !backdrop-blur-xl !transition-colors !outline-none"
-              >
-                <Sparkles />
-                Ask AI
-              </Button>
+              <AskAIButton user={user} type="home" />
               <SearchButton />
             </div>
           </div>

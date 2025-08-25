@@ -5,6 +5,7 @@ import { decryptString, encryptString } from "@/lib/crypto";
 import { handleError } from "@/lib/utils";
 import openai from "@/openai";
 import { getUser } from "@/utils/supabase/server";
+import { htmlToText } from "html-to-text";
 import { ChatCompletionMessageParam } from "openai/resources/chat/completions";
 
 export const updateNoteAction = async (
@@ -114,7 +115,7 @@ export const askAIAboutNotesAction = async (
       authorId: user.id,
     },
     orderBy: {
-      createdAt: "desc",
+      createdAt: "asc",
     },
     select: {
       body: true,
@@ -124,10 +125,16 @@ export const askAIAboutNotesAction = async (
   });
 
   notes = await Promise.all(
-    notes.map(async (n) => ({
-      ...n,
-      body: await decryptString(n.body as unknown as string),
-    })),
+    notes.map(async (n) => {
+      const body = await decryptString(n.body as unknown as string);
+
+      const plainTextBody = htmlToText(body);
+
+      return {
+        ...n,
+        body: plainTextBody,
+      };
+    }),
   );
 
   if (notes.length === 0) {
@@ -137,22 +144,25 @@ export const askAIAboutNotesAction = async (
   const formattedNotes = notes
     .map((note) =>
       `
+      [Note]
       Text: ${note.body}
-      Created At: ${note.createdAt}
-      Updated At: ${note.updatedAt}
+      Created At: ${note.createdAt.toISOString()}
+      Updated At: ${note.updatedAt.toISOString()}
     `.trim(),
     )
-    .join("\n");
+    .join("\n---\n");
 
   const messages: ChatCompletionMessageParam[] = [
     {
       role: "developer",
-      content: `You are a helpful assistant that answers questions about a user's notes. 
+      content: `
+          You are a helpful assistant that answers questions about a user's notes. 
           Assume all questions are related to the user's notes. 
           Make sure that your answers are not too verbose and you speak succinctly. 
           Your responses MUST be formatted in clean, valid HTML with proper structure. 
           Use tags like <p>, <strong>, <em>, <ul>, <ol>, <li>, <h1> to <h6>, and <br> when appropriate. 
-          Do NOT wrap the entire response in a single <p> tag unless it's a single paragraph. 
+          Do NOT wrap the entire response in a single <p> tag unless it's a single paragraph.
+          DO NOT use <html>, <head>, or <body> tags. 
           Avoid inline styles, JavaScript, or custom attributes.
           
           Rendered like this in JSX:

@@ -1,28 +1,34 @@
 "use client";
 
-import { createContext, useState } from "react";
+import { Note } from "@prisma/client";
+import { createContext, Dispatch, SetStateAction, useState } from "react";
 
 type NoteProviderContextType = {
   noteTitle: string;
   setNoteTitle: (noteTitle: string) => void;
-  noteUpdatedAt: Date | null;
-  setNoteUpdatedAt: (noteUpdatedAt: Date | null) => void;
+  noteUpdated: boolean;
+  setNoteUpdated: (noteUpdated: boolean) => void;
 };
 
 export const NoteProviderContext = createContext<NoteProviderContextType>({
   noteTitle: "",
   setNoteTitle: () => {},
-  noteUpdatedAt: null,
-  setNoteUpdatedAt: () => {},
+  noteUpdated: false,
+  setNoteUpdated: () => {},
 });
 
 const NoteProvider = ({ children }: { children: React.ReactNode }) => {
   const [noteTitle, setNoteTitle] = useState<string>("");
-  const [noteUpdatedAt, setNoteUpdatedAt] = useState<Date | null>(null);
+  const [noteUpdated, setNoteUpdated] = useState<boolean>(false);
 
   return (
     <NoteProviderContext.Provider
-      value={{ noteTitle, setNoteTitle, noteUpdatedAt, setNoteUpdatedAt }}
+      value={{
+        noteTitle,
+        setNoteTitle,
+        noteUpdated,
+        setNoteUpdated,
+      }}
     >
       {children}
     </NoteProviderContext.Provider>
