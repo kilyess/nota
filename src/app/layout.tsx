@@ -1,10 +1,12 @@
 import AppSidebar from "@/components/AppSidebar";
 import AppToaster from "@/components/AppToaster";
+import CommandMenu from "@/components/CommandMenu";
 import DarkModeToggle from "@/components/DarkModeToggle";
 import FloatingActions from "@/components/FloatingActions";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 import { prisma } from "@/db/prisma";
 import { decryptString } from "@/lib/crypto";
+import CommandProvider from "@/providers/CommandProvider";
 import NoteProvider from "@/providers/NoteProvider";
 import { ThemeProvider } from "@/providers/ThemeProvider";
 import "@/styles/globals.css";
@@ -71,19 +73,24 @@ export default async function RootLayout({
     >
       <body className="h-[calc(100svh-2rem)] overflow-hidden">
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-          <NoteProvider>
-            <SidebarProvider>
-              <AppSidebar notes={notes} user={userdb} isLoggedIn={!!user} />
-              <SidebarInset>
-                <main className="flex h-[calc(100svh-2rem)] w-full flex-col overflow-hidden">
-                  <FloatingActions notes={notes} isLoggedIn={!!user} />
-                  <DarkModeToggle />
-                  <div className="min-h-0 flex-1 overflow-auto">{children}</div>
-                </main>
-              </SidebarInset>
-            </SidebarProvider>
-            <AppToaster />
-          </NoteProvider>
+          <CommandProvider>
+            <NoteProvider>
+              <SidebarProvider>
+                <AppSidebar notes={notes} user={userdb} isLoggedIn={!!user} />
+                <SidebarInset>
+                  <main className="flex h-[calc(100svh-2rem)] w-full flex-col overflow-hidden">
+                    <FloatingActions notes={notes} isLoggedIn={!!user} />
+                    <DarkModeToggle />
+                    <div className="min-h-0 flex-1 overflow-auto">
+                      {children}
+                    </div>
+                    <CommandMenu notes={notes} isLoggedIn={!!user} />
+                  </main>
+                </SidebarInset>
+              </SidebarProvider>
+              <AppToaster />
+            </NoteProvider>
+          </CommandProvider>
         </ThemeProvider>
       </body>
     </html>

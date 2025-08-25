@@ -220,7 +220,7 @@ const MenuBar = ({ editor, user }: Props) => {
 
   const Separator = () => (
     <span
-      className="bg-border mx-1 inline-block h-6 w-px align-middle"
+      className="bg-border mx-1 inline-block h-6 w-px align-middle max-sm:hidden"
       aria-hidden="true"
     />
   );

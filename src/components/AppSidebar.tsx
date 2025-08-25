@@ -47,15 +47,21 @@ function AppSidebar({
   useEffect(() => {
     if (currentNoteId && (noteTitle != null || noteUpdatedAt != null)) {
       setAllNotes((prevNotes) =>
-        prevNotes.map((n) =>
-          n.id === currentNoteId
-            ? {
-                ...n,
-                title: noteTitle ?? n.title,
-                updatedAt: noteUpdatedAt ?? n.updatedAt,
-              }
-            : n,
-        ),
+        prevNotes
+          .map((n) =>
+            n.id === currentNoteId
+              ? {
+                  ...n,
+                  title: noteTitle ?? n.title,
+                  updatedAt: noteUpdatedAt ?? n.updatedAt,
+                }
+              : n,
+          )
+          .sort((a, b) => {
+            return (
+              new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
+            );
+          }),
       );
     }
   }, [currentNoteId, noteTitle, noteUpdatedAt]);
