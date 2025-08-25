@@ -22,6 +22,7 @@ type Props = {
   currentNoteId: string;
   onDeleted?: (deletedId: string) => void;
   type?: "sidebar" | "context-menu";
+  onDisable?: (disabledId: string | null) => void;
 };
 
 function DeleteNoteButton({
@@ -30,6 +31,7 @@ function DeleteNoteButton({
   currentNoteId,
   onDeleted,
   type = "sidebar",
+  onDisable,
 }: Props) {
   const [open, setOpen] = useState(false);
   const router = useRouter();
@@ -40,10 +42,12 @@ function DeleteNoteButton({
   ) => {
     e.stopPropagation();
     e.preventDefault();
+    onDisable?.(noteId);
     toast.promise(deleteNoteAction(noteId), {
       loading: "Deleting note...",
       success: () => {
         onDeleted?.(noteId);
+        onDisable?.(null);
         if (noteId === currentNoteId) {
           router.replace("/");
         }

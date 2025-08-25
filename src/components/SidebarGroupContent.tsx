@@ -31,7 +31,8 @@ function SidebarGroupContent({ groupedNotes, onDeleted, onPinned }: Props) {
     '[data-slot="sidebar-content"]',
   );
   const [pinnedCollapsed, setPinnedCollapsed] = useState(false);
-  const [open, setOpen] = useState(false);
+  const [disabledNoteId, setDisabledNoteId] = useState<string | null>(null);
+
   const handlePinClick = (
     e: React.MouseEvent<HTMLDivElement | HTMLButtonElement>,
     note: Note,
@@ -39,6 +40,10 @@ function SidebarGroupContent({ groupedNotes, onDeleted, onPinned }: Props) {
     e.stopPropagation();
     e.preventDefault();
     onPinned(note.id, !note.pinned);
+  };
+
+  const handleDisableNote = (noteId: string | null) => {
+    setDisabledNoteId(noteId);
   };
 
   return (
@@ -81,7 +86,7 @@ function SidebarGroupContent({ groupedNotes, onDeleted, onPinned }: Props) {
                   <ContextMenu key={note.id}>
                     <ContextMenuTrigger>
                       <Link
-                        className={`group/link relative flex w-full cursor-pointer items-center overflow-hidden rounded-lg px-3 py-2 text-left text-sm font-medium transition ${note.id === currentNoteId ? "bg-sidebar-accent text-accent-foreground" : ""} hover:bg-sidebar-accent hover:text-sidebar-accent-foreground`}
+                        className={`group/link relative flex w-full cursor-pointer items-center overflow-hidden rounded-lg px-3 py-2 text-left text-sm font-medium transition ${note.id === currentNoteId ? "bg-sidebar-accent text-accent-foreground" : ""} hover:bg-sidebar-accent hover:text-sidebar-accent-foreground ${note.id === disabledNoteId ? "pointer-events-none opacity-50" : ""}`}
                         href={`/note/${note.id}`}
                       >
                         <div className="w-full truncate">
@@ -106,6 +111,7 @@ function SidebarGroupContent({ groupedNotes, onDeleted, onPinned }: Props) {
                             currentNoteId={currentNoteId as string}
                             noteTitle={note.title}
                             onDeleted={onDeleted}
+                            onDisable={handleDisableNote}
                           />
                         </div>
                       </Link>
@@ -126,6 +132,7 @@ function SidebarGroupContent({ groupedNotes, onDeleted, onPinned }: Props) {
                           noteTitle={note.title}
                           onDeleted={onDeleted}
                           type="context-menu"
+                          onDisable={handleDisableNote}
                         />
                       </ContextMenuItem>
                     </ContextMenuContent>

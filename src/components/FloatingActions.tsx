@@ -57,7 +57,7 @@ export default function FloatingActions({ notes, isLoggedIn }: Props) {
 
     window.addEventListener("keydown", key);
     return () => window.removeEventListener("keydown", key);
-  }, [isMobile]);
+  }, []);
 
   const fuse = useMemo(
     () => new Fuse(notes, { keys: ["title"], threshold: 0.4 }),
