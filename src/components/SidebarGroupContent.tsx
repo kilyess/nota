@@ -31,7 +31,7 @@ function SidebarGroupContent({ groupedNotes, onDeleted, onPinned }: Props) {
     '[data-slot="sidebar-content"]',
   );
   const [pinnedCollapsed, setPinnedCollapsed] = useState(false);
-
+  const [open, setOpen] = useState(false);
   const handlePinClick = (
     e: React.MouseEvent<HTMLDivElement | HTMLButtonElement>,
     note: Note,
@@ -87,7 +87,6 @@ function SidebarGroupContent({ groupedNotes, onDeleted, onPinned }: Props) {
                         <div className="w-full truncate">
                           {note.title || "New Note"}
                         </div>
-                        {/* Hover Actions */}
                         <div className="text-muted-foreground group-hover/link:bg-sidebar-accent pointer-events-none absolute top-0 right-1 bottom-0 z-50 flex items-center justify-end opacity-0 transition-opacity group-hover/link:pointer-events-auto group-hover/link:opacity-100">
                           <div className="from-sidebar-accent pointer-events-none absolute top-0 right-full h-full w-8 bg-gradient-to-l to-transparent group-hover/link:opacity-100"></div>
                           <Button
@@ -114,13 +113,13 @@ function SidebarGroupContent({ groupedNotes, onDeleted, onPinned }: Props) {
                     <ContextMenuContent>
                       <ContextMenuItem onClick={(e) => handlePinClick(e, note)}>
                         {note.pinned ? (
-                          <PinOff className="mr-2 size-4" />
+                          <PinOff className="text-accent-foreground mr-2 size-4" />
                         ) : (
-                          <Pin className="mr-2 size-4" />
+                          <Pin className="text-accent-foreground mr-2 size-4" />
                         )}
                         <span>{note.pinned ? "Unpin" : "Pin"}</span>
                       </ContextMenuItem>
-                      <ContextMenuItem onSelect={(e) => e.preventDefault()}>
+                      <ContextMenuItem>
                         <DeleteNoteButton
                           noteId={note.id}
                           currentNoteId={currentNoteId as string}

@@ -37,16 +37,13 @@ function AppSidebar({
   const { id: currentNoteId } = useParams();
   const { noteTitle, noteUpdatedAt } = useNote();
 
-  // The single source of truth for all notes on the client
   const [allNotes, setAllNotes] = useState<Note[]>(initialNotes);
   const [searchValue, setSearchValue] = useState("");
 
-  // Update internal state if the initial server-provided notes change
   useEffect(() => {
     setAllNotes(initialNotes);
   }, [initialNotes]);
 
-  // If the active note is being edited, reflect its title/date changes in the sidebar list
   useEffect(() => {
     if (currentNoteId && (noteTitle != null || noteUpdatedAt != null)) {
       setAllNotes((prevNotes) =>
@@ -63,13 +60,11 @@ function AppSidebar({
     }
   }, [currentNoteId, noteTitle, noteUpdatedAt]);
 
-  // Memoize the Fuse instance
   const fuse = useMemo(
     () => new Fuse(allNotes, { keys: ["title"], threshold: 0.4 }),
     [allNotes],
   );
 
-  // Derive filtered notes from the search value and master list
   const filteredNotes = useMemo(() => {
     if (searchValue.trim() === "") {
       return allNotes;
@@ -77,7 +72,6 @@ function AppSidebar({
     return fuse.search(searchValue).map((result) => result.item);
   }, [allNotes, searchValue, fuse]);
 
-  // Derive grouped notes from the filtered list using our custom hook
   const groupedNotes = useGroupedNotes(filteredNotes);
 
   const handleNoteDeleted = (deletedId: string) => {
@@ -86,7 +80,6 @@ function AppSidebar({
 
   const handleNotePinned = useCallback(
     async (noteId: string, newPinnedState: boolean) => {
-      // Optimistic UI update
       const originalNotes = allNotes;
       setAllNotes((prev) =>
         prev.map((n) =>
@@ -97,7 +90,7 @@ function AppSidebar({
       const res = await togglePinNoteAction(noteId, newPinnedState);
       if (res.errorMessage) {
         toast.error(res.errorMessage);
-        setAllNotes(originalNotes); // Revert on failure
+        setAllNotes(originalNotes);
       }
     },
     [allNotes],

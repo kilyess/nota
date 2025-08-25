@@ -1,4 +1,3 @@
-// hooks/use-scroll-fade.ts
 import { useEffect, useState } from "react";
 
 export const useScrollFade = (selector: string) => {
@@ -18,7 +17,7 @@ export const useScrollFade = (selector: string) => {
       setShowBottomFade(!atBottom);
     };
 
-    updateFades(); // Initial check
+    updateFades();
     element.addEventListener("scroll", updateFades, { passive: true });
     window.addEventListener("resize", updateFades);
 

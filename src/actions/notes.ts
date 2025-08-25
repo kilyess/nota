@@ -34,7 +34,7 @@ export const updateNoteAction = async (
   }
 };
 
-export const createNoteAction = async () => {
+export const createNoteAction = async (title: string = "New Note") => {
   try {
     const user = await getUser();
 
@@ -42,7 +42,7 @@ export const createNoteAction = async () => {
       throw new Error("Unauthorized");
     }
 
-    const encryptedTitle = await encryptString("New Note");
+    const encryptedTitle = await encryptString(title);
     const encryptedBody = await encryptString("");
 
     const note = await prisma.note.create({

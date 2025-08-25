@@ -1,4 +1,3 @@
-// hooks/use-grouped-notes.ts
 import { Note } from "@prisma/client";
 import { useMemo } from "react";
 
@@ -47,7 +46,6 @@ export const useGroupedNotes = (notes: Note[]) => {
       }
     });
 
-    // Sort each group by date descending
     for (const label in groups) {
       groups[label].sort(
         (a, b) =>

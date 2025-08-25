@@ -29,28 +29,24 @@ export default function FloatingActions({ notes, isLoggedIn }: Props) {
   const [open, setOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const [commandOpen, setCommandOpen] = useState(false);
-  const [visibleNotes, setVisibleNotes] = useState<Note[]>([]);
   const [loading, setLoading] = useState(false);
+  const [searchValue, setSearchValue] = useState("");
   const router = useRouter();
 
   useEffect(() => {
     const checkMobile = () => {
-      setIsMobile(window.innerWidth < 768); // md breakpoint
+      setOpen(window.innerWidth < 768);
+      setIsMobile(window.innerWidth < 768);
     };
 
     checkMobile();
+
     window.addEventListener("resize", checkMobile);
 
     return () => window.removeEventListener("resize", checkMobile);
   }, []);
 
   useEffect(() => {
-    if (isMobile) {
-      setOpen(true);
-    } else {
-      setOpen(false);
-    }
-
     const key = (e: KeyboardEvent) => {
       if (e.key === "k" && (e.metaKey || e.ctrlKey)) {
         e.preventDefault();
@@ -63,6 +59,18 @@ export default function FloatingActions({ notes, isLoggedIn }: Props) {
     return () => window.removeEventListener("keydown", key);
   }, [isMobile]);
 
+  const fuse = useMemo(
+    () => new Fuse(notes, { keys: ["title"], threshold: 0.4 }),
+    [notes],
+  );
+
+  const visibleNotes = useMemo(() => {
+    if (searchValue.trim() === "") {
+      return [];
+    }
+    return fuse.search(searchValue).map((result) => result.item);
+  }, [notes, searchValue, fuse]);
+
   const handleToggle = () => {
     if (!isMobile) {
       setOpen((s) => !s);
@@ -73,23 +81,11 @@ export default function FloatingActions({ notes, isLoggedIn }: Props) {
     setCommandOpen(true);
   };
 
-  const fuse = useMemo(() => {
-    return new Fuse(notes, {
-      keys: ["title"],
-      threshold: 0.4,
-    });
-  }, [notes]);
-
-  const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.value.trim() === "") {
-      setVisibleNotes([]);
-      return;
-    }
-    const filteredNotes = fuse.search(e.target.value);
-    setVisibleNotes(filteredNotes.map((result) => result.item));
+  const handleSearchChange = (value: string) => {
+    setSearchValue(value);
   };
 
-  const handleNewNote = async () => {
+  const handleNewNote = async (title: string = "New Note") => {
     setLoading(true);
     setCommandOpen(true);
     if (!isLoggedIn) {
@@ -101,7 +97,7 @@ export default function FloatingActions({ notes, isLoggedIn }: Props) {
     }
 
     toast.promise(
-      createNoteAction() as Promise<{
+      createNoteAction(title) as Promise<{
         noteId: string;
         errorMessage: string | null;
       }>,
@@ -172,7 +168,7 @@ export default function FloatingActions({ notes, isLoggedIn }: Props) {
           >
             <Button
               disabled={loading}
-              onClick={handleNewNote}
+              onClick={() => handleNewNote()}
               variant="ghost"
               size="sm"
               aria-hidden={!open}
@@ -184,12 +180,13 @@ export default function FloatingActions({ notes, isLoggedIn }: Props) {
       </div>
       <CommandDialog open={commandOpen} onOpenChange={setCommandOpen}>
         <CommandInput
-          onChangeCapture={handleSearch}
+          onValueChange={(e) => handleSearchChange(e)}
           onKeyDown={(e) => {
             if (e.key === "Enter") {
-              handleNewNote();
+              handleNewNote(searchValue);
             }
           }}
+          value={searchValue}
           placeholder="Search or press Enter to create a new note..."
         />
         <CommandList>
