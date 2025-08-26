@@ -1,7 +1,6 @@
-import { prisma } from "@/db/prisma";
-import { decryptString } from "@/lib/crypto";
+import { getDecryptedNoteAction } from "@/actions/notes";
+import NotFound from "@/app/not-found";
 import { getUser } from "@/utils/supabase/server";
-import { notFound } from "next/navigation";
 import NoteEditor from "./editor";
 
 type Props = {
@@ -14,31 +13,17 @@ async function NotePage({ params }: Props) {
 
   const user = await getUser();
 
-  // Redirect to login if not authenticated
   if (!user) {
-    notFound();
+    return <NotFound isLoggedIn={false} />;
   }
 
-  const note = await prisma.note.findUnique({
-    where: {
-      id: noteId,
-      authorId: user.id,
-    },
-  });
+  const { title, body, errorMessage } = await getDecryptedNoteAction(noteId);
 
-  // Return 404 if note doesn't exist or doesn't belong to user
-  if (!note) {
-    notFound();
+  if (errorMessage) {
+    return <NotFound isLoggedIn={!!user} />;
   }
 
-  return (
-    <NoteEditor
-      id={noteId}
-      title={await decryptString(note.title as unknown as string)}
-      content={await decryptString(note.body as unknown as string)}
-      user={user}
-    />
-  );
+  return <NoteEditor id={noteId} title={title} content={body} user={user} />;
 }
 
 export default NotePage;

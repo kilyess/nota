@@ -8,6 +8,10 @@ type NoteProviderContextType = {
   setNoteTitle: (noteTitle: string) => void;
   noteUpdated: boolean;
   setNoteUpdated: (noteUpdated: boolean) => void;
+  noteCreated: Note | null;
+  setNoteCreated: (noteCreated: Note | null) => void;
+  noteDeleted: string | null;
+  setNoteDeleted: (noteDeleted: string | null) => void;
 };
 
 export const NoteProviderContext = createContext<NoteProviderContextType>({
@@ -15,12 +19,17 @@ export const NoteProviderContext = createContext<NoteProviderContextType>({
   setNoteTitle: () => {},
   noteUpdated: false,
   setNoteUpdated: () => {},
+  noteCreated: null,
+  setNoteCreated: () => {},
+  noteDeleted: null,
+  setNoteDeleted: () => {},
 });
 
 const NoteProvider = ({ children }: { children: React.ReactNode }) => {
   const [noteTitle, setNoteTitle] = useState<string>("");
   const [noteUpdated, setNoteUpdated] = useState<boolean>(false);
-
+  const [noteCreated, setNoteCreated] = useState<Note | null>(null);
+  const [noteDeleted, setNoteDeleted] = useState<string | null>(null);
   return (
     <NoteProviderContext.Provider
       value={{
@@ -28,6 +37,10 @@ const NoteProvider = ({ children }: { children: React.ReactNode }) => {
         setNoteTitle,
         noteUpdated,
         setNoteUpdated,
+        noteCreated,
+        setNoteCreated,
+        noteDeleted,
+        setNoteDeleted,
       }}
     >
       {children}

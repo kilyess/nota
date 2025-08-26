@@ -1,7 +1,6 @@
 "use client";
 
 import { loginAction, signUpAction } from "@/actions/users";
-import { Loader2 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useTransition } from "react";
@@ -29,32 +28,66 @@ function AuthForm({ type }: Props) {
       const email = formData.get("email") as string;
       const password = formData.get("password") as string;
 
-      let errorMessage;
-      let title;
-      let description;
-
       if (isLoginForm) {
-        errorMessage = (await loginAction(email, password)).errorMessage;
-        title = "Logged in";
-        description = "You have been successfully logged in.";
+        const promise = new Promise<{ errorMessage: string | null }>(
+          async (resolve, reject) => {
+            const result = await loginAction(email, password);
+            if (result.errorMessage) {
+              reject(new Error(result.errorMessage));
+            } else {
+              resolve(result);
+            }
+          },
+        );
+        toast.promise(promise, {
+          loading: "Logging in...",
+          success: () => {
+            router.replace("/");
+            return {
+              message: "Logged in",
+              description: "You have been successfully logged in.",
+            };
+          },
+          error: (error) => {
+            return {
+              message: "Login failed",
+              description: error.message,
+            };
+          },
+        });
       } else {
         firstName = formData.get("firstName") as string;
         lastName = formData.get("lastName") as string;
-        errorMessage = (
-          await signUpAction(firstName, lastName, email, password)
-        ).errorMessage;
-        title = "Signed up";
-        description = "Check your email for confirmation link.";
-      }
-
-      if (!errorMessage) {
-        toast.success(title, {
-          description: description,
-        });
-        router.replace("/");
-      } else {
-        toast.error("Error", {
-          description: errorMessage,
+        const promise = new Promise<{ errorMessage: string | null }>(
+          async (resolve, reject) => {
+            const result = await signUpAction(
+              firstName,
+              lastName,
+              email,
+              password,
+            );
+            if (result.errorMessage) {
+              reject(new Error(result.errorMessage));
+            } else {
+              resolve(result);
+            }
+          },
+        );
+        toast.promise(promise, {
+          loading: "Signing up...",
+          success: () => {
+            router.replace("/");
+            return {
+              message: "Signed up",
+              description: "Check your email for confirmation link.",
+            };
+          },
+          error: (error) => {
+            return {
+              message: "Sign up failed",
+              description: error.message,
+            };
+          },
         });
       }
     });
@@ -122,13 +155,7 @@ function AuthForm({ type }: Props) {
       </CardContent>
       <CardFooter className="mt-6 flex-col gap-4">
         <Button type="submit" className="w-full" disabled={isPending}>
-          {isPending ? (
-            <Loader2 className="animate-spin" />
-          ) : isLoginForm ? (
-            "Login"
-          ) : (
-            "Sign Up"
-          )}
+          {isLoginForm ? "Login" : "Sign Up"}
         </Button>
         <p className="text-sm">
           {isLoginForm ? "Don't have an account?" : "Already have an account?"}{" "}

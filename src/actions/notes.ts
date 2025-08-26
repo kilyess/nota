@@ -42,7 +42,7 @@ export const createNoteAction = async (title: string = "New Note") => {
     const user = await getUser();
 
     if (!user) {
-      throw new Error("You must be logged in to create a note");
+      throw new Error("Please login or sign up to create a new note.");
     }
 
     const encryptedTitle = await encryptString(title);
@@ -57,9 +57,40 @@ export const createNoteAction = async (title: string = "New Note") => {
       },
     });
 
-    return { noteId: note.id, errorMessage: null };
+    return { note, errorMessage: null };
   } catch (error) {
-    return handleError(error);
+    const { errorMessage } = handleError(error);
+    return { note: null, errorMessage };
+  }
+};
+
+export const getDecryptedNoteAction = async (noteId: string) => {
+  try {
+    const user = await getUser();
+
+    if (!user) {
+      throw new Error("Please login or sign up to get a note");
+    }
+
+    const note = await prisma.note.findUnique({
+      where: { id: noteId, authorId: user.id },
+    });
+
+    if (!note) {
+      throw new Error("Note not found");
+    }
+
+    const decryptedTitle = await decryptString(note.title);
+    const decryptedBody = await decryptString(note.body);
+
+    return {
+      title: decryptedTitle,
+      body: decryptedBody,
+      errorMessage: null,
+    };
+  } catch (error) {
+    const { errorMessage } = handleError(error);
+    return { title: "", body: "", errorMessage };
   }
 };
 
@@ -68,7 +99,7 @@ export const deleteNoteAction = async (noteId: string) => {
     const user = await getUser();
 
     if (!user) {
-      throw new Error("You must be logged in to delete a note");
+      throw new Error("Please login or sign up to delete a note");
     }
 
     await prisma.note.delete({
@@ -86,7 +117,7 @@ export const togglePinNoteAction = async (noteId: string, pinned: boolean) => {
     const user = await getUser();
 
     if (!user) {
-      throw new Error("You must be logged in to pin a note");
+      throw new Error("Please login or sign up to pin a note");
     }
 
     await prisma.note.update({
@@ -107,7 +138,7 @@ export const askAIAboutNotesAction = async (
   const user = await getUser();
 
   if (!user) {
-    throw new Error("You must be logged in to ask AI about your notes");
+    throw new Error("Please login or sign up to ask AI about your notes");
   }
 
   let notes = await prisma.note.findMany({

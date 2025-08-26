@@ -1,51 +1,68 @@
 "use client";
 
-import { createNoteAction } from "@/actions/notes";
+import { createNoteAction, getDecryptedNoteAction } from "@/actions/notes";
+import useNote from "@/hooks/use-note";
+import { Note } from "@prisma/client";
 import { Notebook } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useTransition } from "react";
 import { toast } from "sonner";
 import { Button } from "./ui/button";
 
 type Props = {
-  isLoggedIn: boolean;
   type: "home" | "sidebar";
 };
 
-function NewNoteButton({ isLoggedIn, type }: Props) {
+function NewNoteButton({ type }: Props) {
   const router = useRouter();
-  const [loading, setLoading] = useState(false);
-
+  const [isPending, startTransition] = useTransition();
+  const { setNoteCreated } = useNote();
   const handleNewNote = async () => {
-    setLoading(true);
-    if (!isLoggedIn) {
-      toast.warning("Not logged in", {
-        description: "Please login or sign up to create a new note.",
-      });
-      setLoading(false);
-      return;
-    }
-
-    toast.promise(
-      createNoteAction() as Promise<{
-        noteId: string;
+    startTransition(() => {
+      const promise = new Promise<{
+        note: Note | null;
         errorMessage: string | null;
-      }>,
-      {
-        loading: "Creating note...",
-        success: (data) => {
-          if (data.noteId) {
-            router.push(`/note/${data.noteId}`);
+      }>(async (resolve, reject) => {
+        const result = await createNoteAction();
+        if (result.errorMessage) {
+          reject(new Error(result.errorMessage));
+        } else {
+          resolve(result);
+        }
+      });
+
+      toast.promise(promise, {
+        loading: "Creating new note...",
+        success: async (data) => {
+          const { title, body, errorMessage } = await getDecryptedNoteAction(
+            data.note!.id,
+          );
+          if (errorMessage) {
+            throw new Error(errorMessage);
           }
-          setLoading(false);
-          return "Note created";
+          const note = {
+            ...data.note!,
+            title,
+            body,
+          };
+          setNoteCreated(note);
+          return {
+            message: "Note created",
+            description: "You can now view and edit your new note.",
+            action: {
+              label: "View Note",
+              onClick: () => router.push(`/note/${note.id}`),
+            },
+          };
         },
         error: (error) => {
-          setLoading(false);
-          return error.message;
+          return {
+            message: "Note creation failed",
+            description: error.message,
+          };
         },
-      },
-    );
+      });
+    });
   };
 
   return (
@@ -55,7 +72,7 @@ function NewNoteButton({ isLoggedIn, type }: Props) {
           onClick={handleNewNote}
           variant="outline"
           className="focus-visible:!ring-ring !text-foreground focus-visible:!border-ring hover:!text-accent-foreground flex !h-10 !w-40 !shrink-0 !gap-2 !rounded-full !border !font-semibold !shadow !outline-1 !backdrop-blur-xl !transition-colors !outline-none"
-          disabled={loading}
+          disabled={isPending}
         >
           <Notebook />
           New Note
@@ -64,7 +81,7 @@ function NewNoteButton({ isLoggedIn, type }: Props) {
         <Button
           onClick={handleNewNote}
           className="w-[14rem] self-center font-bold max-sm:py-3 max-sm:text-base"
-          disabled={loading}
+          disabled={isPending}
         >
           New Note
         </Button>

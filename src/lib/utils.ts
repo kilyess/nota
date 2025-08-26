@@ -6,9 +6,19 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 export const handleError = (error: unknown) => {
+  const errorString = String(error);
+
+  const detailRegex = /detail: Some\("([^"]+)"\)/;
+  const match = errorString.match(detailRegex);
+
+  if (match && match[1]) {
+    return {
+      errorMessage: match[1],
+    };
+  }
   if (error instanceof Error) {
     return { errorMessage: error.message };
   } else {
-    return { errorMessage: "An error occured." };
+    return { errorMessage: "An unexpected error occured." };
   }
 };

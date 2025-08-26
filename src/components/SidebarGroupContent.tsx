@@ -1,6 +1,6 @@
 "use client";
 
-import { useScrollFade } from "@/hooks/use-scroll-fade";
+import useNote from "@/hooks/use-note";
 import { Note } from "@prisma/client";
 import { ChevronDown, Pin, PinOff } from "lucide-react";
 import Link from "next/link";
@@ -36,7 +36,8 @@ function SidebarGroupContent({
 }: Props) {
   const { id: currentNoteId } = useParams();
   const [pinnedCollapsed, setPinnedCollapsed] = useState(false);
-  const [disabledNoteId, setDisabledNoteId] = useState<string | null>(null);
+  const [disabledNoteId, setDisabledNoteId] = useState<string[]>([]);
+  const { noteTitle } = useNote();
 
   const handlePinClick = (
     e: React.MouseEvent<HTMLDivElement | HTMLButtonElement>,
@@ -47,8 +48,12 @@ function SidebarGroupContent({
     onPinned(note.id, !note.pinned);
   };
 
-  const handleDisableNote = (noteId: string | null) => {
-    setDisabledNoteId(noteId);
+  const handleDisableNote = (noteId: string, disabled: boolean) => {
+    if (disabled) {
+      setDisabledNoteId((prev) => [...prev, noteId]);
+    } else {
+      setDisabledNoteId((prev) => prev.filter((id) => id !== noteId));
+    }
   };
 
   return (
@@ -91,11 +96,13 @@ function SidebarGroupContent({
                   <ContextMenu key={note.id}>
                     <ContextMenuTrigger>
                       <Link
-                        className={`group/link relative flex w-full cursor-pointer items-center overflow-hidden rounded-lg px-3 py-2 text-left text-sm font-medium transition ${note.id === currentNoteId ? "bg-sidebar-accent text-accent-foreground" : ""} hover:bg-sidebar-accent hover:text-sidebar-accent-foreground ${note.id === disabledNoteId ? "pointer-events-none opacity-50" : ""}`}
+                        className={`group/link relative flex w-full cursor-pointer items-center overflow-hidden rounded-lg px-3 py-2 text-left text-sm font-medium transition ${note.id === currentNoteId ? "bg-sidebar-accent text-accent-foreground" : ""} hover:bg-sidebar-accent hover:text-sidebar-accent-foreground ${disabledNoteId.includes(note.id) ? "pointer-events-none opacity-50" : ""}`}
                         href={`/note/${note.id}`}
                       >
                         <div className="w-full truncate">
-                          {note.title || "New Note"}
+                          {(note.id === currentNoteId
+                            ? noteTitle
+                            : note.title) || "New Note"}
                         </div>
                         <div className="text-muted-foreground group-hover/link:bg-sidebar-accent pointer-events-none absolute top-0 right-1 bottom-0 z-50 flex items-center justify-end opacity-0 transition-opacity group-hover/link:pointer-events-auto group-hover/link:opacity-100">
                           <div className="from-sidebar-accent pointer-events-none absolute top-0 right-full h-full w-8 bg-gradient-to-l to-transparent group-hover/link:opacity-100"></div>

@@ -37,7 +37,15 @@ function AppSidebar({
 }: React.ComponentProps<typeof Sidebar> & Props) {
   const { id: noteId } = useParams();
   const [allNotes, setAllNotes] = useState<Note[]>(initialNotes);
-  const { noteUpdated, setNoteUpdated, noteTitle } = useNote();
+  const {
+    noteUpdated,
+    setNoteUpdated,
+    noteTitle,
+    noteCreated,
+    setNoteCreated,
+    noteDeleted,
+    setNoteDeleted,
+  } = useNote();
   const [searchValue, setSearchValue] = useState("");
   const sidebarContentRef = useRef<HTMLDivElement>(null);
   const { showTopFade, showBottomFade } = useScrollFade(
@@ -60,7 +68,23 @@ function AppSidebar({
           .sort((a, b) => b.updatedAt.getTime() - a.updatedAt.getTime()),
       );
     }
-  }, [noteUpdated, setNoteUpdated]);
+    if (noteCreated) {
+      setAllNotes((prev) => [noteCreated, ...prev]);
+      setNoteCreated(null);
+    }
+    if (noteDeleted) {
+      setAllNotes((prev) => prev.filter((n) => n.id !== noteDeleted));
+      setNoteDeleted(null);
+    }
+  }, [
+    noteUpdated,
+    setNoteUpdated,
+    noteCreated,
+    setNoteCreated,
+    noteDeleted,
+    setNoteDeleted,
+    noteId,
+  ]);
 
   const fuse = useMemo(
     () => new Fuse(allNotes, { keys: ["title"], threshold: 0.4 }),
@@ -77,7 +101,7 @@ function AppSidebar({
   const groupedNotes = useGroupedNotes(filteredNotes as Note[]);
 
   const handleNoteDeleted = (deletedId: string) => {
-    setAllNotes((prev) => prev.filter((n) => n.id !== deletedId));
+    setNoteDeleted(deletedId);
   };
 
   const handleNotePinned = useCallback(
@@ -112,7 +136,7 @@ function AppSidebar({
         <Link href="/">
           <h1 className="text-2xl font-semibold">nota</h1>
         </Link>
-        <NewNoteButton isLoggedIn={isLoggedIn} type="sidebar" />
+        <NewNoteButton type="sidebar" />
         <div className="border-sidebar-ring-accent border-b px-2">
           <div className="flex items-center">
             <SearchIcon className="size-4 min-w-4" />

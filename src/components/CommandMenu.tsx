@@ -1,12 +1,13 @@
 "use client";
 
-import { createNoteAction } from "@/actions/notes";
+import { createNoteAction, getDecryptedNoteAction } from "@/actions/notes";
 import useCommandState from "@/hooks/use-command-state";
+import useNote from "@/hooks/use-note";
 import { Note } from "@prisma/client";
 import Fuse from "fuse.js";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { useEffect, useMemo, useState } from "react";
+import { useParams, useRouter } from "next/navigation";
+import { useEffect, useMemo, useRef, useState, useTransition } from "react";
 import { toast } from "sonner";
 import {
   CommandDialog,
@@ -18,14 +19,59 @@ import {
 
 type Props = {
   notes: Note[];
-  isLoggedIn: boolean;
 };
 
-export default function CommandMenu({ notes, isLoggedIn }: Props) {
-  const [loading, setLoading] = useState(false);
+export default function CommandMenu({ notes: initialNotes }: Props) {
+  const { id: noteId } = useParams();
+  const [isPending, startTransition] = useTransition();
   const [searchValue, setSearchValue] = useState("");
   const { commandOpen, toggleCommandOpen } = useCommandState();
   const router = useRouter();
+
+  const [allNotes, setAllNotes] = useState<Note[]>(initialNotes);
+  const {
+    noteUpdated,
+    setNoteUpdated,
+    noteTitle,
+    noteCreated,
+    setNoteCreated,
+    noteDeleted,
+    setNoteDeleted,
+  } = useNote();
+
+  useEffect(() => {
+    setAllNotes(initialNotes);
+  }, [initialNotes]);
+
+  useEffect(() => {
+    if (noteUpdated) {
+      setNoteUpdated(false);
+      setAllNotes((prev) =>
+        prev
+          .map((n) =>
+            n.id === noteId
+              ? { ...n, title: noteTitle, updatedAt: new Date() }
+              : n,
+          )
+          .sort((a, b) => b.updatedAt.getTime() - a.updatedAt.getTime()),
+      );
+    }
+    if (noteCreated) {
+      setAllNotes((prev) => [noteCreated, ...prev]);
+      setNoteCreated(null);
+    }
+    if (noteDeleted) {
+      setAllNotes((prev) => prev.filter((n) => n.id !== noteDeleted));
+      setNoteDeleted(null);
+    }
+  }, [
+    noteUpdated,
+    setNoteUpdated,
+    noteCreated,
+    setNoteCreated,
+    noteDeleted,
+    setNoteDeleted,
+  ]);
 
   useEffect(() => {
     const key = (e: KeyboardEvent) => {
@@ -41,19 +87,19 @@ export default function CommandMenu({ notes, isLoggedIn }: Props) {
   }, []);
 
   const fuse = useMemo(
-    () => new Fuse(notes, { keys: ["title"], threshold: 0.4 }),
-    [notes],
+    () => new Fuse(allNotes, { keys: ["title"], threshold: 0.4 }),
+    [allNotes],
   );
 
   const recentNotes = useMemo(() => {
-    return [...notes]
+    return [...allNotes]
       .sort((a, b) => {
         return (
           new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
         );
       })
       .slice(0, 5);
-  }, [notes]);
+  }, [allNotes]);
 
   const visibleNotes = useMemo(() => {
     if (searchValue.trim() === "") {
@@ -65,42 +111,46 @@ export default function CommandMenu({ notes, isLoggedIn }: Props) {
       return recentNotes;
     }
     return searchResults;
-  }, [searchValue, fuse, recentNotes]);
+  }, [searchValue, fuse, recentNotes, allNotes]);
 
   const handleSearchChange = (value: string) => {
     setSearchValue(value);
   };
 
   const handleNewNote = async (title: string = "New Note") => {
-    setLoading(true);
-    if (!isLoggedIn) {
-      toast.warning("Not logged in", {
-        description: "Please login or sign up to create a new note.",
-      });
-      setLoading(false);
-      return;
-    }
-
-    toast.promise(
-      createNoteAction(title || "New Note") as Promise<{
-        noteId: string;
-        errorMessage: string | null;
-      }>,
-      {
+    startTransition(() => {
+      toast.promise(createNoteAction(title || "New Note"), {
         loading: "Creating note...",
-        success: (data) => {
-          if (data.noteId) {
-            router.push(`/note/${data.noteId}`);
+        success: async (data) => {
+          const { title, body, errorMessage } = await getDecryptedNoteAction(
+            data.note!.id,
+          );
+          if (errorMessage) {
+            throw new Error(errorMessage);
           }
-          setLoading(false);
-          return "Note created";
+          const note = {
+            ...data.note!,
+            title,
+            body,
+          };
+          setNoteCreated(note);
+          return {
+            message: "Note created",
+            description: "You can now view and edit your new note.",
+            action: {
+              label: "View Note",
+              onClick: () => router.push(`/note/${note.id}`),
+            },
+          };
         },
         error: (error) => {
-          setLoading(false);
-          return error.message;
+          return {
+            message: "Note creation failed",
+            description: error.message,
+          };
         },
-      },
-    );
+      });
+    });
     toggleCommandOpen();
   };
 

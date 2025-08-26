@@ -79,12 +79,12 @@ export default async function RootLayout({
                 <AppSidebar notes={notes} user={userdb} isLoggedIn={!!user} />
                 <SidebarInset>
                   <main className="flex h-[calc(100svh-2rem)] w-full flex-col overflow-hidden">
-                    <FloatingActions notes={notes} isLoggedIn={!!user} />
+                    <FloatingActions />
                     <DarkModeToggle />
                     <div className="min-h-0 flex-1 overflow-auto">
                       {children}
                     </div>
-                    <CommandMenu notes={notes} isLoggedIn={!!user} />
+                    <CommandMenu notes={notes} />
                   </main>
                 </SidebarInset>
               </SidebarProvider>

@@ -2,9 +2,13 @@ import { Button } from "@/components/ui/button";
 import { FileX, Home } from "lucide-react";
 import Link from "next/link";
 
-export default function NotFound() {
+type Props = {
+  isLoggedIn: boolean;
+};
+
+export default function NotFound({ isLoggedIn = false }: Props) {
   return (
-    <div className="bg-background flex min-h-screen items-center justify-center">
+    <div className="bg-background flex min-h-full items-center justify-center">
       <div className="mx-auto max-w-md text-center">
         <div className="mb-6">
           <FileX className="text-muted-foreground mx-auto h-16 w-16" />
@@ -23,11 +27,13 @@ export default function NotFound() {
               Back to Home
             </Link>
           </Button>
-          <Button variant="outline" asChild>
-            <Link className="max-sm:w-50" href="/login">
-              Sign In
-            </Link>
-          </Button>
+          {!isLoggedIn && (
+            <Button variant="outline" asChild>
+              <Link className="max-sm:w-50" href="/login">
+                Sign In
+              </Link>
+            </Button>
+          )}
         </div>
       </div>
     </div>

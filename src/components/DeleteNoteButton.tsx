@@ -1,7 +1,7 @@
 import { deleteNoteAction } from "@/actions/notes";
 import { Trash } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useState, useTransition } from "react";
 import { toast } from "sonner";
 import {
   AlertDialog,
@@ -22,7 +22,7 @@ type Props = {
   currentNoteId: string;
   onDeleted?: (deletedId: string) => void;
   type?: "sidebar" | "context-menu";
-  onDisable?: (disabledId: string | null) => void;
+  onDisable?: (disabledId: string, disabled: boolean) => void;
 };
 
 function DeleteNoteButton({
@@ -34,6 +34,7 @@ function DeleteNoteButton({
   onDisable,
 }: Props) {
   const [open, setOpen] = useState(false);
+  const [isPending, startTransition] = useTransition();
   const router = useRouter();
 
   const handleDeleteNote = async (
@@ -42,18 +43,36 @@ function DeleteNoteButton({
   ) => {
     e.stopPropagation();
     e.preventDefault();
-    onDisable?.(noteId);
-    toast.promise(deleteNoteAction(noteId), {
-      loading: "Deleting note...",
-      success: () => {
-        onDeleted?.(noteId);
-        onDisable?.(null);
-        if (noteId === currentNoteId) {
-          router.replace("/");
+    onDisable?.(noteId, true);
+    startTransition(() => {
+      const promise = new Promise(async (resolve, reject) => {
+        const result = await deleteNoteAction(noteId);
+        if (result.errorMessage) {
+          reject(new Error(result.errorMessage));
+        } else {
+          resolve(result);
         }
-        return "Note deleted successfully";
-      },
-      error: (error) => error.message,
+      });
+      toast.promise(promise, {
+        loading: "Deleting note...",
+        success: () => {
+          onDeleted?.(noteId);
+          if (noteId === currentNoteId) {
+            router.replace("/");
+          }
+          onDisable?.(noteId, false);
+          return {
+            message: "Note deleted",
+            description: "You have successfully deleted your note.",
+          };
+        },
+        error: (error) => {
+          return {
+            message: "Note deletion failed",
+            description: "An error occurred while deleting the note.",
+          };
+        },
+      });
     });
     setOpen(false);
   };

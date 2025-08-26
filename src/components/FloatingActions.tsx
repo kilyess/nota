@@ -1,27 +1,24 @@
 "use client";
 
-import { createNoteAction } from "@/actions/notes";
+import { createNoteAction, getDecryptedNoteAction } from "@/actions/notes";
 import { Button } from "@/components/ui/button";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import useCommandState from "@/hooks/use-command-state";
+import useNote from "@/hooks/use-note";
 import { Note } from "@prisma/client";
 import clsx from "clsx";
 import { PlusIcon, SearchIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useTransition } from "react";
 import { toast } from "sonner";
 
-type Props = {
-  notes: Note[];
-  isLoggedIn: boolean;
-};
-
-export default function FloatingActions({ notes, isLoggedIn }: Props) {
+export default function FloatingActions() {
   const [open, setOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const { setCommandOpen } = useCommandState();
-  const [loading, setLoading] = useState(false);
   const router = useRouter();
+  const { setNoteCreated } = useNote();
+  const [isPending, startTransition] = useTransition();
 
   useEffect(() => {
     const checkMobile = () => {
@@ -47,35 +44,51 @@ export default function FloatingActions({ notes, isLoggedIn }: Props) {
   };
 
   const handleNewNote = async () => {
-    setLoading(true);
-    if (!isLoggedIn) {
-      toast.warning("Not logged in", {
-        description: "Please login or sign up to create a new note.",
-      });
-      setLoading(false);
-      return;
-    }
-
-    toast.promise(
-      createNoteAction("New Note") as Promise<{
-        noteId: string;
+    startTransition(async () => {
+      const promise = new Promise<{
+        note: Note | null;
         errorMessage: string | null;
-      }>,
-      {
-        loading: "Creating note...",
-        success: (data) => {
-          if (data.noteId) {
-            router.push(`/note/${data.noteId}`);
+      }>(async (resolve, reject) => {
+        const result = await createNoteAction();
+        if (result.errorMessage) {
+          reject(new Error(result.errorMessage));
+        } else {
+          resolve(result);
+        }
+      });
+
+      toast.promise(promise, {
+        loading: "Creating new note...",
+        success: async (data) => {
+          const { title, body, errorMessage } = await getDecryptedNoteAction(
+            data.note!.id,
+          );
+          if (errorMessage) {
+            throw new Error(errorMessage);
           }
-          setLoading(false);
-          return "Note created";
+          const note = {
+            ...data.note!,
+            title,
+            body,
+          };
+          setNoteCreated(note);
+          return {
+            message: "Note created",
+            description: "You can now view and edit your new note.",
+            action: {
+              label: "View Note",
+              onClick: () => router.push(`/note/${note.id}`),
+            },
+          };
         },
         error: (error) => {
-          setLoading(false);
-          return error.message;
+          return {
+            message: "Note creation failed",
+            description: error.message,
+          };
         },
-      },
-    );
+      });
+    });
   };
 
   return (
@@ -125,7 +138,7 @@ export default function FloatingActions({ notes, isLoggedIn }: Props) {
           style={{ transitionDelay: open ? "150ms" : "0ms" }}
         >
           <Button
-            disabled={loading}
+            disabled={isPending}
             onClick={() => handleNewNote()}
             variant="ghost"
             size="sm"
