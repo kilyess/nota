@@ -142,7 +142,7 @@ function AskAIButton({ user, type }: Props) {
           </Button>
         )}
       </DialogTrigger>
-      <DialogContent className="flex h-[75vh] !max-w-4xl flex-col">
+      <DialogContent className="flex h-[75vh] !max-w-4xl flex-col max-sm:!max-w-sm">
         <DialogHeader>
           <DialogTitle className="font-bold">
             Ask AI about your notes

@@ -1,48 +1,57 @@
 "use client";
 
 import { logOutAction } from "@/actions/users";
-import { Loader2, LogOut } from "lucide-react";
+import { LogOut } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useTransition } from "react";
 import { toast } from "sonner";
+import { Button } from "./ui/button";
 
 function LogOutButton() {
-  const [loading, setLoading] = useState(false);
+  const [isPending, startTransition] = useTransition();
   const router = useRouter();
 
   const handleLogOut = async () => {
-    setLoading(true);
-
-    const { errorMessage } = await logOutAction();
-
-    if (!errorMessage) {
-      toast.success("Logged Out", {
-        description: "You have been succesfully logged out.",
+    startTransition(() => {
+      const promise = new Promise<{
+        errorMessage: string | null;
+      }>(async (resolve, reject) => {
+        const result = await logOutAction();
+        if (result.errorMessage) {
+          reject(new Error(result.errorMessage));
+        } else {
+          resolve(result);
+        }
       });
-      router.push("/");
-    } else {
-      toast.error("Error", {
-        description: errorMessage,
-      });
-    }
 
-    setLoading(false);
+      toast.promise(promise, {
+        loading: "Logging out...",
+        success: () => {
+          router.replace("/login");
+          return {
+            message: "Logged out",
+            description: "You have been succesfully logged out.",
+          };
+        },
+        error: (error) => {
+          return {
+            message: "Logout failed",
+            description: error.message,
+          };
+        },
+      });
+    });
   };
 
   return (
-    <div
-      className="inline-flex w-full items-center gap-2"
+    <Button
+      variant="ghost"
+      className="size-7"
       onClick={handleLogOut}
+      disabled={isPending}
     >
-      {loading ? (
-        <Loader2 className="animate-spin" />
-      ) : (
-        <>
-          <LogOut />
-          Log out
-        </>
-      )}
-    </div>
+      <LogOut className="size-4" />
+    </Button>
   );
 }
 

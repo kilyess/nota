@@ -13,7 +13,7 @@ export const handleError = (error: unknown) => {
 
   if (match && match[1]) {
     return {
-      errorMessage: match[1],
+      errorMessage: errorString,
     };
   }
   if (error instanceof Error) {

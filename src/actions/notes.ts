@@ -112,6 +112,24 @@ export const deleteNoteAction = async (noteId: string) => {
   }
 };
 
+export const deleteSelectedNotesAction = async (noteIds: string[]) => {
+  try {
+    const user = await getUser();
+
+    if (!user) {
+      throw new Error("Please login or sign up to delete notes");
+    }
+
+    await prisma.note.deleteMany({
+      where: { id: { in: noteIds }, authorId: user.id },
+    });
+
+    return { errorMessage: null };
+  } catch (error) {
+    return handleError(error);
+  }
+};
+
 export const togglePinNoteAction = async (noteId: string, pinned: boolean) => {
   try {
     const user = await getUser();

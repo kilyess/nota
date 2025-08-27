@@ -125,7 +125,7 @@ function NoteEditor({ id, title, content, user }: Props) {
   });
 
   return (
-    <>
+    <div className="flex flex-col items-center justify-center">
       <Button
         size="icon"
         variant="ghost"
@@ -137,9 +137,9 @@ function NoteEditor({ id, title, content, user }: Props) {
           <CloudCheck className="size-5" />
         )}
       </Button>
-      <div className="animate-in fade-in-50 zoom-in-95 relative mx-auto flex w-full max-w-[50vw] flex-col items-center justify-center gap-5 pt-30 max-sm:max-w-[90vw]">
+      <div className="animate-in fade-in-50 zoom-in-95 relative flex w-full max-w-[55vw] flex-col items-center justify-center gap-5 pt-30 max-md:max-w-[90vw] max-sm:max-w-[90vw]">
         <Input
-          className="placeholder:!text-muted-foreground/50 !h-auto !min-h-0 w-full border-none !bg-transparent !text-5xl font-semibold placeholder:select-none focus:!ring-0"
+          className="placeholder:!text-muted-foreground/50 !h-auto !min-h-0 w-full border-none !bg-transparent !text-5xl font-semibold placeholder:select-none focus:!ring-0 max-md:!text-4xl max-sm:!text-3xl lg:!text-5xl"
           placeholder="New Note"
           value={noteTitle}
           onChange={(e) => {
@@ -156,7 +156,7 @@ function NoteEditor({ id, title, content, user }: Props) {
           />
         </div>
       </div>
-    </>
+    </div>
   );
 }
 

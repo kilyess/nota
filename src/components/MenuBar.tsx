@@ -25,6 +25,7 @@ import {
 import { useEffect, useRef, useState } from "react";
 import AskAIButton from "./AskAIButton";
 import { LinkPopover } from "./LinkPopover";
+import { Separator } from "./ui/separator";
 import { Toggle } from "./ui/toggle";
 
 type Props = {
@@ -225,13 +226,6 @@ const MenuBar = ({ editor, user }: Props) => {
     },
   ];
 
-  const Separator = () => (
-    <span
-      className="bg-border mx-1 inline-block h-6 w-px align-middle max-sm:hidden"
-      aria-hidden="true"
-    />
-  );
-
   return (
     <div className="bg-background border-accent sticky top-0 z-50 flex gap-1 border-b px-2 py-2">
       <div className="relative flex min-w-0 flex-1">
@@ -249,7 +243,7 @@ const MenuBar = ({ editor, user }: Props) => {
               {option.icon}
             </Toggle>
           ))}
-          <Separator />
+          <Separator orientation="vertical" className="mx-1 !h-6" />
           {formattingOptions.map((option) => (
             <Toggle
               key={option.name}
@@ -260,7 +254,7 @@ const MenuBar = ({ editor, user }: Props) => {
               {option.icon}
             </Toggle>
           ))}
-          <Separator />
+          <Separator orientation="vertical" className="mx-1 !h-6" />
           {blockOptions.map((option) => (
             <Toggle
               key={option.name}
@@ -272,7 +266,7 @@ const MenuBar = ({ editor, user }: Props) => {
             </Toggle>
           ))}
           <LinkPopover editor={editor} />
-          <Separator />
+          <Separator orientation="vertical" className="mx-1 !h-6" />
           {listOptions.map((option) => (
             <Toggle
               key={option.name}
@@ -283,7 +277,7 @@ const MenuBar = ({ editor, user }: Props) => {
               {option.icon}
             </Toggle>
           ))}
-          <Separator />
+          <Separator orientation="vertical" className="mx-1 !h-6" />
           {alignOptions.map((option) => (
             <Toggle
               key={option.name}

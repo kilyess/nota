@@ -104,6 +104,12 @@ function AppSidebar({
     setNoteDeleted(deletedId);
   };
 
+  const handleSelectedNotesDeleted = (selectedNotes: string[]) => {
+    selectedNotes.forEach((noteId) => {
+      setNoteDeleted(noteId);
+    });
+  };
+
   const handleNotePinned = useCallback(
     async (noteId: string, newPinnedState: boolean) => {
       const originalNotes = allNotes;
@@ -170,7 +176,11 @@ function AppSidebar({
       </SidebarContent>
       <SidebarFooter>
         {isLoggedIn ? (
-          <NavUser user={user as User} />
+          <NavUser
+            user={user as User}
+            notes={allNotes}
+            onSelectedNotesDeleted={handleSelectedNotesDeleted}
+          />
         ) : (
           <>
             <Button asChild>

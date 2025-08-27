@@ -181,7 +181,7 @@ export default function CommandMenu({ notes: initialNotes }: Props) {
               key={note.id}
               asChild
             >
-              <Link href={`/note/${note.id}`}> {note.title}</Link>
+              <Link href={`/note/${note.id}`}> {note.title || "New Note"}</Link>
             </CommandItem>
           ))}
         </CommandGroup>
