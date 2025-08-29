@@ -7,6 +7,7 @@ import {
   getDecryptedApiKeyAction,
   updateApiKeyAction,
   updateAvatarAction,
+  updatePasswordAction,
   updateUserAction,
 } from "@/actions/users";
 import {
@@ -44,6 +45,7 @@ import {
   Check,
   Key,
   KeyRound,
+  Lock,
   Mail,
   Settings2,
   Trash2,
@@ -55,6 +57,7 @@ import {
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { toast } from "sonner";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 
 type Props = {
@@ -71,6 +74,8 @@ export default function SettingsDialog({ user, notes, onUpdate }: Props) {
   const [firstName, setFirstName] = useState(user?.firstName || "");
   const [lastName, setLastName] = useState(user?.lastName || "");
   const [avatar, setAvatar] = useState(user?.avatar || null);
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const { apiKey, setApiKey } = useApiKey();
   const [apiKeySaved, setApiKeySaved] = useState<boolean>(false);
   const [selectedNotes, setSelectedNotes] = useState<string[]>([]);
@@ -89,6 +94,8 @@ export default function SettingsDialog({ user, notes, onUpdate }: Props) {
     useActionHandler(updateAvatarAction);
   const { handler: deleteAvatar, isPending: isDeletingAvatar } =
     useActionHandler(deleteAvatarAction);
+  const { handler: updatePassword, isPending: isUpdatingPassword } =
+    useActionHandler(updatePasswordAction);
   const { setNotes } = useNote();
   const router = useRouter();
 
@@ -114,6 +121,22 @@ export default function SettingsDialog({ user, notes, onUpdate }: Props) {
       },
       firstName,
       lastName,
+    );
+  };
+
+  const handleUpdatePassword = async () => {
+    if (password !== confirmPassword) {
+      toast.error("Passwords do not match");
+      return;
+    }
+    updatePassword(
+      {
+        loadingMessage: "Updating password...",
+        successMessage: "Password updated successfully",
+        successDescription: "Your password has been updated successfully.",
+        errorMessage: "Failed to update password",
+      },
+      password,
     );
   };
 
@@ -270,10 +293,14 @@ export default function SettingsDialog({ user, notes, onUpdate }: Props) {
         </DialogHeader>
 
         <Tabs defaultValue="profile" className="w-full">
-          <TabsList className="mx-auto grid w-[85%] grid-cols-4">
+          <TabsList className="mx-auto grid w-full grid-cols-5">
             <TabsTrigger value="profile">
               <UserCog className="size-4 max-sm:mr-0" />
               <span className="sr-only pb-0.5 md:not-sr-only">Profile</span>
+            </TabsTrigger>
+            <TabsTrigger value="password">
+              <Lock className="size-4 max-sm:mr-0" />
+              <span className="sr-only pb-0.5 md:not-sr-only">Password</span>
             </TabsTrigger>
             <TabsTrigger value="integrations">
               <KeyRound className="size-4 max-sm:mr-0" />
@@ -371,6 +398,50 @@ export default function SettingsDialog({ user, notes, onUpdate }: Props) {
                   }
                 >
                   Save Profile
+                </Button>
+              </div>
+            </div>
+          </TabsContent>
+
+          <TabsContent className="mt-2" value="password">
+            <div className="flex w-full items-center justify-center">
+              <div className="flex w-[80%] flex-col items-center gap-4">
+                <div className="flex items-center gap-2 font-semibold">
+                  <Lock className="size-5" />
+                  <span className="pb-0.5">Change Password</span>
+                </div>
+                <div className="flex w-full flex-col gap-4">
+                  <div className="flex flex-col gap-2">
+                    <Label htmlFor="password">New Password</Label>
+                    <Input
+                      type="password"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      placeholder="Enter new password"
+                      disabled={isUpdatingPassword}
+                    />
+                  </div>
+                  <div className="flex flex-col gap-2">
+                    <Label htmlFor="confirmPassword">Confirm Password</Label>
+                    <Input
+                      type="password"
+                      value={confirmPassword}
+                      onChange={(e) => setConfirmPassword(e.target.value)}
+                      placeholder="Confirm new password"
+                      disabled={isUpdatingPassword}
+                    />
+                  </div>
+                </div>
+                <Button
+                  onClick={handleUpdatePassword}
+                  className="w-[50%]"
+                  disabled={
+                    isUpdatingPassword ||
+                    password.length === 0 ||
+                    confirmPassword.length === 0
+                  }
+                >
+                  Save Password
                 </Button>
               </div>
             </div>

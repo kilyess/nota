@@ -133,7 +133,7 @@ function AuthForm({ type }: Props) {
             <div className="flex items-center" hidden={!isLoginForm}>
               <Label htmlFor="password">Password</Label>
               <a
-                href="#"
+                href="/forgot-password"
                 className="ml-auto inline-block text-sm underline-offset-4 hover:underline"
               >
                 Forgot your password?

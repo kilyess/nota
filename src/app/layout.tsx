@@ -14,7 +14,7 @@ import "@/styles/globals.css";
 import { getUser } from "@/utils/supabase/server";
 import { Note, User } from "@prisma/client";
 import type { Metadata } from "next";
-import { JetBrains_Mono } from "next/font/google";
+import { JetBrains_Mono, Noto_Sans_Arabic } from "next/font/google";
 import localFont from "next/font/local";
 
 const proxima = localFont({
@@ -26,6 +26,13 @@ const jetbrains = JetBrains_Mono({
   subsets: ["latin"],
   variable: "--font-mono",
   weight: ["100", "200", "300", "400", "500", "600", "700", "800"],
+  display: "swap",
+});
+
+const notoSans = Noto_Sans_Arabic({
+  subsets: ["arabic", "latin"],
+  variable: "--font-noto",
+  weight: ["300", "400", "500", "700"],
   display: "swap",
 });
 
@@ -69,7 +76,7 @@ export default async function RootLayout({
   return (
     <html
       lang="en"
-      className={`${jetbrains.variable} ${proxima.variable}`}
+      className={`${jetbrains.variable} ${proxima.variable} ${notoSans.variable}`}
       suppressHydrationWarning
     >
       <body className="h-[calc(100svh-2rem)] overflow-hidden">

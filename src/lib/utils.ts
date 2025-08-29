@@ -8,14 +8,23 @@ export function cn(...inputs: ClassValue[]) {
 export const handleError = (error: unknown) => {
   const errorString = String(error);
 
-  const detailRegex = /detail: Some\("([^"]+)"\)/;
+  const detailRegex = /message: "([^"]+)"/;
   const match = errorString.match(detailRegex);
+  const message = match && match[1] ? match[1] : undefined;
 
-  if (match && match[1]) {
+  if (message) {
     return {
-      errorMessage: errorString,
+      errorMessage: message,
     };
   }
+
+  if (errorString.includes("Database error saving new user")) {
+    return {
+      errorMessage:
+        "We've reached the daily signup limit, or signup is currently disabled. Please try again later.",
+    };
+  }
+
   if (error instanceof Error) {
     return { errorMessage: error.message };
   } else {

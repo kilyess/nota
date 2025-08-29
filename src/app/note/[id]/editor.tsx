@@ -18,6 +18,7 @@ import Highlight from "@tiptap/extension-highlight";
 import { TaskItem, TaskList } from "@tiptap/extension-list";
 import Placeholder from "@tiptap/extension-placeholder";
 import TextAlign from "@tiptap/extension-text-align";
+import { CharacterCount } from "@tiptap/extensions";
 import { EditorContent, useEditor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import { CloudCheck, Loader2 } from "lucide-react";
@@ -75,6 +76,9 @@ const extensions = [
   }),
   TaskList,
   TaskItem,
+  CharacterCount.configure({
+    limit: 10000,
+  }),
 ];
 
 type Props = {
@@ -174,6 +178,16 @@ function NoteEditor({ id, title, content, user }: Props) {
         />
         <div className="flex w-full flex-col gap-4 self-stretch">
           <MenuBar editor={editor} user={user} />
+          <div
+            className={`pointer-events-none absolute right-0 bottom-2 w-full px-2 text-right text-sm ${
+              editor?.storage.characterCount.characters() === 10000
+                ? "text-red-500"
+                : ""
+            }`}
+            style={{ zIndex: 10 }}
+          >
+            {editor?.storage.characterCount.characters()} / 10000
+          </div>
           <EditorContent
             editor={editor}
             className="w-full flex-1 px-2 sm:px-0"

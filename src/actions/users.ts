@@ -68,6 +68,55 @@ export const signUpAction = async (
   }
 };
 
+export const sendResetPasswordEmailAction = async (email: string) => {
+  try {
+    const { auth } = await createClient();
+
+    const { data, error } = await auth.resetPasswordForEmail(email, {
+      redirectTo: `${process.env.NEXT_PUBLIC_BASE_URL}/reset-password`,
+    });
+
+    if (error) throw error;
+
+    return { errorMessage: null };
+  } catch (error) {
+    return handleError(error);
+  }
+};
+
+export const resetPasswordAction = async (password: string) => {
+  try {
+    const { auth } = await createClient();
+
+    const { error } = await auth.updateUser({ password });
+
+    if (error) throw error;
+
+    return { errorMessage: null };
+  } catch (error) {
+    return handleError(error);
+  }
+};
+
+export const updatePasswordAction = async (password: string) => {
+  try {
+    const user = await getUser();
+
+    if (!user)
+      throw new Error("Please login or sign up to update your password");
+
+    const { auth } = await createClient();
+
+    const { error } = await auth.updateUser({ password, email: user.email });
+
+    if (error) throw error;
+
+    return { errorMessage: null };
+  } catch (error) {
+    return handleError(error);
+  }
+};
+
 export const deleteAccountAction = async () => {
   try {
     const { auth, storage } = await createAdminClient();
@@ -143,8 +192,14 @@ export const uploadAvatarAction = async (formData: FormData) => {
 
     const filePath = `${user.id}.${fileExtension}`;
 
+    const { data: existingAvatar, error: existingAvatarError } = await storage
+      .from("avatars")
+      .list("", { search: user.id });
+    if (existingAvatarError) throw existingAvatarError;
+    if (existingAvatar?.length > 0)
+      await storage.from("avatars").remove([existingAvatar[0].name]);
+
     const { error } = await storage.from("avatars").upload(filePath, avatar, {
-      upsert: true,
       cacheControl: "0",
     });
 
