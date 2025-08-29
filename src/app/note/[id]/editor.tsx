@@ -50,7 +50,6 @@ const extensions = [
       },
     },
     link: {
-      openOnClick: false,
       HTMLAttributes: {
         class:
           "text-ring hover:!underline hover:text-ring/80 cursor-pointer !no-underline",
@@ -140,6 +139,7 @@ function NoteEditor({ id, title, content, user }: Props) {
     onUpdate: ({ editor }) => {
       forceUpdate((prev) => prev + 1);
       debouncedSave(noteTitle, editor.getHTML());
+      console.log(editor.getHTML());
     },
   });
 

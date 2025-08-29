@@ -62,6 +62,91 @@ export const signUpAction = async (
       },
     });
 
+    const content = `
+      <h1>Welcome to nota! 🎉</h1>
+      <p>
+        We're excited to have you here. <strong>nota</strong> is your new AI-powered note-taking companion, designed to help you organize your thoughts and get instant answers from your notes. Here’s what you can do on the platform:
+      </p>
+      <h2>Features</h2>
+      <ul class="list-disc">
+        <li class="list-item">
+          <p><strong>AI Assistant:</strong> Ask anything about your notes and get smart, instant responses.</p>
+        </li>
+        <li class="list-item">
+          <p><strong>Super User-Friendly:</strong> Experience a seamless, distraction-free interface inspired by the best in chat design.</p>
+        </li>
+        <li class="list-item">
+          <p><strong>Organize Effortlessly:</strong> Create, edit, and manage your notes with ease.</p>
+        </li>
+        <li class="list-item">
+          <p><strong>Modern Design:</strong> Enjoy a clean and intuitive look thanks to shadcn/ui.</p>
+        </li>
+      </ul>
+      <h2>Get Creative</h2>
+      <p>
+        Whether you’re jotting down ideas, planning your day, or storing important information, <strong>nota</strong> makes the process simple and enjoyable. Experiment, explore, and make your workspace truly yours!
+      </p>
+      <h2>Have Fun! 🚀</h2>
+      <p>
+        This platform is built to empower you, so dive in and discover how easy note-taking can be.
+      </p>
+      <hr>
+      <h2>Connect with Me</h2>
+      <ul class="list-disc">
+        <li class="list-item">
+          <p>
+            <strong>Github:</strong>
+            <a
+              target="_blank"
+              rel="noopener noreferrer nofollow"
+              class="text-ring hover:!underline hover:text-ring/80 cursor-pointer !no-underline"
+              href="https://github.com/kilyess"
+            >kilyess</a>
+          </p>
+        </li>
+        <li class="list-item">
+          <p>
+            <strong>Linkedin:</strong>
+            <a
+              target="_blank"
+              rel="noopener noreferrer nofollow"
+              class="text-ring hover:!underline hover:text-ring/80 cursor-pointer !no-underline"
+              href="https://linkedin.com/in/ilyass-krichi"
+            >Ilyass Krichi</a>
+          </p>
+        </li>
+        <li class="list-item">
+          <p>
+            <strong>Email:</strong>
+            <a
+              target="_blank"
+              rel="noopener noreferrer nofollow"
+              class="text-ring hover:!underline hover:text-ring/80 cursor-pointer !no-underline"
+              href="mailto:personal.ilyasskrichi@gmail.com"
+            >personal.ilyasskrichi@gmail.com</a>
+          </p>
+        </li>
+      </ul>
+      <p>
+        If you have any feedback or want to say hello, feel free to reach out on any of the above!
+      </p>
+      <p>Happy note-taking!</p>
+    `;
+
+    const encryptedTitle = await encryptString("Welcome!");
+    const encryptedContent = await encryptString(content);
+
+    await prisma.note.create({
+      data: {
+        id: userId,
+        title: encryptedTitle,
+        body: encryptedContent,
+        authorId: userId,
+        pinned: true,
+        createdAt: new Date(),
+      },
+    });
+
     return { errorMessage: null };
   } catch (error) {
     return handleError(error);
