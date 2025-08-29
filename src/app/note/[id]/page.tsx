@@ -4,7 +4,7 @@ import { getUser } from "@/utils/supabase/server";
 import NoteEditor from "./editor";
 
 type Props = {
-  params: { id: string };
+  params: { id: string } | Promise<{ id: string }>;
 };
 
 async function NotePage({ params }: Props) {
