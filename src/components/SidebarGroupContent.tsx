@@ -1,5 +1,6 @@
 "use client";
 
+import { useGroupedNotes } from "@/hooks/use-grouped-notes";
 import useNote from "@/hooks/use-note";
 import { Note } from "@prisma/client";
 import { ChevronDown, Pin, PinOff } from "lucide-react";
@@ -20,24 +21,16 @@ import {
 } from "./ui/sidebar";
 
 type Props = {
-  groupedNotes: { [label: string]: Note[] };
-  onDeleted: (id: string) => void;
-  onPinned: (id: string, newPinnedState: boolean) => void;
+  notes: Note[];
   showTopFade: boolean;
   showBottomFade: boolean;
 };
 
-function SidebarGroupContent({
-  groupedNotes,
-  onDeleted,
-  onPinned,
-  showTopFade,
-  showBottomFade,
-}: Props) {
+function SidebarGroupContent({ notes, showTopFade, showBottomFade }: Props) {
   const { id: currentNoteId } = useParams();
   const [pinnedCollapsed, setPinnedCollapsed] = useState(false);
   const [disabledNoteId, setDisabledNoteId] = useState<string[]>([]);
-  const { noteTitle } = useNote();
+  const { noteTitle, updateNote } = useNote();
 
   const handlePinClick = (
     e: React.MouseEvent<HTMLDivElement | HTMLButtonElement>,
@@ -45,7 +38,7 @@ function SidebarGroupContent({
   ) => {
     e.stopPropagation();
     e.preventDefault();
-    onPinned(note.id, !note.pinned);
+    updateNote({ ...note, pinned: !note.pinned });
   };
 
   const handleDisableNote = (noteId: string, disabled: boolean) => {
@@ -55,6 +48,8 @@ function SidebarGroupContent({
       setDisabledNoteId((prev) => prev.filter((id) => id !== noteId));
     }
   };
+
+  const groupedNotes = useGroupedNotes(notes);
 
   return (
     <div className="relative">
@@ -122,7 +117,6 @@ function SidebarGroupContent({
                             noteId={note.id}
                             currentNoteId={currentNoteId as string}
                             noteTitle={note.title}
-                            onDeleted={onDeleted}
                             onDisable={handleDisableNote}
                           />
                         </div>
@@ -142,7 +136,6 @@ function SidebarGroupContent({
                           noteId={note.id}
                           currentNoteId={currentNoteId as string}
                           noteTitle={note.title}
-                          onDeleted={onDeleted}
                           type="context-menu"
                           onDisable={handleDisableNote}
                         />

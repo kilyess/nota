@@ -126,7 +126,7 @@ export const getDecryptedApiKeyAction = async () => {
   }
 };
 
-export const uploadAvatarAction = async (avatar: File) => {
+export const uploadAvatarAction = async (formData: FormData) => {
   try {
     const { storage } = await createClient();
 
@@ -134,16 +134,23 @@ export const uploadAvatarAction = async (avatar: File) => {
 
     if (!user) throw new Error("Please login or sign up to upload an avatar");
 
+    const avatar = formData.get("avatar") as File;
+
     if (avatar.size >= 1024 * 1024 * 2)
       throw new Error("Avatar size must be less or equal to 2MB");
 
-    const { error } = await storage.from("avatars").upload(user.id, avatar, {
+    const fileExtension = avatar.name.split(".").pop();
+
+    const filePath = `${user.id}.${fileExtension}`;
+
+    const { error } = await storage.from("avatars").upload(filePath, avatar, {
       upsert: true,
+      cacheControl: "0",
     });
 
     if (error) throw error;
 
-    const avatarUrl = storage.from("avatars").getPublicUrl(user.id)
+    const avatarUrl = storage.from("avatars").getPublicUrl(filePath)
       .data.publicUrl;
 
     return { errorMessage: null, avatarUrl };
@@ -153,7 +160,37 @@ export const uploadAvatarAction = async (avatar: File) => {
   }
 };
 
-export const deleteAvatarAction = async () => {
+export const updateAvatarAction = async (formData: FormData) => {
+  try {
+    const user = await getUser();
+
+    if (!user) throw new Error("Please login or sign up to update your avatar");
+
+    let newAvatarUrl: string | null = null;
+
+    const avatar = formData.get("avatar") as File | null;
+
+    if (avatar) {
+      const { errorMessage, avatarUrl } = await uploadAvatarAction(formData);
+      if (errorMessage) throw new Error(errorMessage);
+      newAvatarUrl = `${avatarUrl}?t=${new Date().getTime()}`;
+    }
+
+    await prisma.user.update({
+      where: { id: user.id },
+      data: {
+        avatar: newAvatarUrl || "",
+      },
+    });
+
+    return { errorMessage: null, avatarUrl: newAvatarUrl };
+  } catch (error) {
+    const { errorMessage } = handleError(error);
+    return { errorMessage, avatarUrl: null };
+  }
+};
+
+export const deleteAvatarAction = async (url: string) => {
   try {
     const { storage } = await createClient();
 
@@ -161,7 +198,7 @@ export const deleteAvatarAction = async () => {
 
     if (!user) throw new Error("Please login or sign up to delete your avatar");
 
-    const { error } = await storage.from("avatars").remove([user.id]);
+    const { error } = await storage.from("avatars").remove([url]);
 
     if (error) throw error;
 
@@ -248,33 +285,5 @@ export const updateApiKeyAction = async (apiKey: string) => {
   } catch (error) {
     const { errorMessage } = handleError(error);
     return { errorMessage };
-  }
-};
-
-export const updateAvatarAction = async (avatar: File | null) => {
-  try {
-    const user = await getUser();
-
-    if (!user) throw new Error("Please login or sign up to update your avatar");
-
-    let newAvatarUrl: string | null = null;
-
-    if (avatar) {
-      const { errorMessage, avatarUrl } = await uploadAvatarAction(avatar);
-      if (errorMessage) throw new Error(errorMessage);
-      newAvatarUrl = avatarUrl;
-    }
-
-    await prisma.user.update({
-      where: { id: user.id },
-      data: {
-        avatar: newAvatarUrl || "",
-      },
-    });
-
-    return { errorMessage: null, avatarUrl: newAvatarUrl };
-  } catch (error) {
-    const { errorMessage } = handleError(error);
-    return { errorMessage, avatarUrl: null };
   }
 };

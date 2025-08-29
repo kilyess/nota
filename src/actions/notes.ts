@@ -152,6 +152,7 @@ export const togglePinNoteAction = async (noteId: string, pinned: boolean) => {
 export const askAIAboutNotesAction = async (
   questions: string[],
   responses: string[],
+  apiKey: string,
 ) => {
   const user = await getUser();
 
@@ -230,7 +231,7 @@ export const askAIAboutNotesAction = async (
     }
   }
 
-  const completion = await openai.chat.completions.create({
+  const completion = await openai(apiKey).chat.completions.create({
     model: "gpt-4o-mini",
     messages,
   });

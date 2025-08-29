@@ -1,46 +1,57 @@
 "use client";
 
 import { Note } from "@prisma/client";
-import { createContext, Dispatch, SetStateAction, useState } from "react";
+import { createContext, useState } from "react";
 
 type NoteProviderContextType = {
   noteTitle: string;
   setNoteTitle: (noteTitle: string) => void;
-  noteUpdated: boolean;
-  setNoteUpdated: (noteUpdated: boolean) => void;
-  noteCreated: Note | null;
-  setNoteCreated: (noteCreated: Note | null) => void;
-  noteDeleted: string | null;
-  setNoteDeleted: (noteDeleted: string | null) => void;
+  notes: Note[];
+  setNotes: (notes: Note[]) => void;
+  addNote: (note: Note) => void;
+  updateNote: (note: Note) => void;
+  deleteNote: (note: Note) => void;
 };
 
 export const NoteProviderContext = createContext<NoteProviderContextType>({
   noteTitle: "",
   setNoteTitle: () => {},
-  noteUpdated: false,
-  setNoteUpdated: () => {},
-  noteCreated: null,
-  setNoteCreated: () => {},
-  noteDeleted: null,
-  setNoteDeleted: () => {},
+  notes: [],
+  setNotes: () => {},
+  addNote: () => {},
+  updateNote: () => {},
+  deleteNote: () => {},
 });
 
 const NoteProvider = ({ children }: { children: React.ReactNode }) => {
   const [noteTitle, setNoteTitle] = useState<string>("");
-  const [noteUpdated, setNoteUpdated] = useState<boolean>(false);
-  const [noteCreated, setNoteCreated] = useState<Note | null>(null);
-  const [noteDeleted, setNoteDeleted] = useState<string | null>(null);
+  const [notes, setNotes] = useState<Note[]>([]);
+
+  const addNote = (note: Note) => {
+    setNotes([note, ...notes]);
+  };
+
+  const updateNote = (note: Note) => {
+    setNotes(
+      notes
+        .map((n) => (n.id === note.id ? note : n))
+        .sort((a, b) => b.updatedAt.getTime() - a.updatedAt.getTime()),
+    );
+  };
+
+  const deleteNote = (note: Note) => {
+    setNotes(notes.filter((n) => n.id !== note.id));
+  };
   return (
     <NoteProviderContext.Provider
       value={{
         noteTitle,
         setNoteTitle,
-        noteUpdated,
-        setNoteUpdated,
-        noteCreated,
-        setNoteCreated,
-        noteDeleted,
-        setNoteDeleted,
+        notes,
+        setNotes,
+        addNote,
+        updateNote,
+        deleteNote,
       }}
     >
       {children}

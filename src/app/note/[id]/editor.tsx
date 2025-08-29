@@ -5,20 +5,25 @@ import { CodeBlockExtension } from "@/components/extensions/CodeBlockExtension";
 import MenuBar from "@/components/MenuBar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import { useDebouncedCallback } from "@/hooks/use-debounced-callback";
 import useNote from "@/hooks/use-note";
+import { Note } from "@prisma/client";
 import { User } from "@supabase/supabase-js";
 import Highlight from "@tiptap/extension-highlight";
-import Italic from "@tiptap/extension-italic";
-import Link from "@tiptap/extension-link";
 import { TaskItem, TaskList } from "@tiptap/extension-list";
 import Placeholder from "@tiptap/extension-placeholder";
 import TextAlign from "@tiptap/extension-text-align";
 import { EditorContent, useEditor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
-import debounce from "lodash/debounce";
 import { CloudCheck, Loader2 } from "lucide-react";
 import { useParams } from "next/navigation";
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
+import { toast } from "sonner";
 
 const extensions = [
   StarterKit.configure({
@@ -43,6 +48,13 @@ const extensions = [
         class: "blockquote",
       },
     },
+    link: {
+      openOnClick: false,
+      HTMLAttributes: {
+        class:
+          "text-ring hover:!underline hover:text-ring/80 cursor-pointer !no-underline",
+      },
+    },
   }),
   CodeBlockExtension,
   Placeholder.configure({
@@ -61,18 +73,6 @@ const extensions = [
   Highlight.configure({
     multicolor: true,
   }),
-  Italic.configure({
-    HTMLAttributes: {
-      class: "italic",
-    },
-  }),
-  Link.configure({
-    openOnClick: false,
-    HTMLAttributes: {
-      class:
-        "text-ring hover:!underline hover:text-ring/80 cursor-pointer !no-underline",
-    },
-  }),
   TaskList,
   TaskItem,
 ];
@@ -87,7 +87,7 @@ type Props = {
 function NoteEditor({ id, title, content, user }: Props) {
   const { id: noteId } = useParams();
   const [, forceUpdate] = useState(0);
-  const { noteTitle, setNoteTitle, setNoteUpdated } = useNote();
+  const { noteTitle, setNoteTitle, updateNote, notes } = useNote();
   const [isSaving, setIsSaving] = useState(false);
 
   useEffect(() => {
@@ -96,14 +96,29 @@ function NoteEditor({ id, title, content, user }: Props) {
     }
   }, [id, noteId, title, setNoteTitle]);
 
-  const debouncedSave = useCallback(
-    debounce(async (title: string, body: string) => {
+  const debouncedSave = useDebouncedCallback(
+    async (title: string, body: string) => {
       setIsSaving(true);
-      await updateNoteAction(id, title, body);
-      setIsSaving(false);
-      setNoteUpdated(true);
-    }, 1000),
-    [id],
+      try {
+        const result = await updateNoteAction(id, title, body);
+        if (result.errorMessage) {
+          throw new Error(result.errorMessage);
+        }
+        const oldNote = notes.find((n) => n.id === id);
+        const updatedNote = {
+          ...(oldNote as Note),
+          title,
+          body,
+          updatedAt: new Date(),
+        };
+        updateNote(updatedNote);
+      } catch (error) {
+        toast.error("Failed to save note");
+      } finally {
+        setIsSaving(false);
+      }
+    },
+    1000,
   );
 
   const editor = useEditor({
@@ -126,17 +141,26 @@ function NoteEditor({ id, title, content, user }: Props) {
 
   return (
     <div className="flex flex-col items-center justify-center">
-      <Button
-        size="icon"
-        variant="ghost"
-        className="text-foreground pointer-events-none fixed top-4 right-13 flex cursor-default items-center gap-2 hover:!bg-transparent"
-      >
-        {isSaving ? (
-          <Loader2 className="size-5 animate-spin" />
-        ) : (
-          <CloudCheck className="size-5" />
-        )}
-      </Button>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <Button
+            size="icon"
+            variant="ghost"
+            className="text-foreground group pointer-events-auto fixed top-4 right-13 flex cursor-default items-center gap-2 hover:!bg-transparent"
+          >
+            {isSaving ? (
+              <Loader2 className="size-5 animate-spin" />
+            ) : (
+              <CloudCheck className="size-5" />
+            )}
+          </Button>
+        </TooltipTrigger>
+        <TooltipContent>
+          {notes.find((n) => n.id === id)?.updatedAt
+            ? `Last saved: ${notes.find((n) => n.id === id)?.updatedAt.toLocaleString()}`
+            : ""}
+        </TooltipContent>
+      </Tooltip>
       <div className="animate-in fade-in-50 zoom-in-95 relative flex w-full max-w-[55vw] flex-col items-center justify-center gap-5 pt-30 max-md:max-w-[90vw] max-sm:max-w-[90vw]">
         <Input
           className="placeholder:!text-muted-foreground/50 !h-auto !min-h-0 w-full border-none !bg-transparent !text-5xl font-semibold placeholder:select-none focus:!ring-0 max-md:!text-4xl max-sm:!text-3xl lg:!text-5xl"

@@ -17,7 +17,7 @@ export default function FloatingActions() {
   const [isMobile, setIsMobile] = useState(false);
   const { setCommandOpen } = useCommandState();
   const router = useRouter();
-  const { setNoteCreated } = useNote();
+  const { addNote } = useNote();
   const [isPending, startTransition] = useTransition();
 
   useEffect(() => {
@@ -71,7 +71,7 @@ export default function FloatingActions() {
             title,
             body,
           };
-          setNoteCreated(note);
+          addNote(note);
           return {
             message: "Note created",
             description: "You can now view and edit your new note.",

@@ -16,7 +16,7 @@ type Props = {
 function NewNoteButton({ type }: Props) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
-  const { setNoteCreated } = useNote();
+  const { addNote } = useNote();
   const handleNewNote = async () => {
     startTransition(() => {
       const promise = new Promise<{
@@ -45,7 +45,7 @@ function NewNoteButton({ type }: Props) {
             title,
             body,
           };
-          setNoteCreated(note);
+          addNote(note);
           return {
             message: "Note created",
             description: "You can now view and edit your new note.",

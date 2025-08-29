@@ -6,6 +6,7 @@ import FloatingActions from "@/components/FloatingActions";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 import { prisma } from "@/db/prisma";
 import { decryptString } from "@/lib/crypto";
+import { ApiKeyProvider } from "@/providers/ApiKeyProvider";
 import CommandProvider from "@/providers/CommandProvider";
 import NoteProvider from "@/providers/NoteProvider";
 import { ThemeProvider } from "@/providers/ThemeProvider";
@@ -75,19 +76,21 @@ export default async function RootLayout({
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
           <CommandProvider>
             <NoteProvider>
-              <SidebarProvider>
-                <AppSidebar notes={notes} user={userdb} isLoggedIn={!!user} />
-                <SidebarInset>
-                  <main className="flex h-[calc(100svh-2rem)] w-full flex-col overflow-hidden">
-                    <FloatingActions />
-                    <DarkModeToggle />
-                    <div className="min-h-0 flex-1 overflow-auto">
-                      {children}
-                    </div>
-                    <CommandMenu notes={notes} />
-                  </main>
-                </SidebarInset>
-              </SidebarProvider>
+              <ApiKeyProvider>
+                <SidebarProvider>
+                  <AppSidebar notes={notes} user={userdb} isLoggedIn={!!user} />
+                  <SidebarInset>
+                    <main className="flex h-[calc(100svh-2rem)] w-full flex-col overflow-hidden">
+                      <FloatingActions />
+                      <DarkModeToggle />
+                      <div className="min-h-0 flex-1 overflow-auto">
+                        {children}
+                      </div>
+                      <CommandMenu notes={notes} />
+                    </main>
+                  </SidebarInset>
+                </SidebarProvider>
+              </ApiKeyProvider>
               <AppToaster />
             </NoteProvider>
           </CommandProvider>

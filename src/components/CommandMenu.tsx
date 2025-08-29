@@ -7,7 +7,7 @@ import { Note } from "@prisma/client";
 import Fuse from "fuse.js";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
-import { useEffect, useMemo, useRef, useState, useTransition } from "react";
+import { useEffect, useMemo, useState, useTransition } from "react";
 import { toast } from "sonner";
 import {
   CommandDialog,
@@ -28,50 +28,11 @@ export default function CommandMenu({ notes: initialNotes }: Props) {
   const { commandOpen, toggleCommandOpen } = useCommandState();
   const router = useRouter();
 
-  const [allNotes, setAllNotes] = useState<Note[]>(initialNotes);
-  const {
-    noteUpdated,
-    setNoteUpdated,
-    noteTitle,
-    noteCreated,
-    setNoteCreated,
-    noteDeleted,
-    setNoteDeleted,
-  } = useNote();
+  const { notes, addNote, setNotes, noteTitle } = useNote();
 
   useEffect(() => {
-    setAllNotes(initialNotes);
+    setNotes(initialNotes);
   }, [initialNotes]);
-
-  useEffect(() => {
-    if (noteUpdated) {
-      setNoteUpdated(false);
-      setAllNotes((prev) =>
-        prev
-          .map((n) =>
-            n.id === noteId
-              ? { ...n, title: noteTitle, updatedAt: new Date() }
-              : n,
-          )
-          .sort((a, b) => b.updatedAt.getTime() - a.updatedAt.getTime()),
-      );
-    }
-    if (noteCreated) {
-      setAllNotes((prev) => [noteCreated, ...prev]);
-      setNoteCreated(null);
-    }
-    if (noteDeleted) {
-      setAllNotes((prev) => prev.filter((n) => n.id !== noteDeleted));
-      setNoteDeleted(null);
-    }
-  }, [
-    noteUpdated,
-    setNoteUpdated,
-    noteCreated,
-    setNoteCreated,
-    noteDeleted,
-    setNoteDeleted,
-  ]);
 
   useEffect(() => {
     const key = (e: KeyboardEvent) => {
@@ -87,19 +48,13 @@ export default function CommandMenu({ notes: initialNotes }: Props) {
   }, []);
 
   const fuse = useMemo(
-    () => new Fuse(allNotes, { keys: ["title"], threshold: 0.4 }),
-    [allNotes],
+    () => new Fuse(notes, { keys: ["title"], threshold: 0.4 }),
+    [notes],
   );
 
   const recentNotes = useMemo(() => {
-    return [...allNotes]
-      .sort((a, b) => {
-        return (
-          new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
-        );
-      })
-      .slice(0, 5);
-  }, [allNotes]);
+    return [...notes].slice(0, 5);
+  }, [notes]);
 
   const visibleNotes = useMemo(() => {
     if (searchValue.trim() === "") {
@@ -111,7 +66,7 @@ export default function CommandMenu({ notes: initialNotes }: Props) {
       return recentNotes;
     }
     return searchResults;
-  }, [searchValue, fuse, recentNotes, allNotes]);
+  }, [searchValue, fuse, recentNotes, notes]);
 
   const handleSearchChange = (value: string) => {
     setSearchValue(value);
@@ -133,7 +88,7 @@ export default function CommandMenu({ notes: initialNotes }: Props) {
             title,
             body,
           };
-          setNoteCreated(note);
+          addNote(note);
           return {
             message: "Note created",
             description: "You can now view and edit your new note.",
@@ -181,7 +136,9 @@ export default function CommandMenu({ notes: initialNotes }: Props) {
               key={note.id}
               asChild
             >
-              <Link href={`/note/${note.id}`}> {note.title || "New Note"}</Link>
+              <Link href={`/note/${note.id}`}>
+                {note.id === noteId ? noteTitle : note.title || "New Note"}
+              </Link>
             </CommandItem>
           ))}
         </CommandGroup>

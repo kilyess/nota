@@ -34,10 +34,13 @@ import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { Table, TableBody, TableCell, TableRow } from "@/components/ui/table";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useActionHandler } from "@/hooks/use-action-handler";
+import useApiKey from "@/hooks/use-api-key";
+import useNote from "@/hooks/use-note";
 import { Note, User } from "@prisma/client";
 import { getCoreRowModel, useReactTable } from "@tanstack/react-table";
 import {
-  AlertCircle,
+  AlertTriangle,
   Check,
   Key,
   KeyRound,
@@ -51,31 +54,42 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useEffect, useState, useTransition } from "react";
-import { toast } from "sonner";
+import { useEffect, useState } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 
 type Props = {
   user: User | null;
-  notes: Note[] | null;
-  onSelectedNotesDeleted: (selectedNotes: string[]) => void;
+  notes: Note[];
+  onUpdate: (
+    avatar: string | null,
+    firstName: string,
+    lastName: string,
+  ) => void;
 };
 
-export default function SettingsDialog({
-  user,
-  notes: initialNotes,
-  onSelectedNotesDeleted,
-}: Props) {
+export default function SettingsDialog({ user, notes, onUpdate }: Props) {
   const [firstName, setFirstName] = useState(user?.firstName || "");
   const [lastName, setLastName] = useState(user?.lastName || "");
   const [avatar, setAvatar] = useState(user?.avatar || null);
-  const [apiKey, setApiKey] = useState("");
+  const { apiKey, setApiKey } = useApiKey();
   const [apiKeySaved, setApiKeySaved] = useState<boolean>(false);
   const [selectedNotes, setSelectedNotes] = useState<string[]>([]);
-  const [notes, setNotes] = useState(
-    initialNotes?.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime()),
+  const { handler: updateProfile, isPending: isUpdatingProfile } =
+    useActionHandler(updateUserAction);
+  const { handler: deleteAccount, isPending: isDeletingAccount } =
+    useActionHandler(deleteAccountAction);
+  const { handler: updateApiKey, isPending: isUpdatingApiKey } =
+    useActionHandler(updateApiKeyAction);
+  const { handler: deleteApiKey, isPending: isDeletingApiKey } =
+    useActionHandler(updateApiKeyAction);
+  const { handler: deleteNotes, isPending: isDeletingNotes } = useActionHandler(
+    deleteSelectedNotesAction,
   );
-  const [isPending, startTransition] = useTransition();
+  const { handler: updateAvatar, isPending: isUpdatingAvatar } =
+    useActionHandler(updateAvatarAction);
+  const { handler: deleteAvatar, isPending: isDeletingAvatar } =
+    useActionHandler(deleteAvatarAction);
+  const { setNotes } = useNote();
   const router = useRouter();
 
   useEffect(() => {
@@ -88,118 +102,79 @@ export default function SettingsDialog({
   }, []);
 
   const handleUpdateProfile = async () => {
-    startTransition(() => {
-      const promise = new Promise(async (resolve, reject) => {
-        const result = await updateUserAction(firstName, lastName);
-        if (result.errorMessage) {
-          reject(new Error(result.errorMessage));
-        } else {
-          resolve(result);
-        }
-      });
-      toast.promise(promise, {
-        loading: "Updating profile...",
-        success: () => {
-          return {
-            message: "Profile updated successfully",
-            description: "Your profile has been updated successfully.",
-          };
+    updateProfile(
+      {
+        onSuccess: () => {
+          onUpdate(avatar || "", firstName, lastName);
         },
-        error: (error) => {
-          return {
-            message: "Profile update failed",
-            description: error.message,
-          };
-        },
-      });
+        loadingMessage: "Updating profile...",
+        successMessage: "Profile updated successfully",
+        successDescription: "Your profile has been updated successfully.",
+        errorMessage: "Failed to update profile",
+      },
+      firstName,
+      lastName,
+    );
+  };
+
+  const handleDeleteAccount = async () => {
+    deleteAccount({
+      onSuccess: () => {
+        router.replace("/");
+      },
+      loadingMessage: "Deleting account...",
+      successMessage: "Account deleted successfully",
+      successDescription: "Your account has been deleted successfully.",
+      errorMessage: "Failed to delete account",
+      errorDescription: "Please try again later.",
     });
   };
 
   const handleUpdateApiKey = async () => {
-    startTransition(() => {
-      const promise = new Promise(async (resolve, reject) => {
-        const result = await updateApiKeyAction(apiKey);
-        if (result.errorMessage) {
-          reject(new Error(result.errorMessage));
-        } else {
+    updateApiKey(
+      {
+        onSuccess: () => {
           setApiKeySaved(true);
-          resolve(result);
-        }
-      });
-      toast.promise(promise, {
-        loading: "Updating API Key...",
-        success: () => {
-          return "API Key updated successfully";
         },
-        error: (error) => {
-          return {
-            message: "API Key update failed",
-            description: error.message,
-          };
-        },
-      });
-    });
+        loadingMessage: "Updating API key...",
+        successMessage: "API key updated successfully",
+        successDescription: "Your API key has been updated successfully.",
+        errorMessage: "Failed to update API key",
+      },
+      apiKey || "",
+    );
   };
 
   const handleDeleteApiKey = async () => {
-    startTransition(() => {
-      const promise = new Promise(async (resolve, reject) => {
-        const result = await updateApiKeyAction("");
-        if (result.errorMessage) {
-          reject(new Error(result.errorMessage));
-        } else {
-          resolve(result);
-        }
-      });
-      toast.promise(promise, {
-        loading: "Deleting API Key...",
-        success: () => {
+    deleteApiKey(
+      {
+        onSuccess: () => {
           setApiKey("");
           setApiKeySaved(false);
-          return {
-            message: "API Key deleted successfully",
-            description: "Your API key has been deleted successfully.",
-          };
         },
-        error: (error) => {
-          return {
-            message: "API Key deletion failed",
-            description: error.message,
-          };
-        },
-      });
-    });
+        loadingMessage: "Deleting API key...",
+        successMessage: "API key deleted successfully",
+        successDescription: "Your API key has been deleted successfully.",
+        errorMessage: "Failed to delete API key",
+      },
+      "",
+    );
   };
 
   const handleDeleteNotes = async () => {
-    startTransition(() => {
-      const promise = new Promise(async (resolve, reject) => {
-        const result = await deleteSelectedNotesAction(selectedNotes);
-        if (result.errorMessage) {
-          reject(new Error(result.errorMessage));
-        } else {
-          resolve(result);
-        }
-      });
-      toast.promise(promise, {
-        loading: "Deleting selected notes...",
-        success: () => {
-          onSelectedNotesDeleted(selectedNotes);
-          setNotes(notes?.filter((note) => !selectedNotes.includes(note.id)));
+    deleteNotes(
+      {
+        onSuccess: () => {
+          setNotes(notes.filter((note) => !selectedNotes.includes(note.id)));
           setSelectedNotes([]);
-          return {
-            message: `${selectedNotes.length} ${selectedNotes.length === 1 ? "Note" : "Notes"} deleted successfully`,
-            description: `You have successfully deleted ${selectedNotes.length} ${selectedNotes.length === 1 ? "note" : "notes"}.`,
-          };
         },
-        error: (error) => {
-          return {
-            message: "Note deletion failed",
-            description: error.message,
-          };
-        },
-      });
-    });
+        loadingMessage: "Deleting notes...",
+        successMessage: "Notes deleted successfully",
+        successDescription: "Your notes have been deleted successfully.",
+        errorMessage: "Failed to delete notes",
+      },
+      selectedNotes,
+    );
   };
 
   const handleEditAvatar = async () => {
@@ -210,106 +185,46 @@ export default function SettingsDialog({
     fileInput.onchange = (e) => {
       const file = (e.target as HTMLInputElement).files?.[0];
       if (file) {
-        startTransition(() => {
-          const promise = new Promise<{
-            errorMessage: string | null;
-            avatarUrl: string | null;
-          }>(async (resolve, reject) => {
-            const result = await updateAvatarAction(file);
-            if (result.errorMessage) {
-              reject(new Error(result.errorMessage));
-            } else {
-              resolve(result);
-            }
-          });
-
-          toast.promise(promise, {
-            loading: "Updating avatar...",
-            success: (result) => {
+        const formData = new FormData();
+        formData.append("avatar", file);
+        updateAvatar(
+          {
+            onSuccess: (result) => {
               if (result.avatarUrl) {
                 setAvatar(result.avatarUrl);
+                onUpdate(result.avatarUrl, firstName, lastName);
               }
-              return {
-                message: "Avatar updated successfully",
-                description: "Your avatar has been updated successfully.",
-              };
             },
-            error: (error) => {
-              return {
-                message: "Avatar update failed",
-                description: error.message,
-              };
-            },
-          });
-        });
+            loadingMessage: "Updating avatar...",
+            successMessage: "Avatar updated successfully",
+            successDescription: "Your avatar has been updated successfully.",
+            errorMessage: "Failed to update avatar",
+          },
+          formData,
+        );
       }
     };
     fileInput.click();
   };
 
   const handleDeleteAvatar = async () => {
-    startTransition(() => {
-      const promise = new Promise(async (resolve, reject) => {
-        const result = await updateAvatarAction(null);
-        if (result.errorMessage) {
-          reject(new Error(result.errorMessage));
-        } else {
-          const { errorMessage } = await deleteAvatarAction();
-          if (errorMessage) reject(new Error(errorMessage));
-          resolve(result);
-        }
-      });
-      toast.promise(promise, {
-        loading: "Deleting avatar...",
-        success: () => {
+    deleteAvatar(
+      {
+        onSuccess: () => {
           setAvatar(null);
-          return {
-            message: "Avatar deleted successfully",
-            description: "Your avatar has been deleted successfully.",
-          };
+          onUpdate(null, firstName, lastName);
         },
-        error: (error) => {
-          return {
-            message: "Avatar deletion failed",
-            description: error.message,
-          };
-        },
-      });
-    });
-  };
-
-  const handleDeleteAccount = async () => {
-    startTransition(() => {
-      const promise = new Promise(async (resolve, reject) => {
-        const result = await deleteAccountAction();
-        if (result.errorMessage) {
-          reject(new Error(result.errorMessage));
-        } else {
-          resolve(result);
-        }
-      });
-      toast.promise(promise, {
-        loading: "Deleting account...",
-        success: () => {
-          router.replace("/");
-          return {
-            message: "Account deleted successfully",
-            description: "Your account has been deleted successfully.",
-          };
-        },
-        error: () => {
-          return {
-            message: "Account deletion failed",
-            description:
-              "Please try again later or contact us if the problem persists.",
-          };
-        },
-      });
-    });
+        loadingMessage: "Deleting avatar...",
+        successMessage: "Avatar deleted successfully",
+        successDescription: "Your avatar has been deleted successfully.",
+        errorMessage: "Failed to delete avatar",
+      },
+      avatar || "",
+    );
   };
 
   const handleSelectAllNotes = (checked: boolean) => {
-    setSelectedNotes(checked ? notes?.map((note) => note.id) || [] : []);
+    setSelectedNotes(checked ? notes.map((note) => note.id) || [] : []);
   };
 
   const handleNoteSelect = (noteId: string) => {
@@ -332,10 +247,14 @@ export default function SettingsDialog({
   ];
 
   const table = useReactTable({
-    data: notes || [],
+    data:
+      notes.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime()) || [],
     columns,
     getCoreRowModel: getCoreRowModel(),
+    manualPagination: false,
+    manualSorting: false,
   });
+
   return (
     <Dialog>
       <DialogTrigger asChild>
@@ -367,7 +286,7 @@ export default function SettingsDialog({
               <span className="sr-only pb-0.5 md:not-sr-only">Notes</span>
             </TabsTrigger>
             <TabsTrigger value="danger-zone">
-              <Trash2 className="size-4 max-sm:mr-0" />
+              <AlertTriangle className="size-4 max-sm:mr-0" />
               <span className="sr-only pb-0.5 md:not-sr-only">Danger Zone</span>
             </TabsTrigger>
           </TabsList>
@@ -396,7 +315,7 @@ export default function SettingsDialog({
                         size="sm"
                         className="flex items-center justify-center text-xs"
                         onClick={handleEditAvatar}
-                        disabled={isPending}
+                        disabled={isUpdatingAvatar}
                       >
                         <Upload className="size-4" />
                         <span className="hidden pb-0.5 font-semibold md:inline">
@@ -410,7 +329,7 @@ export default function SettingsDialog({
                           avatar === null ? "hidden" : ""
                         }`}
                         onClick={handleDeleteAvatar}
-                        disabled={isPending || avatar === null}
+                        disabled={isDeletingAvatar || avatar === null}
                       >
                         <X className="size-4" />
                         <span className="hidden pb-0.5 font-semibold md:inline">
@@ -428,7 +347,7 @@ export default function SettingsDialog({
                       value={firstName}
                       onChange={(e) => setFirstName(e.target.value)}
                       placeholder="Enter first name"
-                      disabled={isPending}
+                      disabled={isUpdatingProfile}
                     />
                   </div>
                   <div className="flex flex-col gap-2">
@@ -438,7 +357,7 @@ export default function SettingsDialog({
                       value={lastName}
                       onChange={(e) => setLastName(e.target.value)}
                       placeholder="Enter last name"
-                      disabled={isPending}
+                      disabled={isUpdatingProfile}
                     />
                   </div>
                 </div>
@@ -446,7 +365,9 @@ export default function SettingsDialog({
                   onClick={handleUpdateProfile}
                   className="w-[50%]"
                   disabled={
-                    isPending || firstName.length === 0 || lastName.length === 0
+                    isUpdatingProfile ||
+                    firstName.length === 0 ||
+                    lastName.length === 0
                   }
                 >
                   Save Profile
@@ -468,14 +389,15 @@ export default function SettingsDialog({
                   <Label htmlFor="apiKey">API Key</Label>
                   <Input
                     type="password"
-                    value={apiKey}
+                    value={apiKey || ""}
                     onChange={(e) => setApiKey(e.target.value)}
                     placeholder="Enter your OpenAI API Key"
                     pattern="^sk-proj-[A-Za-z0-9-_]{74}T3BlbkFJ[A-Za-z0-9-_]{74}$"
-                    disabled={isPending || apiKeySaved}
+                    disabled={isUpdatingApiKey || apiKeySaved}
                   />
                   <p
                     className={`text-muted-foreground text-xs ${
+                      apiKey &&
                       apiKey.length > 0 &&
                       !apiKey.match(
                         /^sk-proj-[A-Za-z0-9-_]{74}T3BlbkFJ[A-Za-z0-9-_]{74}$/,
@@ -493,10 +415,10 @@ export default function SettingsDialog({
                     onClick={handleUpdateApiKey}
                     className="w-[50%]"
                     disabled={
-                      isPending ||
+                      isUpdatingApiKey ||
                       apiKeySaved ||
-                      apiKey.length === 0 ||
-                      !apiKey.match(
+                      apiKey?.length === 0 ||
+                      !apiKey?.match(
                         /^sk-proj-[A-Za-z0-9-_]{74}T3BlbkFJ[A-Za-z0-9-_]{74}$/,
                       )
                     }
@@ -508,7 +430,7 @@ export default function SettingsDialog({
                       variant="outline"
                       className="w-[50%]"
                       onClick={handleDeleteApiKey}
-                      disabled={isPending}
+                      disabled={isDeletingApiKey}
                     >
                       Delete API Key
                     </Button>
@@ -533,13 +455,14 @@ export default function SettingsDialog({
                       className="flex h-8 items-center gap-2.5 px-4 text-xs"
                       onClick={() =>
                         handleSelectAllNotes(
-                          selectedNotes.length !== (notes?.length || 0),
+                          selectedNotes.length !== notes.length,
                         )
                       }
                     >
                       <div
                         className={`border-input size-4 shrink-0 rounded-sm border ${
-                          selectedNotes.length === (notes?.length || 0)
+                          selectedNotes.length === notes.length &&
+                          notes.length !== 0
                             ? "border-primary"
                             : ""
                         }`}
@@ -547,11 +470,13 @@ export default function SettingsDialog({
                         <div className="text-primary-foreground flex items-center justify-center">
                           <Check
                             className={`size-3.5 ${
-                              selectedNotes.length === (notes?.length || 0)
+                              selectedNotes.length === notes.length &&
+                              notes.length !== 0
                                 ? "bg-primary"
                                 : ""
                             } ${
-                              selectedNotes.length !== (notes?.length || 0)
+                              selectedNotes.length !== notes.length ||
+                              notes.length === 0
                                 ? "opacity-0"
                                 : ""
                             }`}
@@ -579,7 +504,7 @@ export default function SettingsDialog({
                         variant="destructive"
                         size="sm"
                         className="flex h-8 items-center gap-2 px-3 text-xs"
-                        disabled={selectedNotes.length === 0 || isPending}
+                        disabled={selectedNotes.length === 0 || isDeletingNotes}
                       >
                         <Trash2 className="size-4" />
                         <span className="sr-only font-semibold md:not-sr-only">
@@ -665,7 +590,7 @@ export default function SettingsDialog({
             <div className="flex w-full items-center justify-center">
               <div className="flex w-[80%] flex-col items-center gap-4">
                 <div className="flex items-center gap-2 font-semibold">
-                  <AlertCircle className="size-5" />
+                  <AlertTriangle className="size-5" />
                   <span className="pb-0.5">Danger Zone</span>
                 </div>
                 <AlertDialog>
@@ -674,7 +599,7 @@ export default function SettingsDialog({
                       variant="destructive"
                       size="lg"
                       className="flex h-12 w-[50%] items-center gap-2 px-3 text-lg"
-                      disabled={isPending}
+                      disabled={isDeletingAccount}
                     >
                       <Trash2 className="size-6" />
                       <span className="sr-only font-semibold md:not-sr-only">

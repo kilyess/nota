@@ -1,6 +1,7 @@
 "use client";
 
 import { askAIAboutNotesAction } from "@/actions/notes";
+import { getDecryptedApiKeyAction } from "@/actions/users";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -10,11 +11,13 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import useApiKey from "@/hooks/use-api-key";
 import "@/styles/ai-responses.css";
 import { User } from "@supabase/supabase-js";
 import { ArrowUp, Loader2, Sparkles } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { Fragment, useEffect, useRef, useState, useTransition } from "react";
+import { toast } from "sonner";
 import { Textarea } from "./ui/textarea";
 
 type Props = {
@@ -26,6 +29,8 @@ function AskAIButton({ user, type }: Props) {
   const router = useRouter();
 
   const [isPending, startTransition] = useTransition();
+
+  const { apiKey, setApiKey } = useApiKey();
 
   const [open, setOpen] = useState(false);
   const [questionText, setQuestionText] = useState("");
@@ -62,6 +67,14 @@ function AskAIButton({ user, type }: Props) {
     };
   }, [questions, responses]);
 
+  useEffect(() => {
+    const fetchApiKey = async () => {
+      const { apiKey: decryptedApiKey } = await getDecryptedApiKeyAction();
+      setApiKey(decryptedApiKey || "");
+    };
+    fetchApiKey();
+  }, []);
+
   const handleOnOpenChange = (isOpen: boolean) => {
     if (!user) {
       router.push("/login");
@@ -93,6 +106,11 @@ function AskAIButton({ user, type }: Props) {
   };
 
   const handleSubmit = () => {
+    if (!apiKey) {
+      toast.warning("Please set your API key in the settings");
+      return;
+    }
+
     if (questionText.trim() === "") {
       return;
     }
@@ -103,7 +121,11 @@ function AskAIButton({ user, type }: Props) {
     setTimeout(ScrollToBottom, 100);
 
     startTransition(async () => {
-      const response = await askAIAboutNotesAction(newQuestions, responses);
+      const response = await askAIAboutNotesAction(
+        newQuestions,
+        responses,
+        apiKey || "",
+      );
       setResponses((prev) => [...prev, response]);
       setTimeout(ScrollToBottom, 100);
     });
