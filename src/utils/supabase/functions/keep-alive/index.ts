@@ -10,7 +10,7 @@ async function main() {
       process.env.SUPABASE_ANON_KEY ?? "",
     );
 
-    const { data, error } = await supabase.rpc("keep_alive");
+    const { data, error } = await supabase.rpc("now");
 
     if (error) throw error;
 
