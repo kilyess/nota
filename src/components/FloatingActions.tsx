@@ -104,31 +104,31 @@ export default function FloatingActions() {
         open ? "bg-sidebar/50 backdrop-blur-sm" : "bg-transparent ring-0",
       )}
     >
-      <div
-        onClick={handleToggle}
-        aria-expanded={open}
-        aria-label={open ? "Close actions" : "Open actions"}
-        className="pointer-events-auto transition-transform duration-200 ease-in-out"
-      >
-        <Tooltip>
-          <TooltipTrigger asChild>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <div
+            onClick={handleToggle}
+            aria-expanded={open}
+            aria-label={open ? "Close actions" : "Open actions"}
+            className="pointer-events-auto transition-transform duration-200 ease-in-out"
+          >
             <SidebarTrigger className="size-8" />
-          </TooltipTrigger>
-          <TooltipContent>
-            <div className="flex items-center gap-2">
-              <kbd className="bg-ring/30 flex items-center gap-2 rounded-sm px-1 py-0.5 text-xs">
-                <span>⌘</span>
-                <span>\</span>
-              </kbd>
-              or
-              <kbd className="bg-ring/30 flex items-center gap-2 rounded-sm px-1 py-0.5 text-xs">
-                <span>Ctrl</span>
-                <span>\</span>
-              </kbd>
-            </div>
-          </TooltipContent>
-        </Tooltip>
-      </div>
+          </div>
+        </TooltipTrigger>
+        <TooltipContent>
+          <div className="flex items-center gap-2">
+            <kbd className="bg-ring/30 flex items-center gap-2 rounded-sm px-1 py-0.5 text-xs">
+              <span>⌘</span>
+              <span>\</span>
+            </kbd>
+            or
+            <kbd className="bg-ring/30 flex items-center gap-2 rounded-sm px-1 py-0.5 text-xs">
+              <span>Ctrl</span>
+              <span>\</span>
+            </kbd>
+          </div>
+        </TooltipContent>
+      </Tooltip>
 
       <div className="flex items-center">
         <div
@@ -140,31 +140,14 @@ export default function FloatingActions() {
           )}
           style={{ transitionDelay: open ? "75ms" : "0ms" }}
         >
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button
-                onClick={handleCommand}
-                variant="ghost"
-                size="sm"
-                aria-hidden={!open}
-              >
-                <SearchIcon />
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent>
-              <div className="flex items-center gap-2">
-                <kbd className="bg-ring/30 flex items-center gap-2 rounded-sm px-1 py-0.5 text-xs">
-                  <span>⌘</span>
-                  <span>K</span>
-                </kbd>
-                or
-                <kbd className="bg-ring/30 flex items-center gap-2 rounded-sm px-1 py-0.5 text-xs">
-                  <span>Ctrl</span>
-                  <span>K</span>
-                </kbd>
-              </div>
-            </TooltipContent>
-          </Tooltip>
+          <Button
+            onClick={handleCommand}
+            variant="ghost"
+            size="sm"
+            aria-hidden={!open}
+          >
+            <SearchIcon />
+          </Button>
         </div>
 
         <div
