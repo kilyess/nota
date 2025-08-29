@@ -10,7 +10,7 @@ async function main() {
       process.env.SUPABASE_ANON_KEY ?? "",
     );
 
-    const { data, error } = await supabase.from("note").select("id").limit(1);
+    const { data, error } = await supabase.from("Note").select("id").limit(1);
 
     if (error) throw error;
 
