@@ -3,6 +3,11 @@
 import { createNoteAction, getDecryptedNoteAction } from "@/actions/notes";
 import { Button } from "@/components/ui/button";
 import { SidebarTrigger } from "@/components/ui/sidebar";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import useCommandState from "@/hooks/use-command-state";
 import useNote from "@/hooks/use-note";
 import { Note } from "@prisma/client";
@@ -105,7 +110,24 @@ export default function FloatingActions() {
         aria-label={open ? "Close actions" : "Open actions"}
         className="pointer-events-auto transition-transform duration-200 ease-in-out"
       >
-        <SidebarTrigger className="size-8" />
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <SidebarTrigger className="size-8" />
+          </TooltipTrigger>
+          <TooltipContent>
+            <div className="flex items-center gap-2">
+              <kbd className="bg-ring/30 flex items-center gap-2 rounded-sm px-1 py-0.5 text-xs">
+                <span>⌘</span>
+                <span>\</span>
+              </kbd>
+              or
+              <kbd className="bg-ring/30 flex items-center gap-2 rounded-sm px-1 py-0.5 text-xs">
+                <span>Ctrl</span>
+                <span>\</span>
+              </kbd>
+            </div>
+          </TooltipContent>
+        </Tooltip>
       </div>
 
       <div className="flex items-center">
@@ -118,14 +140,31 @@ export default function FloatingActions() {
           )}
           style={{ transitionDelay: open ? "75ms" : "0ms" }}
         >
-          <Button
-            onClick={handleCommand}
-            variant="ghost"
-            size="sm"
-            aria-hidden={!open}
-          >
-            <SearchIcon />
-          </Button>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                onClick={handleCommand}
+                variant="ghost"
+                size="sm"
+                aria-hidden={!open}
+              >
+                <SearchIcon />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>
+              <div className="flex items-center gap-2">
+                <kbd className="bg-ring/30 flex items-center gap-2 rounded-sm px-1 py-0.5 text-xs">
+                  <span>⌘</span>
+                  <span>K</span>
+                </kbd>
+                or
+                <kbd className="bg-ring/30 flex items-center gap-2 rounded-sm px-1 py-0.5 text-xs">
+                  <span>Ctrl</span>
+                  <span>K</span>
+                </kbd>
+              </div>
+            </TooltipContent>
+          </Tooltip>
         </div>
 
         <div

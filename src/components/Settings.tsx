@@ -190,6 +190,7 @@ export default function SettingsDialog({ user, notes, onUpdate }: Props) {
         onSuccess: () => {
           setNotes(notes.filter((note) => !selectedNotes.includes(note.id)));
           setSelectedNotes([]);
+          router.replace("/");
         },
         loadingMessage: "Deleting notes...",
         successMessage: "Notes deleted successfully",
