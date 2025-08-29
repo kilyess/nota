@@ -106,7 +106,7 @@ export default function SettingsDialog({ user, notes, onUpdate }: Props) {
       setApiKeySaved(Boolean(decryptedApiKey));
     };
     fetchApiKey();
-  }, []);
+  }, [setApiKey, setApiKeySaved]);
 
   const handleUpdateProfile = async () => {
     updateProfile(

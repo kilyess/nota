@@ -38,7 +38,7 @@ function AppSidebar({
   );
   useEffect(() => {
     setNotes(initialNotes);
-  }, [initialNotes]);
+  }, [initialNotes, setNotes]);
 
   const handleSearchChange = (value: string) => {
     setSearchValue(value);

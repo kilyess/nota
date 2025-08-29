@@ -3,13 +3,14 @@ import NotFound from "@/app/not-found";
 import { getUser } from "@/utils/supabase/server";
 import NoteEditor from "./editor";
 
-type Props = {
-  params: { id: string } | Promise<{ id: string }>;
+type PageProps = {
+  params: Promise<{
+    id: string;
+  }>;
 };
 
-async function NotePage({ params }: Props) {
-  const { id } = await params;
-  const noteId = id;
+async function NotePage({ params }: PageProps) {
+  const { id: noteId } = await params;
 
   const user = await getUser();
 

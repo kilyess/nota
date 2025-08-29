@@ -23,8 +23,8 @@ function AuthForm({ type }: Props) {
 
   const handleSubmit = (formData: FormData) => {
     startTransition(async () => {
-      var firstName: string;
-      var lastName: string;
+      let firstName: string;
+      let lastName: string;
       const email = formData.get("email") as string;
       const password = formData.get("password") as string;
 

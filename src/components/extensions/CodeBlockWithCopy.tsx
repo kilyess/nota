@@ -5,7 +5,13 @@ import { Copy } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "../ui/button";
 
-export function CodeBlockComponent({ node, updateAttributes, extension }: any) {
+import type { NodeViewProps } from "@tiptap/react";
+
+export function CodeBlockComponent({
+  node,
+  updateAttributes,
+  extension,
+}: NodeViewProps) {
   const copyToClipboard = async () => {
     try {
       await navigator.clipboard.writeText(node.textContent);
@@ -33,7 +39,7 @@ export function CodeBlockComponent({ node, updateAttributes, extension }: any) {
           </Button>
         </div>
         <pre className="overflow-x-auto p-4">
-          <NodeViewContent as="code" className="font-mono text-sm" />
+          <NodeViewContent className="font-mono text-sm" />
         </pre>
       </div>
     </NodeViewWrapper>

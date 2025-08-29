@@ -3,13 +3,8 @@
 import { useTransition } from "react";
 import { toast } from "sonner";
 
-type ActionResult = {
-  errorMessage?: string | null;
-  [key: string]: any;
-};
-
-type ActionHandlerOptions<T> = {
-  onSuccess?: (data: T) => void;
+type ActionHandlerOptions<TResult> = {
+  onSuccess?: (data: TResult) => void;
   onError?: (error: Error) => void;
   loadingMessage?: string;
   successMessage?: string;
@@ -19,22 +14,23 @@ type ActionHandlerOptions<T> = {
 };
 
 export function useActionHandler<
-  T extends (...args: any[]) => Promise<ActionResult>,
+  T extends (...args: any[]) => Promise<TResult>,
+  TResult extends { errorMessage?: string | null },
 >(action: T) {
   const [isPending, startTransition] = useTransition();
 
   const handler = async (
     options: ActionHandlerOptions<Awaited<ReturnType<T>>> = {},
-    ...args: Parameters<T> | []
+    ...args: Parameters<T>
   ) => {
     startTransition(() => {
       const promise = new Promise<Awaited<ReturnType<T>>>(
         async (resolve, reject) => {
           const result = await action(...args);
-          if (result.errorMessage) {
-            reject(new Error(result.errorMessage));
+          if ((result as TResult).errorMessage) {
+            reject(new Error((result as TResult).errorMessage!));
           } else {
-            resolve(result as unknown as Awaited<ReturnType<T>>);
+            resolve(result as Awaited<ReturnType<T>>);
           }
         },
       );

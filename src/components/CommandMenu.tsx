@@ -32,7 +32,7 @@ export default function CommandMenu({ notes: initialNotes }: Props) {
 
   useEffect(() => {
     setNotes(initialNotes);
-  }, [initialNotes]);
+  }, [initialNotes, setNotes]);
 
   useEffect(() => {
     const key = (e: KeyboardEvent) => {
@@ -45,7 +45,7 @@ export default function CommandMenu({ notes: initialNotes }: Props) {
 
     window.addEventListener("keydown", key);
     return () => window.removeEventListener("keydown", key);
-  }, []);
+  }, [toggleCommandOpen]);
 
   const fuse = useMemo(
     () => new Fuse(notes, { keys: ["title"], threshold: 0.4 }),
@@ -66,7 +66,7 @@ export default function CommandMenu({ notes: initialNotes }: Props) {
       return recentNotes;
     }
     return searchResults;
-  }, [searchValue, fuse, recentNotes, notes]);
+  }, [searchValue, fuse, recentNotes]);
 
   const handleSearchChange = (value: string) => {
     setSearchValue(value);

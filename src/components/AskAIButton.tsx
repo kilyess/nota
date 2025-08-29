@@ -73,7 +73,7 @@ function AskAIButton({ user, type }: Props) {
       setApiKey(decryptedApiKey || "");
     };
     fetchApiKey();
-  }, []);
+  }, [setApiKey]);
 
   const handleOnOpenChange = (isOpen: boolean) => {
     if (!user) {
