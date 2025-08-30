@@ -1,4 +1,4 @@
-# nota
+# nota [![Netlify Status](https://api.netlify.com/api/v1/badges/b7b659a5-5a7e-495d-9f3a-ea3443ea9bc7/deploy-status)](https://app.netlify.com/projects/notama/deploys)
 
 nota is a super user-friendly note-taking app featuring an AI assistant that lets you ask anything about your notes. Inspired by the sleek look of [t3.chat](https://t3.chat), nota offers a seamless design experience powered by [shadcn/ui](https://ui.shadcn.com/).
 
