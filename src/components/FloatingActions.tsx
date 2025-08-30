@@ -131,24 +131,41 @@ export default function FloatingActions() {
       </Tooltip>
 
       <div className="flex items-center">
-        <div
-          className={clsx(
-            "pointer-events-auto origin-left transform transition-all duration-300 ease-in-out",
-            open
-              ? "translate-x-0 opacity-100"
-              : "pointer-events-none -translate-x-2 opacity-0",
-          )}
-          style={{ transitionDelay: open ? "75ms" : "0ms" }}
-        >
-          <Button
-            onClick={handleCommand}
-            variant="ghost"
-            size="sm"
-            aria-hidden={!open}
-          >
-            <SearchIcon />
-          </Button>
-        </div>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <div
+              className={clsx(
+                "pointer-events-auto origin-left transform transition-all duration-300 ease-in-out",
+                open
+                  ? "translate-x-0 opacity-100"
+                  : "pointer-events-none -translate-x-2 opacity-0",
+              )}
+              style={{ transitionDelay: open ? "75ms" : "0ms" }}
+            >
+              <Button
+                onClick={handleCommand}
+                variant="ghost"
+                size="sm"
+                aria-hidden={!open}
+              >
+                <SearchIcon />
+              </Button>
+            </div>
+          </TooltipTrigger>
+          <TooltipContent>
+            <div className="flex items-center gap-2">
+              <kbd className="bg-ring/30 flex items-center gap-2 rounded-sm px-1 py-0.5 text-xs">
+                <span>⌘</span>
+                <span>K</span>
+              </kbd>
+              or
+              <kbd className="bg-ring/30 flex items-center gap-2 rounded-sm px-1 py-0.5 text-xs">
+                <span>Ctrl</span>
+                <span>K</span>
+              </kbd>
+            </div>
+          </TooltipContent>
+        </Tooltip>
 
         <div
           className={clsx(
