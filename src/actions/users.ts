@@ -338,7 +338,14 @@ export const deleteAvatarAction = async (url: string) => {
 
     if (!user) throw new Error("Please login or sign up to delete your avatar");
 
-    const { error } = await storage.from("avatars").remove([url]);
+    const { data: existingAvatar, error: listError } = await storage
+      .from("avatars")
+      .list("", { search: user.id });
+    if (listError) throw listError;
+    const fileToDelete = existingAvatar[0].name;
+    if (!fileToDelete) throw new Error("Avatar file not found for deletion");
+
+    const { error } = await storage.from("avatars").remove([fileToDelete]);
 
     if (error) throw error;
 
