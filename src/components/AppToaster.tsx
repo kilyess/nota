@@ -20,6 +20,7 @@ export default function AppToaster() {
   return (
     <Toaster
       theme={effective ?? "system"}
+      duration={4000}
       icons={{
         loading: <Loader2 className="size-4 animate-spin" />,
         success: <CircleCheckBig className="size-4" />,
