@@ -1,7 +1,7 @@
 "use client";
 
 import { User } from "@supabase/supabase-js";
-import { Editor } from "@tiptap/react";
+import { Editor, useEditorState } from "@tiptap/react";
 import {
   AlignCenter,
   AlignJustify,
@@ -37,6 +37,11 @@ const MenuBar = ({ editor, user }: Props) => {
   const scrollRef = useRef<HTMLDivElement | null>(null);
   const [showLeftFade, setShowLeftFade] = useState(false);
   const [showRightFade, setShowRightFade] = useState(false);
+
+  useEditorState({
+    editor,
+    selector: (ctx) => ({ editor: ctx.editor, state: ctx.editor?.state }),
+  });
 
   useEffect(() => {
     const el = scrollRef.current;
@@ -170,7 +175,7 @@ const MenuBar = ({ editor, user }: Props) => {
       name: "Horizontal Rule",
       icon: <Minus className="size-5" />,
       onClick: () => editor.chain().focus().setHorizontalRule().run(),
-      pressed: false, // HR doesn't have an active state
+      pressed: false,
     },
   ];
 

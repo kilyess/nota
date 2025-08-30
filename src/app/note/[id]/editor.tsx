@@ -19,7 +19,7 @@ import { TaskItem, TaskList } from "@tiptap/extension-list";
 import Placeholder from "@tiptap/extension-placeholder";
 import TextAlign from "@tiptap/extension-text-align";
 import { CharacterCount } from "@tiptap/extensions";
-import { EditorContent, useEditor } from "@tiptap/react";
+import { EditorContent, useEditor, useEditorState } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import { CloudCheck, Loader2 } from "lucide-react";
 import { useParams } from "next/navigation";
@@ -131,7 +131,7 @@ function NoteEditor({ id, title, content, user }: Props) {
       attributes: {
         class:
           "w-full min-h-[calc(100vh-25rem)] flex-1 selection:bg-primary placeholder:select-none self-stretch px-3 py-1 mb-20 resize-none outline-none font-medium",
-        spellCheck: "true",
+        spellCheck: "false",
       },
     },
     extensions,
@@ -139,8 +139,13 @@ function NoteEditor({ id, title, content, user }: Props) {
     onUpdate: ({ editor }) => {
       forceUpdate((prev) => prev + 1);
       debouncedSave(noteTitle, editor.getHTML());
-      console.log(editor.getHTML());
     },
+  });
+
+  useEditorState({
+    editor,
+    selector: (ctx) => ctx.editor?.state?.tr?.steps?.length ?? 0,
+    equalityFn: (a, b) => a !== b,
   });
 
   return (
