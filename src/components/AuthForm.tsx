@@ -180,10 +180,10 @@ function AuthForm({ type }: Props) {
           {isLoginForm
             ? isPending
               ? "Logging in..."
-              : "Sign Up"
+              : "Login"
             : isPending
               ? "Signing up..."
-              : "Login"}
+              : "Sign Up"}
         </Button>
         <p className="text-sm">
           {isLoginForm ? "Don't have an account?" : "Already have an account?"}{" "}
@@ -191,7 +191,7 @@ function AuthForm({ type }: Props) {
             href={isLoginForm ? "signup" : "login"}
             className={`text-ring hover:underline ${isPending ? "pointer-events-none opacity-50" : ""}`}
           >
-            {isLoginForm ? "Sign Up" : "Login"}
+            {isLoginForm ? "Login" : "Sign Up"}
           </Link>
         </p>
       </CardFooter>
