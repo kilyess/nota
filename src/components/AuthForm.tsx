@@ -191,7 +191,7 @@ function AuthForm({ type }: Props) {
             href={isLoginForm ? "signup" : "login"}
             className={`text-ring hover:underline ${isPending ? "pointer-events-none opacity-50" : ""}`}
           >
-            {isLoginForm ? "Login" : "Sign Up"}
+            {isLoginForm ? "Sign Up" : "Login"}
           </Link>
         </p>
       </CardFooter>
