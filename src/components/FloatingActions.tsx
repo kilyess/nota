@@ -117,15 +117,23 @@ export default function FloatingActions() {
         </TooltipTrigger>
         <TooltipContent>
           <div className="flex items-center gap-2">
-            <kbd className="bg-ring/30 flex items-center gap-2 rounded-sm px-1 py-0.5 text-xs">
-              <span>⌘</span>
-              <span>\</span>
-            </kbd>
+            <div className="flex items-center gap-0.5">
+              <kbd className="bg-ring/30 flex items-center rounded-sm px-1.5 py-0.5 text-xs">
+                <span>⌘</span>
+              </kbd>
+              <kbd className="bg-ring/30 flex items-center rounded-sm px-1.5 py-0.5 text-xs">
+                <span>\</span>
+              </kbd>
+            </div>
             or
-            <kbd className="bg-ring/30 flex items-center gap-2 rounded-sm px-1 py-0.5 text-xs">
-              <span>Ctrl</span>
-              <span>\</span>
-            </kbd>
+            <div className="flex items-center gap-0.5">
+              <kbd className="bg-ring/30 flex items-center rounded-sm px-1.5 py-0.5 text-xs">
+                <span>Ctrl</span>
+              </kbd>
+              <kbd className="bg-ring/30 flex items-center rounded-sm px-1.5 py-0.5 text-xs">
+                <span>\</span>
+              </kbd>
+            </div>
           </div>
         </TooltipContent>
       </Tooltip>
@@ -154,15 +162,23 @@ export default function FloatingActions() {
           </TooltipTrigger>
           <TooltipContent>
             <div className="flex items-center gap-2">
-              <kbd className="bg-ring/30 flex items-center gap-2 rounded-sm px-1 py-0.5 text-xs">
-                <span>⌘</span>
-                <span>K</span>
-              </kbd>
+              <div className="flex items-center gap-0.5">
+                <kbd className="bg-ring/30 flex items-center rounded-sm px-1.5 py-0.5 text-xs">
+                  <span>⌘</span>
+                </kbd>
+                <kbd className="bg-ring/30 flex items-center rounded-sm px-1.5 py-0.5 text-xs">
+                  <span>K</span>
+                </kbd>
+              </div>
               or
-              <kbd className="bg-ring/30 flex items-center gap-2 rounded-sm px-1 py-0.5 text-xs">
-                <span>Ctrl</span>
-                <span>K</span>
-              </kbd>
+              <div className="flex items-center gap-0.5">
+                <kbd className="bg-ring/30 flex items-center rounded-sm px-1.5 py-0.5 text-xs">
+                  <span>Ctrl</span>
+                </kbd>
+                <kbd className="bg-ring/30 flex items-center rounded-sm px-1.5 py-0.5 text-xs">
+                  <span>K</span>
+                </kbd>
+              </div>
             </div>
           </TooltipContent>
         </Tooltip>

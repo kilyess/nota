@@ -14,7 +14,7 @@ import "@/styles/globals.css";
 import { getUser } from "@/utils/supabase/server";
 import { Note, User } from "@prisma/client";
 import type { Metadata } from "next";
-import { JetBrains_Mono, Noto_Sans_Arabic } from "next/font/google";
+import { Noto_Sans_Arabic } from "next/font/google";
 import localFont from "next/font/local";
 
 const proxima = localFont({
@@ -22,11 +22,9 @@ const proxima = localFont({
   variable: "--font-proxima",
 });
 
-const jetbrains = JetBrains_Mono({
-  subsets: ["latin"],
-  variable: "--font-mono",
-  weight: ["100", "200", "300", "400", "500", "600", "700", "800"],
-  display: "swap",
+const zenbonesMono = localFont({
+  src: "../../public/fonts/Zenbones-Mono-Regular.woff2",
+  variable: "--font-zenbones",
 });
 
 const notoSans = Noto_Sans_Arabic({
@@ -38,6 +36,11 @@ const notoSans = Noto_Sans_Arabic({
 
 export const metadata: Metadata = {
   title: "nota",
+  description:
+    "nota is a user-friendly note-taking app with an integrated AI assistant, allowing you to ask questions and get instant answers based on your notes. ",
+  icons: {
+    icon: "/favicon.ico",
+  },
 };
 
 export default async function RootLayout({
@@ -76,7 +79,7 @@ export default async function RootLayout({
   return (
     <html
       lang="en"
-      className={`${jetbrains.variable} ${proxima.variable} ${notoSans.variable}`}
+      className={`${proxima.variable} ${notoSans.variable} ${zenbonesMono.variable}`}
       suppressHydrationWarning
     >
       <body className="h-[calc(100svh-2rem)] overflow-hidden">

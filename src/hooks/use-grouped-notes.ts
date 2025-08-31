@@ -39,7 +39,7 @@ export const useGroupedNotes = (notes: Note[]) => {
 
     notes.forEach((note) => {
       if (note.pinned) {
-        groups["Pinned"].push(note);
+        groups["Pinned"] = [note, ...groups["Pinned"]];
       } else {
         const groupLabel = getNoteGroup(new Date(note.updatedAt));
         groups[groupLabel].push(note);
@@ -47,10 +47,12 @@ export const useGroupedNotes = (notes: Note[]) => {
     });
 
     for (const label in groups) {
-      groups[label].sort(
-        (a, b) =>
-          new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime(),
-      );
+      if (label !== "Pinned") {
+        groups[label].sort(
+          (a, b) =>
+            new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime(),
+        );
+      }
     }
 
     return groups;

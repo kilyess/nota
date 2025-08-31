@@ -7,7 +7,7 @@
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --font-sans: var(--font-proxima), sans-serif;
-  --font-mono: "JetBrains_Mono", monospace;
+  --font-mono: var(--font-zenbones), monospace;
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
@@ -106,7 +106,7 @@
   --destructive-foreground: oklch(1 0 0);
   --font-sans: var(--font-sans);
   --font-serif: var(--font-serif);
-  --font-mono: var(--font-mono);
+  --font-mono: var(--font-zenbones);
   --shadow-color: oklch(0 0 0);
   --shadow-opacity: 0.1;
   --shadow-blur: 3px;
@@ -167,7 +167,7 @@
   --radius: 0.5rem;
   --font-sans: var(--font-sans);
   --font-serif: var(--font-serif);
-  --font-mono: var(--font-mono);
+  --font-mono: var(--font-zenbones);
   --shadow-color: oklch(0 0 0);
   --shadow-opacity: 0.1;
   --shadow-blur: 3px;
@@ -269,7 +269,7 @@
       color: var(--card-foreground) !important;
       font-size: 1rem !important;
       padding: 0.25em 0.3em !important;
-      font-family: var(--font-mono) !important;
+      font-family: var(--font-zenbones) !important;
       font-weight: 600 !important;
     }
 
@@ -277,7 +277,7 @@
       background: none !important;
       border-radius: 0.5rem !important;
       color: var(--card-foreground) !important;
-      font-family: var(--font-mono) !important;
+      font-family: var(--font-zenbones) !important;
 
       code {
         background: none;
