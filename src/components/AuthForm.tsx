@@ -155,7 +155,13 @@ function AuthForm({ type }: Props) {
       </CardContent>
       <CardFooter className="mt-6 flex-col gap-4">
         <Button type="submit" className="w-full" disabled={isPending}>
-          {isLoginForm ? "Login" : "Sign Up"}
+          {isLoginForm
+            ? isPending
+              ? "Logging in..."
+              : "Sign Up"
+            : isPending
+              ? "Signing up..."
+              : "Login"}
         </Button>
         <p className="text-sm">
           {isLoginForm ? "Don't have an account?" : "Already have an account?"}{" "}

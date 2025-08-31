@@ -60,6 +60,7 @@ function ForgotPasswordPage() {
               placeholder="Enter your email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
+              disabled={isSendingResetPasswordEmail}
             />
           </div>
         </CardContent>
@@ -68,7 +69,9 @@ function ForgotPasswordPage() {
             onClick={handleResetPassword}
             disabled={isSendingResetPasswordEmail}
           >
-            Send Reset Password Email
+            {isSendingResetPasswordEmail
+              ? "Sending..."
+              : "Send Reset Password Email"}
           </Button>
         </CardFooter>
       </Card>

@@ -125,9 +125,9 @@ function SidebarGroupContent({ notes, showTopFade, showBottomFade }: Props) {
                     <ContextMenuContent>
                       <ContextMenuItem onClick={(e) => handlePinClick(e, note)}>
                         {note.pinned ? (
-                          <PinOff className="text-accent-foreground mr-2 size-4" />
+                          <PinOff className="text-accent-foreground size-4" />
                         ) : (
-                          <Pin className="text-accent-foreground mr-2 size-4" />
+                          <Pin className="text-accent-foreground size-4" />
                         )}
                         <span>{note.pinned ? "Unpin" : "Pin"}</span>
                       </ContextMenuItem>

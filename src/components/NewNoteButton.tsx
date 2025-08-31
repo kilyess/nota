@@ -75,7 +75,7 @@ function NewNoteButton({ type }: Props) {
           disabled={isPending}
         >
           <Notebook />
-          New Note
+          {isPending ? "Creating..." : "New Note"}
         </Button>
       ) : (
         <Button
@@ -83,7 +83,7 @@ function NewNoteButton({ type }: Props) {
           className="w-[14rem] self-center font-bold max-sm:py-3 max-sm:text-base"
           disabled={isPending}
         >
-          New Note
+          {isPending ? "Creating..." : "New Note"}
         </Button>
       )}
     </>

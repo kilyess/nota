@@ -398,7 +398,7 @@ export default function SettingsDialog({ user, notes, onUpdate }: Props) {
                     lastName.length === 0
                   }
                 >
-                  Save Profile
+                  {isUpdatingProfile ? "Updating..." : "Save Profile"}
                 </Button>
               </div>
             </div>
@@ -442,7 +442,7 @@ export default function SettingsDialog({ user, notes, onUpdate }: Props) {
                     confirmPassword.length === 0
                   }
                 >
-                  Save Password
+                  {isUpdatingPassword ? "Updating..." : "Save Password"}
                 </Button>
               </div>
             </div>
@@ -495,7 +495,7 @@ export default function SettingsDialog({ user, notes, onUpdate }: Props) {
                       )
                     }
                   >
-                    Save API Key
+                    {isUpdatingApiKey ? "Updating..." : "Save API Key"}
                   </Button>
                   {apiKeySaved && (
                     <Button
@@ -504,7 +504,7 @@ export default function SettingsDialog({ user, notes, onUpdate }: Props) {
                       onClick={handleDeleteApiKey}
                       disabled={isDeletingApiKey}
                     >
-                      Delete API Key
+                      {isDeletingApiKey ? "Deleting..." : "Delete API Key"}
                     </Button>
                   )}
                 </div>
@@ -580,7 +580,7 @@ export default function SettingsDialog({ user, notes, onUpdate }: Props) {
                       >
                         <Trash2 className="size-4" />
                         <span className="sr-only font-semibold md:not-sr-only">
-                          Delete
+                          {isDeletingNotes ? "Deleting..." : "Delete"}
                           {selectedNotes.length > 0 &&
                             ` (${selectedNotes.length})`}
                         </span>
@@ -675,7 +675,7 @@ export default function SettingsDialog({ user, notes, onUpdate }: Props) {
                     >
                       <Trash2 className="size-6" />
                       <span className="sr-only font-semibold md:not-sr-only">
-                        Delete Account
+                        {isDeletingAccount ? "Deleting..." : "Delete Account"}
                       </span>
                     </Button>
                   </AlertDialogTrigger>
