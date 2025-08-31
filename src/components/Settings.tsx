@@ -367,39 +367,44 @@ export default function SettingsDialog({ user, notes, onUpdate }: Props) {
                     </div>
                   </div>
                 </div>
-                <div className="grid w-full grid-cols-2 gap-2 max-sm:grid-cols-1">
-                  <div className="flex flex-col gap-2">
-                    <Label htmlFor="firstName">First Name</Label>
-                    <Input
-                      id="firstName"
-                      value={firstName}
-                      onChange={(e) => setFirstName(e.target.value)}
-                      placeholder="Enter first name"
-                      disabled={isUpdatingProfile}
-                    />
-                  </div>
-                  <div className="flex flex-col gap-2">
-                    <Label htmlFor="lastName">Last Name</Label>
-                    <Input
-                      id="lastName"
-                      value={lastName}
-                      onChange={(e) => setLastName(e.target.value)}
-                      placeholder="Enter last name"
-                      disabled={isUpdatingProfile}
-                    />
-                  </div>
-                </div>
-                <Button
-                  onClick={handleUpdateProfile}
-                  className="w-[50%]"
-                  disabled={
-                    isUpdatingProfile ||
-                    firstName.length === 0 ||
-                    lastName.length === 0
-                  }
+                <form
+                  action={handleUpdateProfile}
+                  className="flex w-full flex-col items-center gap-4"
                 >
-                  {isUpdatingProfile ? "Saving..." : "Save Profile"}
-                </Button>
+                  <div className="grid w-full grid-cols-2 gap-2 max-sm:grid-cols-1">
+                    <div className="flex flex-col gap-2">
+                      <Label htmlFor="firstName">First Name</Label>
+                      <Input
+                        id="firstName"
+                        value={firstName}
+                        onChange={(e) => setFirstName(e.target.value)}
+                        placeholder="Enter first name"
+                        disabled={isUpdatingProfile}
+                      />
+                    </div>
+                    <div className="flex flex-col gap-2">
+                      <Label htmlFor="lastName">Last Name</Label>
+                      <Input
+                        id="lastName"
+                        value={lastName}
+                        onChange={(e) => setLastName(e.target.value)}
+                        placeholder="Enter last name"
+                        disabled={isUpdatingProfile}
+                      />
+                    </div>
+                  </div>
+                  <Button
+                    type="submit"
+                    className="w-[50%]"
+                    disabled={
+                      isUpdatingProfile ||
+                      firstName.length === 0 ||
+                      lastName.length === 0
+                    }
+                  >
+                    {isUpdatingProfile ? "Saving..." : "Save Profile"}
+                  </Button>
+                </form>
               </div>
             </div>
           </TabsContent>
@@ -411,39 +416,44 @@ export default function SettingsDialog({ user, notes, onUpdate }: Props) {
                   <Lock className="size-5" />
                   <span className="pb-0.5">Change Password</span>
                 </div>
-                <div className="flex w-full flex-col gap-4">
-                  <div className="flex flex-col gap-2">
-                    <Label htmlFor="password">New Password</Label>
-                    <Input
-                      type="password"
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                      placeholder="Enter new password"
-                      disabled={isUpdatingPassword}
-                    />
-                  </div>
-                  <div className="flex flex-col gap-2">
-                    <Label htmlFor="confirmPassword">Confirm Password</Label>
-                    <Input
-                      type="password"
-                      value={confirmPassword}
-                      onChange={(e) => setConfirmPassword(e.target.value)}
-                      placeholder="Confirm new password"
-                      disabled={isUpdatingPassword}
-                    />
-                  </div>
-                </div>
-                <Button
-                  onClick={handleUpdatePassword}
-                  className="w-[50%]"
-                  disabled={
-                    isUpdatingPassword ||
-                    password.length === 0 ||
-                    confirmPassword.length === 0
-                  }
+                <form
+                  action={handleUpdatePassword}
+                  className="flex w-full flex-col items-center gap-4"
                 >
-                  {isUpdatingPassword ? "Saving..." : "Save Password"}
-                </Button>
+                  <div className="flex w-full flex-col gap-4">
+                    <div className="flex flex-col gap-2">
+                      <Label htmlFor="password">New Password</Label>
+                      <Input
+                        type="password"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        placeholder="Enter new password"
+                        disabled={isUpdatingPassword}
+                      />
+                    </div>
+                    <div className="flex flex-col gap-2">
+                      <Label htmlFor="confirmPassword">Confirm Password</Label>
+                      <Input
+                        type="password"
+                        value={confirmPassword}
+                        onChange={(e) => setConfirmPassword(e.target.value)}
+                        placeholder="Confirm new password"
+                        disabled={isUpdatingPassword}
+                      />
+                    </div>
+                  </div>
+                  <Button
+                    type="submit"
+                    className="w-[50%]"
+                    disabled={
+                      isUpdatingPassword ||
+                      password.length === 0 ||
+                      confirmPassword.length === 0
+                    }
+                  >
+                    {isUpdatingPassword ? "Saving..." : "Save Password"}
+                  </Button>
+                </form>
               </div>
             </div>
           </TabsContent>
@@ -457,57 +467,62 @@ export default function SettingsDialog({ user, notes, onUpdate }: Props) {
                     OpenAI API Key (gpt-4o-mini)
                   </span>
                 </div>
-                <div className="flex w-full flex-col gap-2">
-                  <Label htmlFor="apiKey">API Key</Label>
-                  <Input
-                    type="password"
-                    value={apiKey || ""}
-                    onChange={(e) => setApiKey(e.target.value)}
-                    placeholder="Enter your OpenAI API Key"
-                    pattern="^sk-proj-[A-Za-z0-9-_]{74}T3BlbkFJ[A-Za-z0-9-_]{74}$"
-                    disabled={isUpdatingApiKey || apiKeySaved}
-                  />
-                  <p
-                    className={`text-muted-foreground text-xs ${
-                      apiKey &&
-                      apiKey.length > 0 &&
-                      !apiKey.match(
-                        /^sk-proj-[A-Za-z0-9-_]{74}T3BlbkFJ[A-Za-z0-9-_]{74}$/,
-                      )
-                        ? "block"
-                        : "hidden"
-                    }`}
-                  >
-                    Your Project API key is not valid. Please enter a valid
-                    Project API key.
-                  </p>
-                </div>
-                <div className="flex w-[80%] items-center justify-center gap-1">
-                  <Button
-                    onClick={handleUpdateApiKey}
-                    className="w-[50%]"
-                    disabled={
-                      isUpdatingApiKey ||
-                      apiKeySaved ||
-                      apiKey?.length === 0 ||
-                      !apiKey?.match(
-                        /^sk-proj-[A-Za-z0-9-_]{74}T3BlbkFJ[A-Za-z0-9-_]{74}$/,
-                      )
-                    }
-                  >
-                    {isUpdatingApiKey ? "Saving..." : "Save API Key"}
-                  </Button>
-                  {apiKeySaved && (
-                    <Button
-                      variant="outline"
-                      className="w-[50%]"
-                      onClick={handleDeleteApiKey}
-                      disabled={isDeletingApiKey}
+                <form
+                  action={handleUpdateApiKey}
+                  className="flex w-full flex-col items-center gap-4"
+                >
+                  <div className="flex w-full flex-col gap-2">
+                    <Label htmlFor="apiKey">API Key</Label>
+                    <Input
+                      type="password"
+                      value={apiKey || ""}
+                      onChange={(e) => setApiKey(e.target.value)}
+                      placeholder="Enter your OpenAI API Key"
+                      pattern="^sk-proj-[A-Za-z0-9-_]{74}T3BlbkFJ[A-Za-z0-9-_]{74}$"
+                      disabled={isUpdatingApiKey || apiKeySaved}
+                    />
+                    <p
+                      className={`text-muted-foreground text-xs ${
+                        apiKey &&
+                        apiKey.length > 0 &&
+                        !apiKey.match(
+                          /^sk-proj-[A-Za-z0-9-_]{74}T3BlbkFJ[A-Za-z0-9-_]{74}$/,
+                        )
+                          ? "block"
+                          : "hidden"
+                      }`}
                     >
-                      {isDeletingApiKey ? "Deleting..." : "Delete API Key"}
+                      Your Project API key is not valid. Please enter a valid
+                      Project API key.
+                    </p>
+                  </div>
+                  <div className="flex w-[80%] items-center justify-center gap-1">
+                    <Button
+                      type="submit"
+                      className="w-[50%]"
+                      disabled={
+                        isUpdatingApiKey ||
+                        apiKeySaved ||
+                        apiKey?.length === 0 ||
+                        !apiKey?.match(
+                          /^sk-proj-[A-Za-z0-9-_]{74}T3BlbkFJ[A-Za-z0-9-_]{74}$/,
+                        )
+                      }
+                    >
+                      {isUpdatingApiKey ? "Saving..." : "Save API Key"}
                     </Button>
-                  )}
-                </div>
+                    {apiKeySaved && (
+                      <Button
+                        variant="outline"
+                        className="w-[50%]"
+                        onClick={handleDeleteApiKey}
+                        disabled={isDeletingApiKey}
+                      >
+                        {isDeletingApiKey ? "Deleting..." : "Delete API Key"}
+                      </Button>
+                    )}
+                  </div>
+                </form>
               </div>
             </div>
           </TabsContent>

@@ -214,32 +214,34 @@ function AskAIButton({ user, type }: Props) {
           />
         </div>
 
-        <div
-          className={`mt-4 flex flex-col rounded-lg border p-4 ${
-            isPending ? "cursor-not-allowed" : "cursor-text"
-          }`}
-          onClick={handleClickInput}
-        >
-          <Textarea
-            ref={textAreaRef}
-            placeholder="Ask me anything about your notes..."
-            className="placeholder:!text-muted-foreground !resize-none !rounded-none !border-none !bg-transparent !p-0 !font-semibold !shadow-none focus-visible:!ring-0 focus-visible:!ring-offset-0"
-            style={{ minHeight: "0", lineHeight: "normal" }}
-            rows={1}
-            value={questionText}
-            onChange={(e) => setQuestionText(e.target.value)}
-            onKeyDown={handleKeyDown}
-            onInput={handleInput}
-            disabled={isPending}
-          />
-          <Button
-            className="ml-auto size-8 rounded-full"
-            disabled={isPending}
-            onClick={handleSubmit}
+        <form action={handleSubmit}>
+          <div
+            className={`mt-4 flex flex-col rounded-lg border p-4 ${
+              isPending ? "cursor-not-allowed" : "cursor-text"
+            }`}
+            onClick={handleClickInput}
           >
-            <ArrowUp className="size-4" />
-          </Button>
-        </div>
+            <Textarea
+              ref={textAreaRef}
+              placeholder="Ask me anything about your notes..."
+              className="placeholder:!text-muted-foreground !resize-none !rounded-none !border-none !bg-transparent !p-0 !font-semibold !shadow-none focus-visible:!ring-0 focus-visible:!ring-offset-0"
+              style={{ minHeight: "0", lineHeight: "normal" }}
+              rows={1}
+              value={questionText}
+              onChange={(e) => setQuestionText(e.target.value)}
+              onKeyDown={handleKeyDown}
+              onInput={handleInput}
+              disabled={isPending}
+            />
+            <Button
+              className="ml-auto size-8 rounded-full"
+              disabled={isPending}
+              type="submit"
+            >
+              <ArrowUp className="size-4" />
+            </Button>
+          </div>
+        </form>
       </DialogContent>
     </Dialog>
   );

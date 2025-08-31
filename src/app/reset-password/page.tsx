@@ -104,50 +104,54 @@ export default function ResetPasswordPage() {
   }
 
   return (
-    <div className="mt-20 flex flex-1 flex-col items-center max-sm:mx-auto max-sm:max-w-sm">
-      <Card className="w-full max-w-md">
-        <CardHeader className="mb-1">
-          <CardTitle className="text-center text-3xl">Reset Password</CardTitle>
-          <CardDescription className="text-center">
-            Please enter your new password below.
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="flex flex-col gap-4">
-            <div className="grid gap-2">
-              <Label htmlFor="password">New Password</Label>
-              <Input
-                id="password"
-                type="password"
-                placeholder="Enter new password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                disabled={isResettingPassword}
-              />
+    <form action={handleResetPassword}>
+      <div className="mt-20 flex flex-1 flex-col items-center max-sm:mx-auto max-sm:max-w-sm">
+        <Card className="w-full max-w-md">
+          <CardHeader className="mb-1">
+            <CardTitle className="text-center text-3xl">
+              Reset Password
+            </CardTitle>
+            <CardDescription className="text-center">
+              Please enter your new password below.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="flex flex-col gap-4">
+              <div className="grid gap-2">
+                <Label htmlFor="password">New Password</Label>
+                <Input
+                  id="password"
+                  type="password"
+                  placeholder="Enter new password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  disabled={isResettingPassword}
+                />
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="confirmPassword">Confirm Password</Label>
+                <Input
+                  id="confirmPassword"
+                  type="password"
+                  placeholder="Confirm new password"
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  disabled={isResettingPassword}
+                />
+              </div>
             </div>
-            <div className="grid gap-2">
-              <Label htmlFor="confirmPassword">Confirm Password</Label>
-              <Input
-                id="confirmPassword"
-                type="password"
-                placeholder="Confirm new password"
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-                disabled={isResettingPassword}
-              />
-            </div>
-          </div>
-        </CardContent>
-        <CardFooter className="flex items-center justify-center">
-          <Button
-            onClick={handleResetPassword}
-            disabled={isResettingPassword}
-            className="w-full"
-          >
-            {isResettingPassword ? "Resetting..." : "Reset Password"}
-          </Button>
-        </CardFooter>
-      </Card>
-    </div>
+          </CardContent>
+          <CardFooter className="flex items-center justify-center">
+            <Button
+              type="submit"
+              disabled={isResettingPassword}
+              className="w-full"
+            >
+              {isResettingPassword ? "Resetting..." : "Reset Password"}
+            </Button>
+          </CardFooter>
+        </Card>
+      </div>
+    </form>
   );
 }

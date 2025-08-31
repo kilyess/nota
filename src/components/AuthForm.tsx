@@ -3,7 +3,7 @@
 import { loginAction, signUpAction } from "@/actions/users";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useTransition } from "react";
+import { useState, useTransition } from "react";
 import { toast } from "sonner";
 import { Button } from "./ui/button";
 import { CardContent, CardFooter } from "./ui/card";
@@ -16,6 +16,10 @@ type Props = {
 
 function AuthForm({ type }: Props) {
   const isLoginForm = type === "login";
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
 
   const router = useRouter();
 
@@ -102,6 +106,8 @@ function AuthForm({ type }: Props) {
               id="firstName"
               name="firstName"
               type="firstName"
+              value={firstName}
+              onChange={(e) => setFirstName(e.target.value)}
               placeholder="Enter your first name"
               required={isLoginForm}
               disabled={isPending || isLoginForm}
@@ -113,6 +119,8 @@ function AuthForm({ type }: Props) {
               id="lastName"
               name="lastName"
               type="lastName"
+              value={lastName}
+              onChange={(e) => setLastName(e.target.value)}
               placeholder="Enter your last name"
               required={isLoginForm}
               disabled={isPending || isLoginForm}
@@ -124,6 +132,8 @@ function AuthForm({ type }: Props) {
               id="email"
               name="email"
               type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
               placeholder="Enter your email"
               required
               disabled={isPending}
@@ -146,10 +156,22 @@ function AuthForm({ type }: Props) {
               id="password"
               name="password"
               type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
               placeholder="Enter your password"
               required
               disabled={isPending}
+              minLength={8}
             />
+            {!isLoginForm &&
+              password &&
+              !/(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}/.test(password) && (
+                <p className="text-muted-foreground text-sm">
+                  Password must be at least 8 characters long and contain at
+                  least one uppercase letter, one lowercase letter, and one
+                  number.
+                </p>
+              )}
           </div>
         </div>
       </CardContent>

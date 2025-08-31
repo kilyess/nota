@@ -41,41 +41,40 @@ function ForgotPasswordPage() {
   };
 
   return (
-    <div className="mt-20 flex flex-1 flex-col items-center max-sm:mx-auto max-sm:max-w-sm">
-      <Card className="w-full max-w-md">
-        <CardHeader className="mb-1">
-          <CardTitle className="text-center text-3xl">
-            Forgot Password
-          </CardTitle>
-          <CardDescription className="text-center">
-            Please enter your email below to reset your password.
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="grid gap-2">
-            <Label htmlFor="email">Email</Label>
-            <Input
-              id="email"
-              type="email"
-              placeholder="Enter your email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              disabled={isSendingResetPasswordEmail}
-            />
-          </div>
-        </CardContent>
-        <CardFooter className="flex items-center justify-center">
-          <Button
-            onClick={handleResetPassword}
-            disabled={isSendingResetPasswordEmail}
-          >
-            {isSendingResetPasswordEmail
-              ? "Sending..."
-              : "Send Reset Password Email"}
-          </Button>
-        </CardFooter>
-      </Card>
-    </div>
+    <form action={handleResetPassword}>
+      <div className="mt-20 flex flex-1 flex-col items-center max-sm:mx-auto max-sm:max-w-sm">
+        <Card className="w-full max-w-md">
+          <CardHeader className="mb-1">
+            <CardTitle className="text-center text-3xl">
+              Forgot Password
+            </CardTitle>
+            <CardDescription className="text-center">
+              Please enter your email below to reset your password.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="grid gap-2">
+              <Label htmlFor="email">Email</Label>
+              <Input
+                id="email"
+                type="email"
+                placeholder="Enter your email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                disabled={isSendingResetPasswordEmail}
+              />
+            </div>
+          </CardContent>
+          <CardFooter className="flex items-center justify-center">
+            <Button type="submit" disabled={isSendingResetPasswordEmail}>
+              {isSendingResetPasswordEmail
+                ? "Sending..."
+                : "Send Reset Password Email"}
+            </Button>
+          </CardFooter>
+        </Card>
+      </div>
+    </form>
   );
 }
 
