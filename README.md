@@ -2,7 +2,7 @@
 
 nota is a super user-friendly note-taking app featuring an AI assistant that lets you ask anything about your notes. Inspired by the sleek look of [t3.chat](https://t3.chat), nota offers a seamless design experience powered by [shadcn/ui](https://ui.shadcn.com/).
 
-> **Live Demo:** Check out nota at [nota.ma](https://nota.ma)! (currently [notama.netlify.app](notama.netlify.app) until DNS Propagation takes effect.)
+> **Live Demo:** Check out nota at [nota.ma](https://nota.ma)! (if the domain is not live, try: [notama.netlify.app](notama.netlify.app))
 
 ## Features
 

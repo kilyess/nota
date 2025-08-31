@@ -347,7 +347,7 @@ export default function SettingsDialog({ user, notes, onUpdate }: Props) {
                       >
                         <Upload className="size-4" />
                         <span className="hidden pb-0.5 font-semibold md:inline">
-                          Upload Avatar
+                          {isUpdatingAvatar ? "Uploading..." : "Upload Avatar"}
                         </span>
                       </Button>
                       <Button
@@ -361,7 +361,7 @@ export default function SettingsDialog({ user, notes, onUpdate }: Props) {
                       >
                         <X className="size-4" />
                         <span className="hidden pb-0.5 font-semibold md:inline">
-                          Delete Avatar
+                          {isDeletingAvatar ? "Deleting..." : "Delete Avatar"}
                         </span>
                       </Button>
                     </div>
@@ -398,7 +398,7 @@ export default function SettingsDialog({ user, notes, onUpdate }: Props) {
                     lastName.length === 0
                   }
                 >
-                  {isUpdatingProfile ? "Updating..." : "Save Profile"}
+                  {isUpdatingProfile ? "Saving..." : "Save Profile"}
                 </Button>
               </div>
             </div>
@@ -442,7 +442,7 @@ export default function SettingsDialog({ user, notes, onUpdate }: Props) {
                     confirmPassword.length === 0
                   }
                 >
-                  {isUpdatingPassword ? "Updating..." : "Save Password"}
+                  {isUpdatingPassword ? "Saving..." : "Save Password"}
                 </Button>
               </div>
             </div>
@@ -495,7 +495,7 @@ export default function SettingsDialog({ user, notes, onUpdate }: Props) {
                       )
                     }
                   >
-                    {isUpdatingApiKey ? "Updating..." : "Save API Key"}
+                    {isUpdatingApiKey ? "Saving..." : "Save API Key"}
                   </Button>
                   {apiKeySaved && (
                     <Button
