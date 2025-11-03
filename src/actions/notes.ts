@@ -7,7 +7,6 @@ import openai from "@/openai";
 import { getUser } from "@/utils/supabase/server";
 import { htmlToText } from "html-to-text";
 import { ChatCompletionMessageParam } from "openai/resources/chat/completions";
-import { getDecryptedApiKeyAction } from "./users";
 
 export const updateNoteAction = async (
   noteId: string,
@@ -161,10 +160,12 @@ export const askAIAboutNotesAction = async (
     throw new Error("Please login or sign up to ask AI about your notes");
   }
 
-  const { apiKey: decryptedApiKey } = await getDecryptedApiKeyAction();
-  if (!decryptedApiKey) {
-    throw new Error("API key not found. Please set your API key in settings.");
-  }
+  // Debug: Log the API key (first/last few chars only for security)
+  console.log("API Key received:", {
+    length: apiKey?.length,
+    startsWith: apiKey?.substring(0, 5),
+    endsWith: apiKey?.substring(apiKey.length - 5),
+  });
 
   let notes = await prisma.note.findMany({
     where: {
@@ -237,7 +238,7 @@ export const askAIAboutNotesAction = async (
     }
   }
 
-  const completion = await openai(decryptedApiKey).chat.completions.create({
+  const completion = await openai(apiKey).chat.completions.create({
     model: "gpt-4o-mini",
     messages,
   });
