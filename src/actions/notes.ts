@@ -231,10 +231,19 @@ export const askAIAboutNotesAction = async (
     }
   }
 
-  const completion = await openai(apiKey).chat.completions.create({
-    model: "gpt-4o-mini",
-    messages,
-  });
+  const completion = await openai(apiKey)
+    .chat.completions.create({
+      model: "gpt-4o-mini",
+      messages,
+    })
+    .catch((error) => {
+      console.error("OpenAI API Error:", error);
+      throw new Error("Something went wrong. Please try again.");
+    });
 
-  return completion.choices[0].message.content || "A problem has occurred";
+  if (!completion) {
+    return null;
+  }
+
+  return completion.choices[0].message.content;
 };
