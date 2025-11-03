@@ -1,5 +1,4 @@
 "use server";
-export const runtime = "nodejs";
 
 import { prisma } from "@/db/prisma";
 import { decryptString, encryptString } from "@/lib/crypto";
@@ -232,12 +231,29 @@ export const askAIAboutNotesAction = async (
     }
   }
 
-  const client = getOpenAIClient(apiKey);
+  const openai = getOpenAIClient(apiKey);
 
-  const completion = await client.chat.completions.create({
-    model: "gpt-4o-mini",
-    messages,
-  });
+  try {
+    const completion = await openai.chat.completions.create({
+      model: "gpt-4o-mini",
+      messages,
+    });
+    return completion.choices[0].message.content || "A problem has occurred";
+  } catch (error: any) {
+    console.error("OpenAI API Error:", {
+      status: error.status,
+      message: error.message,
+      code: error.code,
+      type: error.type,
+      // Don't log the actual API key
+      keyLength: apiKey?.length,
+      keyPrefix: apiKey?.substring(0, 7) + "...",
+    });
 
-  return completion.choices[0].message.content || "A problem has occurred";
+    // Check for specific error types
+    if (error.status === 401) {
+      console.error("Authentication failed. Key might be invalid or revoked");
+    }
+    return null;
+  }
 };
