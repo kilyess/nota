@@ -2,8 +2,8 @@
 
 import { prisma } from "@/db/prisma";
 import { decryptString, encryptString } from "@/lib/crypto";
+import { getOpenAIClient } from "@/lib/openai";
 import { handleError } from "@/lib/utils";
-import openai from "@/openai";
 import { getUser } from "@/utils/supabase/server";
 import { htmlToText } from "html-to-text";
 import { ChatCompletionMessageParam } from "openai/resources/chat/completions";
@@ -231,7 +231,9 @@ export const askAIAboutNotesAction = async (
     }
   }
 
-  const completion = await openai(apiKey).chat.completions.create({
+  const client = getOpenAIClient(apiKey);
+
+  const completion = await client.chat.completions.create({
     model: "gpt-4o-mini",
     messages,
   });
