@@ -128,7 +128,7 @@ function AskAIButton({ user, type }: Props) {
         responses,
         apiKey || "",
       ).catch((error) => {
-        toast.error(error.message);
+        toast.error("Something went wrong. Please try again.");
         return null;
       });
       if (response) {
