@@ -1,4 +1,5 @@
 "use server";
+export const runtime = "nodejs";
 
 import { prisma } from "@/db/prisma";
 import { decryptString, encryptString } from "@/lib/crypto";
