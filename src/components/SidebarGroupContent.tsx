@@ -1,12 +1,14 @@
 "use client";
 
+import { togglePinNoteAction } from "@/actions/notes";
 import { useGroupedNotes } from "@/hooks/use-grouped-notes";
 import useNote from "@/hooks/use-note";
 import { Note } from "@prisma/client";
 import { ChevronDown, Pin, PinOff } from "lucide-react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { toast } from "sonner";
 import DeleteNoteButton from "./DeleteNoteButton";
 import { Button } from "./ui/button";
 import {
@@ -32,13 +34,32 @@ function SidebarGroupContent({ notes, showTopFade, showBottomFade }: Props) {
   const [disabledNoteId, setDisabledNoteId] = useState<string[]>([]);
   const { noteTitle, updateNote } = useNote();
 
-  const handlePinClick = (
+  useEffect(() => {
+    const collapsed = localStorage.getItem("pinnedCollapsed");
+    if (collapsed) {
+      setPinnedCollapsed(collapsed === "true");
+    }
+  }, []);
+
+  const handlePinnedCollapse = () => {
+    setPinnedCollapsed((prev) => !prev);
+    localStorage.setItem("pinnedCollapsed", (!pinnedCollapsed).toString());
+  };
+
+  const handlePinClick = async (
     e: React.MouseEvent<HTMLDivElement | HTMLButtonElement>,
     note: Note,
   ) => {
     e.stopPropagation();
     e.preventDefault();
     updateNote({ ...note, pinned: !note.pinned });
+    const result = await togglePinNoteAction(note.id, !note.pinned);
+    if (result.errorMessage) {
+      toast.error(result.errorMessage, {
+        description: "Error toggling pin, please try again.",
+      });
+      updateNote({ ...note, pinned: note.pinned });
+    }
   };
 
   const handleDisableNote = (noteId: string, disabled: boolean) => {
@@ -71,7 +92,7 @@ function SidebarGroupContent({ notes, showTopFade, showBottomFade }: Props) {
                   <Button
                     variant="ghost"
                     className="size-7 rounded-md p-1.5"
-                    onClick={() => setPinnedCollapsed((prev) => !prev)}
+                    onClick={handlePinnedCollapse}
                   >
                     <ChevronDown
                       className={`size-4 transition-transform ${pinnedCollapsed ? "-rotate-180" : "rotate-0"}`}

@@ -105,7 +105,9 @@ function AskAIButton({ user, type }: Props) {
     textArea.focus();
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = (e?: React.FormEvent<HTMLFormElement>) => {
+    e?.preventDefault();
+
     if (!apiKey) {
       toast.warning("Please set your API key in the settings");
       return;
@@ -214,7 +216,7 @@ function AskAIButton({ user, type }: Props) {
           />
         </div>
 
-        <form action={handleSubmit}>
+        <form onSubmit={handleSubmit}>
           <div
             className={`mt-4 flex flex-col rounded-lg border p-4 ${
               isPending ? "cursor-not-allowed" : "cursor-text"
