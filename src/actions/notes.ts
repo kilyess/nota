@@ -160,13 +160,6 @@ export const askAIAboutNotesAction = async (
     throw new Error("Please login or sign up to ask AI about your notes");
   }
 
-  // Debug: Log the API key (first/last few chars only for security)
-  console.log("API Key received:", {
-    length: apiKey?.length,
-    startsWith: apiKey?.substring(0, 5),
-    endsWith: apiKey?.substring(apiKey.length - 5),
-  });
-
   let notes = await prisma.note.findMany({
     where: {
       authorId: user.id,

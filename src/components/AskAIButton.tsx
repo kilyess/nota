@@ -127,8 +127,13 @@ function AskAIButton({ user, type }: Props) {
         newQuestions,
         responses,
         apiKey || "",
-      );
-      setResponses((prev) => [...prev, response]);
+      ).catch((error) => {
+        toast.error("Something went wrong. Please try again.");
+        return null;
+      });
+      if (response) {
+        setResponses((prev) => [...prev, response]);
+      }
       setTimeout(ScrollToBottom, 100);
     });
   };
