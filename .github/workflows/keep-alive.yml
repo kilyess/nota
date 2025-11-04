@@ -2,8 +2,8 @@ name: Ping Supabase to Prevent Pausing
 
 on:
   schedule:
-    # 9:00am (`0, 9`), every day (`*`), every month (`*`), monday and thursday (`1, 4`)
-    - cron: '0 9 * * 1,4'
+    # 9:00am (`0 9`), every day (`*`), every month (`*`), monday through friday (`1-5`)
+    - cron: '0 9 * * 1-5'
   workflow_dispatch:
 
 jobs:
