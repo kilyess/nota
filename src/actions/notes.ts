@@ -1,5 +1,6 @@
 "use server";
 
+import { getDecryptedApiKeyAction } from "@/actions/users";
 import { prisma } from "@/db/prisma";
 import { decryptString, encryptString } from "@/lib/crypto";
 import { handleError } from "@/lib/utils";
@@ -152,12 +153,25 @@ export const togglePinNoteAction = async (noteId: string, pinned: boolean) => {
 export const askAIAboutNotesAction = async (
   questions: string[],
   responses: string[],
-  apiKey: string,
 ) => {
   const user = await getUser();
 
   if (!user) {
     throw new Error("Please login or sign up to ask AI about your notes");
+  }
+
+  // Fetch API key directly on the server to avoid serialization issues
+  const { apiKey, errorMessage } = await getDecryptedApiKeyAction();
+
+  if (!apiKey || errorMessage) {
+    throw new Error("Please set your API key in the settings");
+  }
+
+  // Trim the API key to remove any potential whitespace
+  const trimmedApiKey = apiKey.trim();
+
+  if (!trimmedApiKey) {
+    throw new Error("Invalid API key. Please set your API key in the settings");
   }
 
   let notes = await prisma.note.findMany({
@@ -231,7 +245,7 @@ export const askAIAboutNotesAction = async (
     }
   }
 
-  const openaiClient = await openai(apiKey);
+  const openaiClient = openai(trimmedApiKey);
 
   const completion = await openaiClient.chat.completions.create({
     model: "gpt-4o-mini",

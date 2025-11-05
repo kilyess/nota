@@ -108,11 +108,6 @@ function AskAIButton({ user, type }: Props) {
   const handleSubmit = (e?: React.FormEvent<HTMLFormElement>) => {
     e?.preventDefault();
 
-    if (!apiKey) {
-      toast.warning("Please set your API key in the settings");
-      return;
-    }
-
     if (questionText.trim() === "") {
       return;
     }
@@ -126,7 +121,6 @@ function AskAIButton({ user, type }: Props) {
       const response = await askAIAboutNotesAction(
         newQuestions,
         responses,
-        apiKey || "",
       ).catch((error) => {
         toast.error("Something went wrong. Please try again.");
         return null;
