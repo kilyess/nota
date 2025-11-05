@@ -1,9 +1,9 @@
 import OpenAI from "openai";
 
-const openai = (apiKey: string) =>
-  new OpenAI({
+const openai = async (apiKey: string) => {
+  return new OpenAI({
     apiKey,
-    dangerouslyAllowBrowser: true,
   });
+};
 
 export default openai;

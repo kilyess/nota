@@ -231,7 +231,7 @@ export const askAIAboutNotesAction = async (
     }
   }
 
-  const openaiClient = openai(apiKey);
+  const openaiClient = await openai(apiKey);
 
   const completion = await openaiClient.chat.completions.create({
     model: "gpt-4o-mini",
