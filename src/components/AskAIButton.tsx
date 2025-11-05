@@ -133,8 +133,8 @@ function AskAIButton({ user, type }: Props) {
       });
       if (response) {
         setResponses((prev) => [...prev, response]);
+        setTimeout(ScrollToBottom, 100);
       }
-      setTimeout(ScrollToBottom, 100);
     });
   };
 
