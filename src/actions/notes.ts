@@ -7,7 +7,6 @@ import { handleError } from "@/lib/utils";
 import openai from "@/openai";
 import { getUser } from "@/utils/supabase/server";
 import { htmlToText } from "html-to-text";
-import { createHash } from "node:crypto";
 import { ChatCompletionMessageParam } from "openai/resources/chat/completions";
 
 export const updateNoteAction = async (
@@ -245,49 +244,11 @@ export const askAIAboutNotesAction = async (
   }
 
   const openaiClient = openai(trimmedApiKey);
-  try {
-    const completion = await openaiClient.chat.completions.create({
-      model: "gpt-4o-mini",
-      messages,
-    });
 
-    return completion.choices[0].message.content || "A problem has occurred";
-  } catch (error: unknown) {
-    const response = (error as { response?: Response }).response;
-    let responseHeaders: Record<string, string> | undefined;
-    if (response?.headers) {
-      responseHeaders = Object.fromEntries(response.headers.entries());
-    }
+  const completion = await openaiClient.chat.completions.create({
+    model: "gpt-4o-mini",
+    messages,
+  });
 
-    const keyPreview = trimmedApiKey
-      ? `${trimmedApiKey.slice(0, 7)}…${trimmedApiKey.slice(-4)}`
-      : "missing";
-    const keyHash = trimmedApiKey
-      ? createHash("sha256").update(trimmedApiKey).digest("hex")
-      : "missing";
-    const baseUrl =
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      ((openaiClient as any)?.baseURL as string | undefined) ??
-      process.env.OPENAI_BASE_URL ??
-      process.env.OPENAI_API_BASE ??
-      process.env.OPENAI_API_HOST ??
-      "https://api.openai.com/v1";
-
-    console.error("[askAIAboutNotesAction] OpenAI request failed", {
-      error,
-      status: (error as { status?: number }).status,
-      code: (error as { code?: string }).code,
-      type: (error as { type?: string }).type,
-      requestID: (error as { requestID?: string | null }).requestID ?? null,
-      keyPreview,
-      keyHash,
-      keyLength: trimmedApiKey.length,
-      baseUrl,
-      responseUrl: response?.url,
-      responseHeaders,
-      env: process.env.NODE_ENV,
-    });
-
-    throw error;
-  }
+  return completion.choices[0].message.content || "A problem has occurred";
 };

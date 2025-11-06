@@ -117,6 +117,7 @@ function AskAIButton({ user, type }: Props) {
         setResponses((prev) => [...prev, response]);
         setTimeout(ScrollToBottom, 100);
       }
+      textAreaRef.current?.focus();
     });
   };
 
