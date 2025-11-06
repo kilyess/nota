@@ -55,7 +55,7 @@ function AppSidebar({
           <h1 className="text-2xl font-semibold">nota</h1>
         </Link>
         <NewNoteButton type="sidebar" />
-        <div className="border-sidebar-ring-accent border-b px-2">
+        <div className="border-sidebar-ring-accent w-full border-b px-2">
           <div className="flex items-center">
             <SearchIcon className="size-4 min-w-4" />
             <Input

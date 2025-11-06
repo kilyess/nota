@@ -1,7 +1,6 @@
 "use client";
 
 import { askAIAboutNotesAction } from "@/actions/notes";
-import { getDecryptedApiKeyAction } from "@/actions/users";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -11,7 +10,6 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import useApiKey from "@/hooks/use-api-key";
 import "@/styles/ai-responses.css";
 import { User } from "@supabase/supabase-js";
 import { ArrowUp, Loader2, Sparkles } from "lucide-react";
@@ -29,8 +27,6 @@ function AskAIButton({ user, type }: Props) {
   const router = useRouter();
 
   const [isPending, startTransition] = useTransition();
-
-  const { apiKey, setApiKey } = useApiKey();
 
   const [open, setOpen] = useState(false);
   const [questionText, setQuestionText] = useState("");
@@ -66,14 +62,6 @@ function AskAIButton({ user, type }: Props) {
       resizeObserver.disconnect();
     };
   }, [questions, responses]);
-
-  useEffect(() => {
-    const fetchApiKey = async () => {
-      const { apiKey: decryptedApiKey } = await getDecryptedApiKeyAction();
-      setApiKey(decryptedApiKey || "");
-    };
-    fetchApiKey();
-  }, [setApiKey]);
 
   const handleOnOpenChange = (isOpen: boolean) => {
     if (!user) {

@@ -160,14 +160,12 @@ export const askAIAboutNotesAction = async (
     throw new Error("Please login or sign up to ask AI about your notes");
   }
 
-  // Fetch API key directly on the server to avoid serialization issues
   const { apiKey, errorMessage } = await getDecryptedApiKeyAction();
 
   if (!apiKey || errorMessage) {
     throw new Error("Please set your API key in the settings");
   }
 
-  // Trim the API key to remove any potential whitespace
   const trimmedApiKey = apiKey.trim();
 
   if (!trimmedApiKey) {
