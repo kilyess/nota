@@ -7,6 +7,7 @@ import { handleError } from "@/lib/utils";
 import openai from "@/openai";
 import { getUser } from "@/utils/supabase/server";
 import { htmlToText } from "html-to-text";
+import { createHash } from "node:crypto";
 import { ChatCompletionMessageParam } from "openai/resources/chat/completions";
 
 export const updateNoteAction = async (
@@ -244,11 +245,33 @@ export const askAIAboutNotesAction = async (
   }
 
   const openaiClient = openai(trimmedApiKey);
+  try {
+    const completion = await openaiClient.chat.completions.create({
+      model: "gpt-4o-mini",
+      messages,
+    });
 
-  const completion = await openaiClient.chat.completions.create({
-    model: "gpt-4o-mini",
-    messages,
-  });
+    return completion.choices[0].message.content || "A problem has occurred";
+  } catch (error: unknown) {
+    const keyPreview = trimmedApiKey
+      ? `${trimmedApiKey.slice(0, 7)}…${trimmedApiKey.slice(-4)}`
+      : "missing";
+    const keyHash = trimmedApiKey
+      ? createHash("sha256").update(trimmedApiKey).digest("hex")
+      : "missing";
 
-  return completion.choices[0].message.content || "A problem has occurred";
+    console.error("[askAIAboutNotesAction] OpenAI request failed", {
+      error,
+      status: (error as { status?: number }).status,
+      code: (error as { code?: string }).code,
+      type: (error as { type?: string }).type,
+      requestID: (error as { requestID?: string | null }).requestID ?? null,
+      keyPreview,
+      keyHash,
+      keyLength: trimmedApiKey.length,
+      env: process.env.NODE_ENV,
+    });
+
+    throw error;
+  }
 };
