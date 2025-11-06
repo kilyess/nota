@@ -253,12 +253,25 @@ export const askAIAboutNotesAction = async (
 
     return completion.choices[0].message.content || "A problem has occurred";
   } catch (error: unknown) {
+    const response = (error as { response?: Response }).response;
+    let responseHeaders: Record<string, string> | undefined;
+    if (response?.headers) {
+      responseHeaders = Object.fromEntries(response.headers.entries());
+    }
+
     const keyPreview = trimmedApiKey
       ? `${trimmedApiKey.slice(0, 7)}…${trimmedApiKey.slice(-4)}`
       : "missing";
     const keyHash = trimmedApiKey
       ? createHash("sha256").update(trimmedApiKey).digest("hex")
       : "missing";
+    const baseUrl =
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      ((openaiClient as any)?.baseURL as string | undefined) ??
+      process.env.OPENAI_BASE_URL ??
+      process.env.OPENAI_API_BASE ??
+      process.env.OPENAI_API_HOST ??
+      "https://api.openai.com/v1";
 
     console.error("[askAIAboutNotesAction] OpenAI request failed", {
       error,
@@ -269,6 +282,9 @@ export const askAIAboutNotesAction = async (
       keyPreview,
       keyHash,
       keyLength: trimmedApiKey.length,
+      baseUrl,
+      responseUrl: response?.url,
+      responseHeaders,
       env: process.env.NODE_ENV,
     });
 
