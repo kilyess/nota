@@ -142,11 +142,7 @@ export default function CommandMenu({ notes: initialNotes }: Props) {
               asChild
             >
               <Link
-                onClick={(e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  toggleCommandOpen();
-                }}
+                onClick={() => toggleCommandOpen()}
                 href={`/app/note/${note.id}`}
               >
                 {note.id === noteId ? noteTitle : note.title || "New Note"}
