@@ -30,14 +30,14 @@ export default function Content() {
           </div>
           <div className="relative aspect-video w-full overflow-hidden rounded-2xl border shadow-xl sm:aspect-3/2 lg:aspect-auto lg:h-[500px]">
             <Image
-              src="https://ecjnldeqsytvzylnjypq.supabase.co/storage/v1/object/public/logo/app-pic-light.png"
+              src="/app-pic-light.png"
               alt="Content Light"
               fill
               className="inline object-cover object-top-left dark:hidden"
               priority
             />
             <Image
-              src="https://ecjnldeqsytvzylnjypq.supabase.co/storage/v1/object/public/logo/app-pic-dark.png"
+              src="/app-pic-dark.png"
               alt="Content Dark"
               fill
               className="hidden object-cover object-top-left dark:inline"
