@@ -1,4 +1,4 @@
-import debounce from "lodash/debounce";
+import { debounce } from "lodash";
 import { useEffect, useMemo, useRef } from "react";
 
 export function useDebouncedCallback<Args extends any[] = any[], Return = void>(
