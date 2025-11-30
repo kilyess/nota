@@ -71,7 +71,7 @@ function NewNoteButton({ type }: Props) {
         <Button
           onClick={handleNewNote}
           variant="outline"
-          className="focus-visible:!ring-ring !text-foreground focus-visible:!border-ring hover:!text-accent-foreground flex !h-10 !w-40 !shrink-0 !gap-2 !rounded-full !border !font-semibold !shadow !outline-1 !backdrop-blur-xl !transition-colors !outline-none"
+          className="focus-visible:ring-ring! text-foreground! focus-visible:border-ring! hover:text-accent-foreground! flex h-10! w-40! shrink-0! gap-2! rounded-full! border! font-semibold! shadow! outline-1! backdrop-blur-xl! transition-colors! outline-none!"
           disabled={isPending}
         >
           <Notebook />

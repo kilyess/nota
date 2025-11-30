@@ -291,7 +291,7 @@ export default function SettingsDialog({ user, notes, onUpdate }: Props) {
           <Settings2 className="size-4" />
         </Button>
       </DialogTrigger>
-      <DialogContent className="flex min-w-2xl flex-col items-center max-sm:!min-w-sm">
+      <DialogContent className="flex min-w-2xl flex-col items-center max-sm:min-w-sm!">
         <DialogHeader>
           <DialogTitle className="text-center text-2xl font-semibold">
             Settings

@@ -50,7 +50,6 @@ function DeleteNoteButton({
         onSuccess: () => {
           const note = notes.find((note) => note.id === noteId);
           if (note) {
-            // @ts-expect-error - NoteWithBody is not assignable to Note but id is sufficient for deletion
             deleteNote(note);
           }
           if (noteId === currentNoteId) {
@@ -81,7 +80,7 @@ function DeleteNoteButton({
             }}
             tabIndex={-1}
             variant="ghost"
-            className="hover:!bg-destructive/50 hover:!text-destructive-foreground z-50 size-7 rounded-md p-1.5"
+            className="hover:bg-destructive/50! hover:text-destructive-foreground! z-50 size-7 rounded-md p-1.5"
             aria-label="Delete note"
           >
             <Trash className="size-4" />

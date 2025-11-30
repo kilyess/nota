@@ -248,7 +248,7 @@ const MenuBar = ({ editor, user }: Props) => {
               {option.icon}
             </Toggle>
           ))}
-          <Separator orientation="vertical" className="mx-1 !h-6" />
+          <Separator orientation="vertical" className="mx-1 h-6!" />
           {formattingOptions.map((option) => (
             <Toggle
               key={option.name}
@@ -259,7 +259,7 @@ const MenuBar = ({ editor, user }: Props) => {
               {option.icon}
             </Toggle>
           ))}
-          <Separator orientation="vertical" className="mx-1 !h-6" />
+          <Separator orientation="vertical" className="mx-1 h-6!" />
           {blockOptions.map((option) => (
             <Toggle
               key={option.name}
@@ -271,7 +271,7 @@ const MenuBar = ({ editor, user }: Props) => {
             </Toggle>
           ))}
           <LinkPopover editor={editor} />
-          <Separator orientation="vertical" className="mx-1 !h-6" />
+          <Separator orientation="vertical" className="mx-1 h-6!" />
           {listOptions.map((option) => (
             <Toggle
               key={option.name}
@@ -282,7 +282,7 @@ const MenuBar = ({ editor, user }: Props) => {
               {option.icon}
             </Toggle>
           ))}
-          <Separator orientation="vertical" className="mx-1 !h-6" />
+          <Separator orientation="vertical" className="mx-1 h-6!" />
           {alignOptions.map((option) => (
             <Toggle
               key={option.name}
@@ -296,11 +296,11 @@ const MenuBar = ({ editor, user }: Props) => {
         </div>
         <div
           aria-hidden
-          className={`from-background pointer-events-none absolute inset-y-0 left-0 z-10 w-6 bg-gradient-to-r to-transparent transition-opacity duration-150 ${showLeftFade ? "opacity-100" : "opacity-0"}`}
+          className={`from-background pointer-events-none absolute inset-y-0 left-0 z-10 w-6 bg-linear-to-r to-transparent transition-opacity duration-150 ${showLeftFade ? "opacity-100" : "opacity-0"}`}
         />
         <div
           aria-hidden
-          className={`from-background pointer-events-none absolute inset-y-0 right-0 z-10 w-6 bg-gradient-to-l to-transparent transition-opacity duration-150 ${showRightFade ? "opacity-100" : "opacity-0"}`}
+          className={`from-background pointer-events-none absolute inset-y-0 right-0 z-10 w-6 bg-linear-to-l to-transparent transition-opacity duration-150 ${showRightFade ? "opacity-100" : "opacity-0"}`}
         />
       </div>
       <div className="ml-auto">

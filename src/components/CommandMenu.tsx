@@ -133,11 +133,11 @@ export default function CommandMenu({ notes: initialNotes }: Props) {
               ? "Recent Notes"
               : `Search Results (${visibleNotes.length})`
           }
-          className="!px-3"
+          className="px-3!"
         >
           {visibleNotes.map((note) => (
             <CommandItem
-              className="!text-accent-foreground hover:!bg-muted hover:!text-accent-foreground h-9 cursor-pointer !bg-transparent"
+              className="text-accent-foreground! hover:bg-muted! hover:text-accent-foreground! h-9 cursor-pointer bg-transparent!"
               key={note.id}
               asChild
             >
