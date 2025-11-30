@@ -17,11 +17,11 @@ export default function Content() {
               summarize content, and generate new ideas from your existing
               knowledge.
             </p>
-            <div className="mt-8 flex items-center gap-x-6">
+            <div className="mt-8 flex flex-col items-start gap-4 sm:flex-row sm:items-center sm:gap-x-6">
               <Button asChild>
                 <Link href="/signup">Start Writing</Link>
               </Button>
-              <Button asChild variant="link">
+              <Button asChild variant="link" className="-ml-3">
                 <Link href="/login">
                   Already have an account? Sign in &rarr;
                 </Link>
@@ -33,14 +33,14 @@ export default function Content() {
               src="https://ecjnldeqsytvzylnjypq.supabase.co/storage/v1/object/public/logo/app-pic-light.png"
               alt="Content Light"
               fill
-              className="inline object-cover object-left dark:hidden"
+              className="inline object-cover object-top-left dark:hidden"
               priority
             />
             <Image
               src="https://ecjnldeqsytvzylnjypq.supabase.co/storage/v1/object/public/logo/app-pic-dark.png"
               alt="Content Dark"
               fill
-              className="hidden object-cover object-left dark:inline"
+              className="hidden object-cover object-top-left dark:inline"
               priority
             />
           </div>

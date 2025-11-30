@@ -126,7 +126,9 @@ export const HeroHeader = () => {
                     <span>Get Started</span>
                   </Link>
                 </Button>
-                <DarkModeToggle />
+                <div className="flex items-center justify-center lg:justify-end">
+                  <DarkModeToggle />
+                </div>
               </div>
             </div>
           </div>

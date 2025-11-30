@@ -291,14 +291,17 @@ export default function SettingsDialog({ user, notes, onUpdate }: Props) {
           <Settings2 className="size-4" />
         </Button>
       </DialogTrigger>
-      <DialogContent className="flex min-w-2xl flex-col items-center max-sm:min-w-sm!">
-        <DialogHeader>
+      <DialogContent className="flex! h-[70vh] max-h-[70vh] min-w-2xl flex-col items-center overflow-hidden max-sm:min-w-sm!">
+        <DialogHeader className="shrink-0 pb-2">
           <DialogTitle className="text-center text-2xl font-semibold">
             Settings
           </DialogTitle>
         </DialogHeader>
 
-        <Tabs defaultValue="profile" className="w-full">
+        <Tabs
+          defaultValue="profile"
+          className="flex min-h-0 w-full flex-1 flex-col overflow-hidden"
+        >
           <TabsList className="mx-auto grid w-full grid-cols-5">
             <TabsTrigger value="profile">
               <UserCog className="size-4 max-sm:mr-0" />
@@ -324,296 +327,413 @@ export default function SettingsDialog({ user, notes, onUpdate }: Props) {
             </TabsTrigger>
           </TabsList>
 
-          <TabsContent className="mt-2" value="profile">
-            <div className="flex w-full items-center justify-center">
-              <div className="flex w-[80%] flex-col items-center gap-4">
-                <div className="flex items-center gap-2 font-semibold">
-                  <UserIcon className="size-5" />{" "}
-                  <span className="pb-0.5">User Profile</span>
-                </div>
-                <div className="flex flex-col items-center justify-center gap-2">
-                  <Avatar className="relative size-32 max-sm:size-24">
-                    <AvatarImage src={avatar || undefined} />
-                    <AvatarFallback className="group text-5xl">
-                      {firstName.charAt(0).toUpperCase()}
-                      {lastName.charAt(0).toUpperCase()}
-                    </AvatarFallback>
-                  </Avatar>
-                  <div className="flex flex-col items-center gap-2">
-                    <p className="text-muted-foreground text-sm font-semibold">
-                      Max size: 2MB
-                    </p>
-                    <div className="flex items-center gap-1">
-                      <Button
-                        size="sm"
-                        className="flex items-center justify-center text-xs"
-                        onClick={handleEditAvatar}
-                        disabled={isUpdatingAvatar}
-                      >
-                        <Upload className="size-4" />
-                        <span className="hidden pb-0.5 font-semibold md:inline">
-                          {isUpdatingAvatar ? "Uploading..." : "Upload Avatar"}
-                        </span>
-                      </Button>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        className={`flex items-center justify-center text-xs ${
-                          avatar === null ? "hidden" : ""
-                        }`}
-                        onClick={handleDeleteAvatar}
-                        disabled={isDeletingAvatar || avatar === null}
-                      >
-                        <X className="size-4" />
-                        <span className="hidden pb-0.5 font-semibold md:inline">
-                          {isDeletingAvatar ? "Deleting..." : "Delete Avatar"}
-                        </span>
-                      </Button>
+          <div className="min-h-0 flex-1">
+            <TabsContent
+              className="mt-2 flex min-h-full items-center justify-center"
+              value="profile"
+            >
+              <div className="flex w-full items-center justify-center">
+                <div className="flex w-[80%] flex-col items-center gap-4">
+                  <div className="flex items-center gap-2 font-semibold">
+                    <UserIcon className="size-5" />{" "}
+                    <span className="pb-0.5">User Profile</span>
+                  </div>
+                  <div className="flex flex-col items-center justify-center gap-2">
+                    <Avatar className="relative size-32 max-sm:size-24">
+                      <AvatarImage src={avatar || undefined} />
+                      <AvatarFallback className="group text-5xl">
+                        {firstName.charAt(0).toUpperCase()}
+                        {lastName.charAt(0).toUpperCase()}
+                      </AvatarFallback>
+                    </Avatar>
+                    <div className="flex flex-col items-center gap-2">
+                      <p className="text-muted-foreground text-sm font-semibold">
+                        Max size: 2MB
+                      </p>
+                      <div className="flex items-center gap-1">
+                        <Button
+                          size="sm"
+                          className="flex items-center justify-center text-xs"
+                          onClick={handleEditAvatar}
+                          disabled={isUpdatingAvatar}
+                        >
+                          <Upload className="size-4" />
+                          <span className="hidden pb-0.5 font-semibold md:inline">
+                            {isUpdatingAvatar
+                              ? "Uploading..."
+                              : "Upload Avatar"}
+                          </span>
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className={`flex items-center justify-center text-xs ${
+                            avatar === null ? "hidden" : ""
+                          }`}
+                          onClick={handleDeleteAvatar}
+                          disabled={isDeletingAvatar || avatar === null}
+                        >
+                          <X className="size-4" />
+                          <span className="hidden pb-0.5 font-semibold md:inline">
+                            {isDeletingAvatar ? "Deleting..." : "Delete Avatar"}
+                          </span>
+                        </Button>
+                      </div>
                     </div>
                   </div>
-                </div>
-                <form
-                  action={handleUpdateProfile}
-                  className="flex w-full flex-col items-center gap-4"
-                >
-                  <div className="grid w-full grid-cols-2 gap-2 max-sm:grid-cols-1">
-                    <div className="flex flex-col gap-2">
-                      <Label htmlFor="firstName">First Name</Label>
-                      <Input
-                        id="firstName"
-                        value={firstName}
-                        onChange={(e) => setFirstName(e.target.value)}
-                        placeholder="Enter first name"
-                        disabled={isUpdatingProfile}
-                      />
-                    </div>
-                    <div className="flex flex-col gap-2">
-                      <Label htmlFor="lastName">Last Name</Label>
-                      <Input
-                        id="lastName"
-                        value={lastName}
-                        onChange={(e) => setLastName(e.target.value)}
-                        placeholder="Enter last name"
-                        disabled={isUpdatingProfile}
-                      />
-                    </div>
-                  </div>
-                  <Button
-                    type="submit"
-                    className="w-[50%]"
-                    disabled={
-                      isUpdatingProfile ||
-                      firstName.length === 0 ||
-                      lastName.length === 0
-                    }
+                  <form
+                    action={handleUpdateProfile}
+                    className="flex w-full flex-col items-center gap-4"
                   >
-                    {isUpdatingProfile ? "Saving..." : "Save Profile"}
-                  </Button>
-                </form>
-              </div>
-            </div>
-          </TabsContent>
-
-          <TabsContent className="mt-2" value="password">
-            <div className="flex w-full items-center justify-center">
-              <div className="flex w-[80%] flex-col items-center gap-4">
-                <div className="flex items-center gap-2 font-semibold">
-                  <Lock className="size-5" />
-                  <span className="pb-0.5">Change Password</span>
-                </div>
-                <form
-                  action={handleUpdatePassword}
-                  className="flex w-full flex-col items-center gap-4"
-                >
-                  <div className="flex w-full flex-col gap-4">
-                    <div className="flex flex-col gap-2">
-                      <Label htmlFor="password">New Password</Label>
-                      <Input
-                        type="password"
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                        placeholder="Enter new password"
-                        disabled={isUpdatingPassword}
-                      />
+                    <div className="grid w-full grid-cols-2 gap-2 max-sm:grid-cols-1">
+                      <div className="flex flex-col gap-2">
+                        <Label htmlFor="firstName">First Name</Label>
+                        <Input
+                          id="firstName"
+                          value={firstName}
+                          onChange={(e) => setFirstName(e.target.value)}
+                          placeholder="Enter first name"
+                          disabled={isUpdatingProfile}
+                        />
+                      </div>
+                      <div className="flex flex-col gap-2">
+                        <Label htmlFor="lastName">Last Name</Label>
+                        <Input
+                          id="lastName"
+                          value={lastName}
+                          onChange={(e) => setLastName(e.target.value)}
+                          placeholder="Enter last name"
+                          disabled={isUpdatingProfile}
+                        />
+                      </div>
                     </div>
-                    <div className="flex flex-col gap-2">
-                      <Label htmlFor="confirmPassword">Confirm Password</Label>
-                      <Input
-                        type="password"
-                        value={confirmPassword}
-                        onChange={(e) => setConfirmPassword(e.target.value)}
-                        placeholder="Confirm new password"
-                        disabled={isUpdatingPassword}
-                      />
-                    </div>
-                  </div>
-                  <Button
-                    type="submit"
-                    className="w-[50%]"
-                    disabled={
-                      isUpdatingPassword ||
-                      password.length === 0 ||
-                      confirmPassword.length === 0
-                    }
-                  >
-                    {isUpdatingPassword ? "Saving..." : "Save Password"}
-                  </Button>
-                </form>
-              </div>
-            </div>
-          </TabsContent>
-
-          <TabsContent className="mt-2" value="integrations">
-            <div className="flex w-full items-center justify-center">
-              <div className="flex w-[80%] flex-col items-center gap-4">
-                <div className="flex items-center gap-2 font-semibold">
-                  <Key className="size-5" />{" "}
-                  <span className="pb-0.5 whitespace-nowrap">
-                    OpenAI API Key (gpt-4o-mini)
-                  </span>
-                </div>
-                <form
-                  action={handleUpdateApiKey}
-                  className="flex w-full flex-col items-center gap-4"
-                >
-                  <div className="flex w-full flex-col gap-2">
-                    <Label htmlFor="apiKey">API Key</Label>
-                    <Input
-                      type="password"
-                      value={apiKey || ""}
-                      onChange={(e) => setApiKey(e.target.value)}
-                      placeholder="Enter your OpenAI API Key"
-                      pattern="^sk-proj-[A-Za-z0-9-_]{74}T3BlbkFJ[A-Za-z0-9-_]{74}$"
-                      disabled={isUpdatingApiKey || apiKeySaved}
-                    />
-                    <p
-                      className={`text-muted-foreground text-xs ${
-                        apiKey &&
-                        apiKey.length > 0 &&
-                        !apiKey.match(
-                          /^sk-proj-[A-Za-z0-9-_]{74}T3BlbkFJ[A-Za-z0-9-_]{74}$/,
-                        )
-                          ? "block"
-                          : "hidden"
-                      }`}
-                    >
-                      Your Project API key is not valid. Please enter a valid
-                      Project API key.
-                    </p>
-                  </div>
-                  <div className="flex w-[80%] items-center justify-center gap-1">
                     <Button
                       type="submit"
                       className="w-[50%]"
                       disabled={
-                        isUpdatingApiKey ||
-                        apiKeySaved ||
-                        apiKey?.length === 0 ||
-                        !apiKey?.match(
-                          /^sk-proj-[A-Za-z0-9-_]{74}T3BlbkFJ[A-Za-z0-9-_]{74}$/,
-                        )
+                        isUpdatingProfile ||
+                        firstName.length === 0 ||
+                        lastName.length === 0
                       }
                     >
-                      {isUpdatingApiKey ? "Saving..." : "Save API Key"}
+                      {isUpdatingProfile ? "Saving..." : "Save Profile"}
                     </Button>
-                    {apiKeySaved && (
-                      <Button
-                        variant="outline"
-                        className="w-[50%]"
-                        onClick={handleDeleteApiKey}
-                        disabled={isDeletingApiKey}
-                      >
-                        {isDeletingApiKey ? "Deleting..." : "Delete API Key"}
-                      </Button>
-                    )}
-                  </div>
-                </form>
-              </div>
-            </div>
-          </TabsContent>
-
-          <TabsContent className="mt-2" value="notes">
-            <div className="flex w-full items-center justify-center">
-              <div className="flex w-[80%] flex-col items-center gap-2">
-                <div className="flex items-center gap-2 font-semibold">
-                  <Trash2 className="size-5" />
-                  <span className="pb-0.5">Delete Notes</span>
+                  </form>
                 </div>
-                <div className="mt-2 flex w-full items-end justify-between">
-                  <div className="flex items-center gap-2">
+              </div>
+            </TabsContent>
+
+            <TabsContent
+              className="mt-2 flex min-h-full items-center justify-center"
+              value="password"
+            >
+              <div className="flex w-full items-center justify-center">
+                <div className="flex w-[80%] flex-col items-center gap-4">
+                  <div className="flex items-center gap-2 font-semibold">
+                    <Lock className="size-5" />
+                    <span className="pb-0.5">Change Password</span>
+                  </div>
+                  <form
+                    action={handleUpdatePassword}
+                    className="flex w-full flex-col items-center gap-4"
+                  >
+                    <div className="flex w-full flex-col gap-4">
+                      <div className="flex flex-col gap-2">
+                        <Label htmlFor="password">New Password</Label>
+                        <Input
+                          type="password"
+                          value={password}
+                          onChange={(e) => setPassword(e.target.value)}
+                          placeholder="Enter new password"
+                          disabled={isUpdatingPassword}
+                        />
+                      </div>
+                      <div className="flex flex-col gap-2">
+                        <Label htmlFor="confirmPassword">
+                          Confirm Password
+                        </Label>
+                        <Input
+                          type="password"
+                          value={confirmPassword}
+                          onChange={(e) => setConfirmPassword(e.target.value)}
+                          placeholder="Confirm new password"
+                          disabled={isUpdatingPassword}
+                        />
+                      </div>
+                    </div>
                     <Button
-                      variant="outline"
-                      size="sm"
-                      className="flex h-8 items-center gap-2.5 px-4 text-xs"
-                      onClick={() =>
-                        handleSelectAllNotes(
-                          selectedNotes.length !== notes.length,
-                        )
+                      type="submit"
+                      className="w-[50%]"
+                      disabled={
+                        isUpdatingPassword ||
+                        password.length === 0 ||
+                        confirmPassword.length === 0
                       }
                     >
-                      <div
-                        className={`border-input size-4 shrink-0 rounded-sm border ${
-                          selectedNotes.length === notes.length &&
-                          notes.length !== 0
-                            ? "border-primary"
-                            : ""
+                      {isUpdatingPassword ? "Saving..." : "Save Password"}
+                    </Button>
+                  </form>
+                </div>
+              </div>
+            </TabsContent>
+
+            <TabsContent
+              className="mt-2 flex min-h-full items-center justify-center"
+              value="integrations"
+            >
+              <div className="flex w-full items-center justify-center">
+                <div className="flex w-[80%] flex-col items-center gap-4">
+                  <div className="flex items-center gap-2 font-semibold">
+                    <Key className="size-5" />{" "}
+                    <span className="pb-0.5 whitespace-nowrap">
+                      OpenAI API Key (gpt-4o-mini)
+                    </span>
+                  </div>
+                  <form
+                    action={handleUpdateApiKey}
+                    className="flex w-full flex-col items-center gap-4"
+                  >
+                    <div className="flex w-full flex-col gap-2">
+                      <Label htmlFor="apiKey">API Key</Label>
+                      <Input
+                        type="password"
+                        value={apiKey || ""}
+                        onChange={(e) => setApiKey(e.target.value)}
+                        placeholder="Enter your OpenAI API Key"
+                        pattern="^sk-proj-[A-Za-z0-9-_]{74}T3BlbkFJ[A-Za-z0-9-_]{74}$"
+                        disabled={isUpdatingApiKey || apiKeySaved}
+                      />
+                      <p
+                        className={`text-muted-foreground text-xs ${
+                          apiKey &&
+                          apiKey.length > 0 &&
+                          !apiKey.match(
+                            /^sk-proj-[A-Za-z0-9-_]{74}T3BlbkFJ[A-Za-z0-9-_]{74}$/,
+                          )
+                            ? "block"
+                            : "hidden"
                         }`}
                       >
-                        <div className="text-primary-foreground flex items-center justify-center">
-                          <Check
-                            className={`size-3.5 ${
-                              selectedNotes.length === notes.length &&
-                              notes.length !== 0
-                                ? "bg-primary"
-                                : ""
-                            } ${
-                              selectedNotes.length !== notes.length ||
-                              notes.length === 0
-                                ? "opacity-0"
-                                : ""
-                            }`}
-                          />
+                        Your Project API key is not valid. Please enter a valid
+                        Project API key.
+                      </p>
+                    </div>
+                    <div className="flex w-[80%] items-center justify-center gap-1">
+                      <Button
+                        type="submit"
+                        className="w-[50%]"
+                        disabled={
+                          isUpdatingApiKey ||
+                          apiKeySaved ||
+                          apiKey?.length === 0 ||
+                          !apiKey?.match(
+                            /^sk-proj-[A-Za-z0-9-_]{74}T3BlbkFJ[A-Za-z0-9-_]{74}$/,
+                          )
+                        }
+                      >
+                        {isUpdatingApiKey ? "Saving..." : "Save API Key"}
+                      </Button>
+                      {apiKeySaved && (
+                        <Button
+                          variant="outline"
+                          className="w-[50%]"
+                          onClick={handleDeleteApiKey}
+                          disabled={isDeletingApiKey}
+                        >
+                          {isDeletingApiKey ? "Deleting..." : "Delete API Key"}
+                        </Button>
+                      )}
+                    </div>
+                  </form>
+                </div>
+              </div>
+            </TabsContent>
+
+            <TabsContent
+              className="mt-2 flex min-h-full items-center justify-center"
+              value="notes"
+            >
+              <div className="flex w-full items-center justify-center">
+                <div className="flex w-[80%] flex-col items-center gap-2">
+                  <div className="flex items-center gap-2 font-semibold">
+                    <Trash2 className="size-5" />
+                    <span className="pb-0.5">Delete Notes</span>
+                  </div>
+                  <div className="mt-2 flex w-full items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="flex h-8 items-center gap-2.5 px-4 text-xs"
+                        onClick={() =>
+                          handleSelectAllNotes(
+                            selectedNotes.length !== notes.length,
+                          )
+                        }
+                      >
+                        <div
+                          className={`border-input size-4 shrink-0 rounded-sm border ${
+                            selectedNotes.length === notes.length &&
+                            notes.length !== 0
+                              ? "border-primary"
+                              : ""
+                          }`}
+                        >
+                          <div className="text-primary-foreground flex items-center justify-center">
+                            <Check
+                              className={`size-3.5 ${
+                                selectedNotes.length === notes.length &&
+                                notes.length !== 0
+                                  ? "bg-primary"
+                                  : ""
+                              } ${
+                                selectedNotes.length !== notes.length ||
+                                notes.length === 0
+                                  ? "opacity-0"
+                                  : ""
+                              }`}
+                            />
+                          </div>
                         </div>
-                      </div>
-                      <span className="hidden text-sm font-semibold md:inline">
-                        Select All
-                      </span>
-                    </Button>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className={`flex h-8 gap-1 px-3 text-sm whitespace-nowrap ${
-                        selectedNotes.length === 0 ? "hidden" : ""
-                      }`}
-                      onClick={() => handleSelectAllNotes(false)}
-                    >
-                      Clear<span className="hidden md:inline"> Selection</span>
-                    </Button>
+                        <span className="hidden text-sm font-semibold md:inline">
+                          Select All
+                        </span>
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className={`flex h-8 gap-1 px-3 text-sm whitespace-nowrap ${
+                          selectedNotes.length === 0 ? "hidden" : ""
+                        }`}
+                        onClick={() => handleSelectAllNotes(false)}
+                      >
+                        Clear
+                        <span className="hidden md:inline"> Selection</span>
+                      </Button>
+                    </div>
+                    <AlertDialog>
+                      <AlertDialogTrigger asChild>
+                        <Button
+                          variant="destructive"
+                          size="sm"
+                          className="flex h-8 items-center gap-2 px-3 text-xs"
+                          disabled={
+                            selectedNotes.length === 0 || isDeletingNotes
+                          }
+                        >
+                          <Trash2 className="size-4" />
+                          <span className="sr-only font-semibold md:not-sr-only">
+                            {isDeletingNotes ? "Deleting..." : "Delete"}
+                            {selectedNotes.length > 0 &&
+                              ` (${selectedNotes.length})`}
+                          </span>
+                        </Button>
+                      </AlertDialogTrigger>
+                      <AlertDialogContent>
+                        <AlertDialogHeader>
+                          <AlertDialogTitle className="font-bold">
+                            Delete Selected Notes
+                          </AlertDialogTitle>
+                          <AlertDialogDescription className="font-semibold">
+                            Are you sure you want to delete{" "}
+                            {selectedNotes.length} notes? This action cannot be
+                            undone.
+                          </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                          <AlertDialogCancel className="font-bold">
+                            Cancel
+                          </AlertDialogCancel>
+                          <AlertDialogAction
+                            className="font-bold"
+                            onClick={handleDeleteNotes}
+                          >
+                            Delete
+                          </AlertDialogAction>
+                        </AlertDialogFooter>
+                      </AlertDialogContent>
+                    </AlertDialog>
+                  </div>
+                  <div className="max-h-[280px] w-full overflow-y-auto rounded-sm border">
+                    <Table>
+                      <TableBody>
+                        {table.getRowModel().rows?.length ? (
+                          table.getRowModel().rows.map((row) => (
+                            <TableRow
+                              key={row.id}
+                              data-state={row.getIsSelected() && "selected"}
+                              className="hover:bg-muted/50 cursor-pointer"
+                              onClick={() => handleNoteSelect(row.original.id)}
+                            >
+                              <TableCell className="ml-2 flex items-center gap-3 font-semibold">
+                                <div className="flex w-fit items-center justify-center">
+                                  <Checkbox
+                                    checked={selectedNotes.includes(
+                                      row.original.id,
+                                    )}
+                                    onCheckedChange={() =>
+                                      handleNoteSelect(row.original.id)
+                                    }
+                                    onClick={(e) => e.stopPropagation()}
+                                  />
+                                </div>
+                                {row.original.title}
+                              </TableCell>
+                              <TableCell className="pr-3 text-right text-xs font-semibold">
+                                {row.original.createdAt.toLocaleDateString()},{" "}
+                                {row.original.createdAt.toLocaleTimeString()}
+                              </TableCell>
+                            </TableRow>
+                          ))
+                        ) : (
+                          <TableRow>
+                            <TableCell
+                              colSpan={columns.length}
+                              className="h-24 text-center font-semibold"
+                            >
+                              No results.
+                            </TableCell>
+                          </TableRow>
+                        )}
+                      </TableBody>
+                    </Table>
+                  </div>
+                </div>
+              </div>
+            </TabsContent>
+
+            <TabsContent
+              className="mt-2 flex min-h-full items-center justify-center"
+              value="danger-zone"
+            >
+              <div className="flex w-full items-center justify-center">
+                <div className="flex w-[80%] flex-col items-center gap-4">
+                  <div className="flex items-center gap-2 font-semibold">
+                    <AlertTriangle className="size-5" />
+                    <span className="pb-0.5">Danger Zone</span>
                   </div>
                   <AlertDialog>
                     <AlertDialogTrigger asChild>
                       <Button
                         variant="destructive"
-                        size="sm"
-                        className="flex h-8 items-center gap-2 px-3 text-xs"
-                        disabled={selectedNotes.length === 0 || isDeletingNotes}
+                        size="lg"
+                        className="flex h-12 w-[50%] items-center gap-2 px-3 text-lg"
+                        disabled={isDeletingAccount}
                       >
-                        <Trash2 className="size-4" />
+                        <Trash2 className="size-6" />
                         <span className="sr-only font-semibold md:not-sr-only">
-                          {isDeletingNotes ? "Deleting..." : "Delete"}
-                          {selectedNotes.length > 0 &&
-                            ` (${selectedNotes.length})`}
+                          {isDeletingAccount ? "Deleting..." : "Delete Account"}
                         </span>
                       </Button>
                     </AlertDialogTrigger>
                     <AlertDialogContent>
                       <AlertDialogHeader>
                         <AlertDialogTitle className="font-bold">
-                          Delete Selected Notes
+                          Delete Account
                         </AlertDialogTitle>
                         <AlertDialogDescription className="font-semibold">
-                          Are you sure you want to delete {selectedNotes.length}{" "}
-                          notes? This action cannot be undone.
+                          Are you sure you want to delete your account? This
+                          action cannot be undone.
                         </AlertDialogDescription>
                       </AlertDialogHeader>
                       <AlertDialogFooter>
@@ -622,7 +742,7 @@ export default function SettingsDialog({ user, notes, onUpdate }: Props) {
                         </AlertDialogCancel>
                         <AlertDialogAction
                           className="font-bold"
-                          onClick={handleDeleteNotes}
+                          onClick={handleDeleteAccount}
                         >
                           Delete
                         </AlertDialogAction>
@@ -630,105 +750,13 @@ export default function SettingsDialog({ user, notes, onUpdate }: Props) {
                     </AlertDialogContent>
                   </AlertDialog>
                 </div>
-                <div className="max-h-[200px] w-full overflow-y-auto rounded-sm border">
-                  <Table>
-                    <TableBody>
-                      {table.getRowModel().rows?.length ? (
-                        table.getRowModel().rows.map((row) => (
-                          <TableRow
-                            key={row.id}
-                            data-state={row.getIsSelected() && "selected"}
-                            className="hover:bg-muted/50 cursor-pointer"
-                            onClick={() => handleNoteSelect(row.original.id)}
-                          >
-                            <TableCell className="ml-2 flex items-center gap-3 font-semibold">
-                              <div className="flex w-fit items-center justify-center">
-                                <Checkbox
-                                  checked={selectedNotes.includes(
-                                    row.original.id,
-                                  )}
-                                  onCheckedChange={() =>
-                                    handleNoteSelect(row.original.id)
-                                  }
-                                  onClick={(e) => e.stopPropagation()}
-                                />
-                              </div>
-                              {row.original.title}
-                            </TableCell>
-                            <TableCell className="pr-3 text-right text-xs font-semibold">
-                              {row.original.createdAt.toLocaleDateString()},{" "}
-                              {row.original.createdAt.toLocaleTimeString()}
-                            </TableCell>
-                          </TableRow>
-                        ))
-                      ) : (
-                        <TableRow>
-                          <TableCell
-                            colSpan={columns.length}
-                            className="h-24 text-center font-semibold"
-                          >
-                            No results.
-                          </TableCell>
-                        </TableRow>
-                      )}
-                    </TableBody>
-                  </Table>
-                </div>
               </div>
-            </div>
-          </TabsContent>
-
-          <TabsContent className="mt-2" value="danger-zone">
-            <div className="flex w-full items-center justify-center">
-              <div className="flex w-[80%] flex-col items-center gap-4">
-                <div className="flex items-center gap-2 font-semibold">
-                  <AlertTriangle className="size-5" />
-                  <span className="pb-0.5">Danger Zone</span>
-                </div>
-                <AlertDialog>
-                  <AlertDialogTrigger asChild>
-                    <Button
-                      variant="destructive"
-                      size="lg"
-                      className="flex h-12 w-[50%] items-center gap-2 px-3 text-lg"
-                      disabled={isDeletingAccount}
-                    >
-                      <Trash2 className="size-6" />
-                      <span className="sr-only font-semibold md:not-sr-only">
-                        {isDeletingAccount ? "Deleting..." : "Delete Account"}
-                      </span>
-                    </Button>
-                  </AlertDialogTrigger>
-                  <AlertDialogContent>
-                    <AlertDialogHeader>
-                      <AlertDialogTitle className="font-bold">
-                        Delete Account
-                      </AlertDialogTitle>
-                      <AlertDialogDescription className="font-semibold">
-                        Are you sure you want to delete your account? This
-                        action cannot be undone.
-                      </AlertDialogDescription>
-                    </AlertDialogHeader>
-                    <AlertDialogFooter>
-                      <AlertDialogCancel className="font-bold">
-                        Cancel
-                      </AlertDialogCancel>
-                      <AlertDialogAction
-                        className="font-bold"
-                        onClick={handleDeleteAccount}
-                      >
-                        Delete
-                      </AlertDialogAction>
-                    </AlertDialogFooter>
-                  </AlertDialogContent>
-                </AlertDialog>
-              </div>
-            </div>
-          </TabsContent>
+            </TabsContent>
+          </div>
         </Tabs>
 
-        <Separator className="mt-4" />
-        <div className="flex w-full flex-col items-center gap-2">
+        <Separator className="mt-4 shrink-0" />
+        <div className="flex w-full shrink-0 flex-col items-center gap-2">
           <div className="flex items-center gap-2 font-semibold">
             <Mail className="size-5" />{" "}
             <span className="pb-0.5">Contact Us</span>
