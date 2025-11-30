@@ -6,7 +6,7 @@ export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
   const token_hash = searchParams.get("token_hash");
   const type = searchParams.get("type") as EmailOtpType | null;
-  const next = searchParams.get("next") ?? "/login";
+  const next = searchParams.get("next");
 
   if (token_hash && type) {
     const supabase = await createClient();
@@ -18,8 +18,18 @@ export async function GET(request: NextRequest) {
     });
 
     if (!error) {
-      // If successful, redirect user to their dashboard/home
-      return NextResponse.redirect(new URL(next, request.url));
+      // Determine redirect URL based on type
+      let redirectUrl: string;
+      if (next) {
+        redirectUrl = next;
+      } else if (type === "recovery") {
+        redirectUrl = "/reset-password/confirm";
+      } else {
+        redirectUrl = "/signup/confirm";
+      }
+
+      // If successful, redirect user to the appropriate page
+      return NextResponse.redirect(new URL(redirectUrl, request.url));
     } else {
       console.error("Auth Error:", error.message);
     }
