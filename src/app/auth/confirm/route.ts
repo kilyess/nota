@@ -20,6 +20,8 @@ export async function GET(request: NextRequest) {
     if (!error) {
       // If successful, redirect user to their dashboard/home
       return NextResponse.redirect(new URL(next, request.url));
+    } else {
+      console.error("Auth Error:", error.message);
     }
   }
 
