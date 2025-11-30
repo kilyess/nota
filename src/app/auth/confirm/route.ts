@@ -24,8 +24,10 @@ export async function GET(request: NextRequest) {
         redirectUrl = next;
       } else if (type === "recovery") {
         redirectUrl = "/reset-password/confirm";
+      } else if (type === "signup" || type === "email") {
+        redirectUrl = "/auth/verified";
       } else {
-        redirectUrl = "/signup/confirm";
+        redirectUrl = "/login";
       }
 
       // If successful, redirect user to the appropriate page
