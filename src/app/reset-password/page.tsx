@@ -6,19 +6,21 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useActionHandler } from "@/hooks/use-action-handler";
 import { createClient } from "@/utils/supabase/client";
+import { EmailOtpType } from "@supabase/supabase-js";
 import { Eye, EyeOff, Loader2 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { Suspense, useEffect, useState } from "react";
 import { toast } from "sonner";
 
-export default function ResetPasswordPage() {
+function ResetPasswordContent() {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const router = useRouter();
+  const searchParams = useSearchParams();
 
   const [status, setStatus] = useState<"loading" | "valid" | "invalid">(
     "loading",
@@ -28,24 +30,40 @@ export default function ResetPasswordPage() {
     useActionHandler(resetPasswordAction);
 
   useEffect(() => {
-    const supabase = createClient();
+    const verifyToken = async () => {
+      const token_hash = searchParams.get("token_hash");
+      const type = searchParams.get("type") as EmailOtpType | null;
 
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((event, session) => {
-      if (session) {
-        setStatus("valid");
-        subscription.unsubscribe();
-      } else {
+      if (!token_hash || !type || type !== "recovery") {
         setStatus("invalid");
-        subscription.unsubscribe();
+        return;
       }
-    });
 
-    return () => {
-      subscription?.unsubscribe();
+      try {
+        const supabase = createClient();
+
+        // Verify the OTP token
+        const { error } = await supabase.auth.verifyOtp({
+          type: "recovery",
+          token_hash,
+        });
+
+        if (error) {
+          console.error("Token verification error:", error.message);
+          setStatus("invalid");
+          return;
+        }
+
+        // Token verified successfully
+        setStatus("valid");
+      } catch (error) {
+        console.error("Error verifying token:", error);
+        setStatus("invalid");
+      }
     };
-  }, []);
+
+    verifyToken();
+  }, [searchParams]);
 
   const handleResetPassword = async () => {
     if (password !== confirmPassword) {
@@ -142,7 +160,9 @@ export default function ResetPasswordPage() {
                     className="absolute top-1/2 right-1 h-7 w-7 -translate-y-1/2 rounded-full p-1.5 hover:bg-transparent"
                     onClick={() => setShowPassword(!showPassword)}
                     disabled={isResettingPassword}
-                    aria-label={showPassword ? "Hide password" : "Show password"}
+                    aria-label={
+                      showPassword ? "Hide password" : "Show password"
+                    }
                   >
                     {showPassword ? (
                       <EyeOff className="text-muted-foreground h-4 w-4" />
@@ -171,7 +191,9 @@ export default function ResetPasswordPage() {
                     className="absolute top-1/2 right-1 h-7 w-7 -translate-y-1/2 rounded-full p-1.5 hover:bg-transparent"
                     onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                     disabled={isResettingPassword}
-                    aria-label={showConfirmPassword ? "Hide password" : "Show password"}
+                    aria-label={
+                      showConfirmPassword ? "Hide password" : "Show password"
+                    }
                   >
                     {showConfirmPassword ? (
                       <EyeOff className="text-muted-foreground h-4 w-4" />
@@ -194,5 +216,20 @@ export default function ResetPasswordPage() {
         </div>
       </form>
     </section>
+  );
+}
+
+export default function ResetPasswordPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="mt-20 flex flex-1 flex-col items-center justify-center">
+          <Loader2 className="text-muted-foreground h-10 w-10 animate-spin" />
+          <p className="text-muted-foreground mt-4">Verifying link...</p>
+        </div>
+      }
+    >
+      <ResetPasswordContent />
+    </Suspense>
   );
 }
