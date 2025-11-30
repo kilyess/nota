@@ -17,7 +17,7 @@ export async function generateMetadata({
     : "View your note in nota";
 
   return {
-    title: `${title} - nota`,
+    title: `${title ? title : "New Note"}`,
     description,
     robots: {
       index: false, // Private notes should not be indexed

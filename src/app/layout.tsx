@@ -26,7 +26,7 @@ export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || "https://nota.ma"),
   title: {
     default: "nota - AI-Powered Note-Taking Web App",
-    template: "%s - nota",
+    template: "%s | nota",
   },
   description:
     "nota is a user-friendly note-taking app with an integrated AI assistant, allowing you to ask questions and get instant answers based on your notes. Organize your thoughts, collaborate seamlessly, and boost productivity.",

@@ -6,9 +6,9 @@ import { CheckCircle2, Loader2, XCircle } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 
-export default function VerifyEmailPage() {
+function VerifyEmailContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [status, setStatus] = useState<"loading" | "success" | "error">(
@@ -140,5 +140,48 @@ export default function VerifyEmailPage() {
         </div>
       </div>
     </section>
+  );
+}
+
+export default function VerifyEmailPage() {
+  return (
+    <Suspense
+      fallback={
+        <section className="bg-background flex min-h-screen px-4 py-16 md:py-32">
+          <div className="bg-muted/50 m-auto h-fit w-full max-w-sm overflow-hidden rounded-[calc(var(--radius)+.125rem)] border shadow-md shadow-zinc-950/5">
+            <div className="bg-card -m-px rounded-[calc(var(--radius)+.125rem)] border p-8 pb-6">
+              <div className="text-center">
+                <Link
+                  href="/"
+                  aria-label="go home"
+                  className="mx-auto block w-fit"
+                >
+                  <Image
+                    src="/favicon.ico"
+                    width={48}
+                    height={48}
+                    alt="nota"
+                    style={{ display: "inline-block" }}
+                  />
+                </Link>
+                <div className="mt-6 flex justify-center">
+                  <div className="bg-primary/10 flex size-16 items-center justify-center rounded-full">
+                    <Loader2 className="text-primary size-8 animate-spin" />
+                  </div>
+                </div>
+                <h1 className="mt-6 mb-2 text-xl font-semibold">
+                  Verifying Email...
+                </h1>
+                <p className="text-muted-foreground text-sm">
+                  Please wait while we verify your email address.
+                </p>
+              </div>
+            </div>
+          </div>
+        </section>
+      }
+    >
+      <VerifyEmailContent />
+    </Suspense>
   );
 }
