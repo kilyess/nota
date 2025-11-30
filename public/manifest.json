@@ -1,0 +1,19 @@
+{
+  "name": "nota - AI-Powered Note-Taking Web App",
+  "short_name": "nota",
+  "description": "Organize your thoughts, ask questions, and get instant answers from your notes. Experience a seamless, distraction-free interface designed for clarity.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#A3004C",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/favicon.ico",
+      "sizes": "any",
+      "type": "image/x-icon"
+    }
+  ],
+  "categories": ["productivity", "utilities"],
+  "lang": "en"
+}
