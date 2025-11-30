@@ -9,10 +9,23 @@ export async function generateMetadata({
   params,
 }: PageProps): Promise<Metadata> {
   const { id: noteId } = await params;
-  const { title } = await getDecryptedNoteAction(noteId);
+  const { title, body } = await getDecryptedNoteAction(noteId);
+
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://nota.ma";
+  const description = body
+    ? body.slice(0, 160).replace(/<[^>]*>/g, "")
+    : "View your note in nota";
 
   return {
     title: `${title} - nota`,
+    description,
+    robots: {
+      index: false, // Private notes should not be indexed
+      follow: false,
+    },
+    alternates: {
+      canonical: `${baseUrl}/app/note/${noteId}`,
+    },
   };
 }
 
