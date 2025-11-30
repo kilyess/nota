@@ -11,14 +11,12 @@ export async function GET(request: NextRequest) {
   if (token_hash && type) {
     const supabase = await createClient();
 
-    // Verify the OTP directly with Supabase
     const { error } = await supabase.auth.verifyOtp({
       type,
       token_hash,
     });
 
     if (!error) {
-      // Determine redirect URL based on type
       let redirectUrl: string;
       if (next) {
         redirectUrl = next;
@@ -26,13 +24,11 @@ export async function GET(request: NextRequest) {
         redirectUrl = "/login";
       }
 
-      // If successful, redirect user to the appropriate page
       return NextResponse.redirect(new URL(redirectUrl, request.url));
     } else {
       console.error("Auth Error:", error.message);
     }
   }
 
-  // If verification fails, send them to an error page
   return NextResponse.redirect(new URL("/auth/auth-code-error", request.url));
 }

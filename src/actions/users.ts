@@ -63,8 +63,6 @@ export const signUpAction = async (
         },
       });
     } catch (dbError) {
-      // If user already exists in database, it means they signed up before
-      // but the Supabase auth might have been reset. Handle gracefully.
       const errorString = String(dbError);
       if (
         errorString.includes("Unique constraint") ||
@@ -210,7 +208,6 @@ export const updatePasswordAction = async (
 
     const { auth } = await createClient();
 
-    // Verify old password by attempting to sign in
     const { error: signInError } = await auth.signInWithPassword({
       email: user.email!,
       password: oldPassword,
@@ -228,7 +225,12 @@ export const updatePasswordAction = async (
       throw signInError;
     }
 
-    // Update to new password
+    if (newPassword === oldPassword) {
+      throw new Error(
+        "New password cannot be the same as the current password.",
+      );
+    }
+
     const { error } = await auth.updateUser({
       password: newPassword,
       email: user.email,

@@ -167,11 +167,6 @@ export default function SettingsDialog({ user, notes, onUpdate }: Props) {
       return;
     }
 
-    if (oldPassword === password) {
-      toast.error("New password cannot be the same as the current password");
-      return;
-    }
-
     updatePassword(
       {
         loadingMessage: "Updating password...",

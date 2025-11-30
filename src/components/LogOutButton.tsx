@@ -70,9 +70,9 @@ function LogOutButton() {
       </AlertDialogTrigger>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>Sign Out</AlertDialogTitle>
+          <AlertDialogTitle>Log Out</AlertDialogTitle>
           <AlertDialogDescription>
-            Are you sure you want to sign out? You will need to log in again to
+            Are you sure you want to log out? You will need to log in again to
             access your notes.
           </AlertDialogDescription>
         </AlertDialogHeader>
@@ -83,7 +83,7 @@ function LogOutButton() {
             disabled={isPending}
             className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
           >
-            {isPending ? "Signing out..." : "Sign Out"}
+            Log Out
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>

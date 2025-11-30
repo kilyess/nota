@@ -42,7 +42,6 @@ function ResetPasswordContent() {
       try {
         const supabase = createClient();
 
-        // Verify the OTP token
         const { error } = await supabase.auth.verifyOtp({
           type: "recovery",
           token_hash,
@@ -54,7 +53,6 @@ function ResetPasswordContent() {
           return;
         }
 
-        // Token verified successfully
         setStatus("valid");
       } catch (error) {
         console.error("Error verifying token:", error);

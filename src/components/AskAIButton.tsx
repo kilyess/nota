@@ -72,14 +72,11 @@ function AskAIButton({ user, type }: Props) {
   const checkApiKey = async () => {
     setIsCheckingApiKey(true);
     try {
-      // First check if we have it in context
       if (apiKey) {
         setHasApiKey(true);
         setIsCheckingApiKey(false);
         return;
       }
-
-      // Otherwise, fetch it from the server
       const result = await getDecryptedApiKeyAction();
       if (result.apiKey) {
         setApiKey(result.apiKey);
@@ -98,7 +95,6 @@ function AskAIButton({ user, type }: Props) {
     if (open && user) {
       checkApiKey();
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open, user]);
 
   const handleOnOpenChange = (isOpen: boolean) => {

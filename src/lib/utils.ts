@@ -8,24 +8,19 @@ export function cn(...inputs: ClassValue[]) {
 export const handleError = (error: unknown) => {
   const errorString = String(error);
 
-  // Extract message from error object if it exists
   let message: string | undefined;
   if (error && typeof error === "object" && "message" in error) {
     message = String(error.message);
   }
 
-  // If no message found, try to extract from string representation
   if (!message) {
     const detailRegex = /message: "([^"]+)"/;
     const match = errorString.match(detailRegex);
     message = match && match[1] ? match[1] : undefined;
   }
 
-  // Normalize message to lowercase for comparison
   const normalizedMessage = message?.toLowerCase() || "";
   const normalizedErrorString = errorString.toLowerCase();
-
-  // Check for duplicate email/user errors
   if (
     normalizedMessage.includes("user already registered") ||
     normalizedMessage.includes("email already registered") ||
@@ -40,7 +35,6 @@ export const handleError = (error: unknown) => {
     };
   }
 
-  // Check for invalid login credentials
   if (
     normalizedMessage.includes("invalid login credentials") ||
     normalizedMessage.includes("invalid password") ||
@@ -53,7 +47,6 @@ export const handleError = (error: unknown) => {
     };
   }
 
-  // Check for email not confirmed
   if (
     normalizedMessage.includes("email not confirmed") ||
     normalizedMessage.includes("email not verified") ||
@@ -65,7 +58,6 @@ export const handleError = (error: unknown) => {
     };
   }
 
-  // Check for weak password
   if (
     normalizedMessage.includes("password is too weak") ||
     normalizedMessage.includes("password should be")
@@ -76,7 +68,6 @@ export const handleError = (error: unknown) => {
     };
   }
 
-  // Check for rate limiting
   if (
     normalizedMessage.includes("too many requests") ||
     normalizedMessage.includes("rate limit") ||
@@ -87,7 +78,6 @@ export const handleError = (error: unknown) => {
     };
   }
 
-  // Check for database errors
   if (normalizedErrorString.includes("database error saving new user")) {
     return {
       errorMessage:
@@ -95,14 +85,12 @@ export const handleError = (error: unknown) => {
     };
   }
 
-  // Return extracted message if available
   if (message) {
     return {
       errorMessage: message,
     };
   }
 
-  // Fallback for unknown errors
   if (error instanceof Error) {
     return { errorMessage: error.message };
   } else {

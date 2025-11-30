@@ -396,7 +396,6 @@
   );
 }
 
-/* Remove scrollbar arrows - all button variants */
 *::-webkit-scrollbar-button {
   display: none;
   width: 0;
