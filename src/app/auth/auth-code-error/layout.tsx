@@ -1,7 +1,7 @@
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Verification Failed - nota",
+  title: "Verification Failed",
   description: "The verification link is invalid or has expired.",
   robots: {
     index: false,
@@ -16,4 +16,3 @@ export default function AuthCodeErrorLayout({
 }) {
   return <>{children}</>;
 }
-

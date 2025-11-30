@@ -1,15 +1,15 @@
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Check Your Email",
-  description: "Please check your email to verify your nota account.",
+  title: "Verify Email",
+  description: "Verify your email address to complete your nota account setup.",
   robots: {
     index: false,
     follow: false,
   },
 };
 
-export default function SignUpConfirmLayout({
+export default function VerifyEmailLayout({
   children,
 }: {
   children: React.ReactNode;
