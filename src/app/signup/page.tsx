@@ -80,7 +80,7 @@ function SignUpPage() {
       toast.promise(promise, {
         loading: "Signing up...",
         success: () => {
-          router.replace("/");
+          router.replace("/signup/confirm");
           return {
             message: "Signed up",
             description: "Check your email for confirmation link.",
@@ -112,7 +112,7 @@ function SignUpPage() {
                 alt="nota"
                 style={{ display: "inline-block" }}
               />
-            </Link>
+      </Link>
             <h1 className="mt-4 mb-1 text-xl font-semibold">
               Create a nota Account
             </h1>
@@ -231,7 +231,7 @@ function SignUpPage() {
               <Link href="/login">Sign In</Link>
             </Button>
           </p>
-        </div>
+    </div>
       </form>
     </section>
   );

@@ -3,15 +3,28 @@
 import { logOutAction } from "@/actions/users";
 import { LogOut } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useTransition } from "react";
+import { useState, useTransition } from "react";
 import { toast } from "sonner";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "./ui/alert-dialog";
 import { Button } from "./ui/button";
 
 function LogOutButton() {
   const [isPending, startTransition] = useTransition();
+  const [open, setOpen] = useState(false);
   const router = useRouter();
 
   const handleLogOut = async () => {
+    setOpen(false);
     startTransition(() => {
       const promise = new Promise<{
         errorMessage: string | null;
@@ -44,14 +57,37 @@ function LogOutButton() {
   };
 
   return (
-    <Button
-      variant="ghost"
-      className="size-7"
-      onClick={handleLogOut}
-      disabled={isPending}
-    >
-      <LogOut className="size-4" />
-    </Button>
+    <AlertDialog open={open} onOpenChange={setOpen}>
+      <AlertDialogTrigger asChild>
+        <Button
+          variant="ghost"
+          className="size-7"
+          disabled={isPending}
+          aria-label="Sign out"
+        >
+          <LogOut className="size-4" />
+        </Button>
+      </AlertDialogTrigger>
+      <AlertDialogContent>
+        <AlertDialogHeader>
+          <AlertDialogTitle>Sign Out</AlertDialogTitle>
+          <AlertDialogDescription>
+            Are you sure you want to sign out? You will need to sign in again to
+            access your notes.
+          </AlertDialogDescription>
+        </AlertDialogHeader>
+        <AlertDialogFooter>
+          <AlertDialogCancel disabled={isPending}>Cancel</AlertDialogCancel>
+          <AlertDialogAction
+            onClick={handleLogOut}
+            disabled={isPending}
+            className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+          >
+            {isPending ? "Signing out..." : "Sign Out"}
+          </AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
   );
 }
 

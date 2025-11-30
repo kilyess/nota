@@ -19,8 +19,8 @@ export default function FooterSection() {
         <Link href="/" aria-label="go home" className="mx-auto block size-fit">
           <Image
             src="/favicon.ico"
-            width={64}
-            height={64}
+            width={48}
+            height={48}
             alt="nota"
             style={{ display: "inline-block" }}
             priority

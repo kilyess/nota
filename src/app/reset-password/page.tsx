@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useActionHandler } from "@/hooks/use-action-handler";
 import { createClient } from "@/utils/supabase/client";
-import { Loader2 } from "lucide-react";
+import { Eye, EyeOff, Loader2 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -16,6 +16,8 @@ import { toast } from "sonner";
 export default function ResetPasswordPage() {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const router = useRouter();
 
   const [status, setStatus] = useState<"loading" | "valid" | "invalid">(
@@ -54,7 +56,7 @@ export default function ResetPasswordPage() {
     resetPassword(
       {
         onSuccess: () => {
-          router.replace("/login");
+          router.replace("/reset-password/confirm");
         },
         loadingMessage: "Resetting password...",
         successMessage: "Password updated successfully!",
@@ -123,25 +125,61 @@ export default function ResetPasswordPage() {
             <div className="flex flex-col gap-4">
               <div className="space-y-2">
                 <Label htmlFor="password">New Password</Label>
-                <Input
-                  id="password"
-                  type="password"
-                  placeholder="Enter new password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  disabled={isResettingPassword}
-                />
+                <div className="relative">
+                  <Input
+                    id="password"
+                    type={showPassword ? "text" : "password"}
+                    placeholder="Enter new password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    disabled={isResettingPassword}
+                    className="pr-10"
+                  />
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon"
+                    className="absolute top-1/2 right-1 h-7 w-7 -translate-y-1/2 rounded-full p-1.5 hover:bg-transparent"
+                    onClick={() => setShowPassword(!showPassword)}
+                    disabled={isResettingPassword}
+                    aria-label={showPassword ? "Hide password" : "Show password"}
+                  >
+                    {showPassword ? (
+                      <EyeOff className="text-muted-foreground h-4 w-4" />
+                    ) : (
+                      <Eye className="text-muted-foreground h-4 w-4" />
+                    )}
+                  </Button>
+                </div>
               </div>
               <div className="space-y-2">
                 <Label htmlFor="confirmPassword">Confirm Password</Label>
-                <Input
-                  id="confirmPassword"
-                  type="password"
-                  placeholder="Confirm new password"
-                  value={confirmPassword}
-                  onChange={(e) => setConfirmPassword(e.target.value)}
-                  disabled={isResettingPassword}
-                />
+                <div className="relative">
+                  <Input
+                    id="confirmPassword"
+                    type={showConfirmPassword ? "text" : "password"}
+                    placeholder="Confirm new password"
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    disabled={isResettingPassword}
+                    className="pr-10"
+                  />
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon"
+                    className="absolute top-1/2 right-1 h-7 w-7 -translate-y-1/2 rounded-full p-1.5 hover:bg-transparent"
+                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                    disabled={isResettingPassword}
+                    aria-label={showConfirmPassword ? "Hide password" : "Show password"}
+                  >
+                    {showConfirmPassword ? (
+                      <EyeOff className="text-muted-foreground h-4 w-4" />
+                    ) : (
+                      <Eye className="text-muted-foreground h-4 w-4" />
+                    )}
+                  </Button>
+                </div>
               </div>
             </div>
 

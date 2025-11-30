@@ -31,7 +31,7 @@ function ForgotPasswordPage() {
       toast.promise(promise, {
         loading: "Sending reset link...",
         success: () => {
-          router.replace("/");
+          router.replace("/login");
           return {
             message: "Email sent",
             description: "Check your email for the password reset link.",

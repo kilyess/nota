@@ -11,9 +11,11 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import useNote from "@/hooks/use-note";
 import { useScrollFade } from "@/hooks/use-scroll-fade";
 import { Note, User } from "@prisma/client";
+import Fuse from "fuse.js";
 import { SearchIcon, XIcon } from "lucide-react";
+import Image from "next/image";
 import Link from "next/link";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { NavUser } from "./NavUser";
 import NewNoteButton from "./NewNoteButton";
 import SidebarGroupContent from "./SidebarGroupContent";
@@ -49,6 +51,20 @@ function AppSidebar({
     setNotes(initialNotes);
   }, [initialNotes, setNotes]);
 
+  const fuse = useMemo(
+    () => new Fuse(notes, { keys: ["title"], threshold: 0.4 }),
+    [notes],
+  );
+
+  const filteredNotes = useMemo(() => {
+    if (searchValue.trim() === "") {
+      return notes;
+    }
+
+    const searchResults = fuse.search(searchValue).map((result) => result.item);
+    return searchResults;
+  }, [searchValue, fuse, notes]);
+
   const handleSearchChange = (value: string) => {
     setSearchValue(value);
   };
@@ -59,7 +75,7 @@ function AppSidebar({
 
   return (
     <Sidebar variant="inset" {...props}>
-      <SidebarHeader className="flex h-36 w-full flex-col items-center justify-center gap-4 pt-4">
+      <SidebarHeader className="flex h-36 w-full flex-col items-center justify-center gap-4 pt-5">
         <Link
           onClick={() => {
             if (isMobile) {
@@ -68,7 +84,16 @@ function AppSidebar({
           }}
           href="/"
         >
-          <Logo className="h-4 w-auto" />
+          <span className="flex items-center gap-2">
+            <Image
+              src="/favicon.ico"
+              width={24}
+              height={24}
+              alt="nota"
+              className="h-6 w-6"
+            />
+            <Logo className="h-3 w-auto" />
+          </span>
         </Link>
         <NewNoteButton type="sidebar" />
         <div className="border-sidebar-ring-accent w-full border-b px-2">
@@ -95,7 +120,7 @@ function AppSidebar({
       </SidebarHeader>
       <SidebarContent ref={sidebarContentRef}>
         <SidebarGroupContent
-          notes={notes}
+          notes={filteredNotes}
           showTopFade={showTopFade}
           showBottomFade={showBottomFade}
         />

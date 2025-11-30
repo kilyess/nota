@@ -43,6 +43,8 @@ import { getCoreRowModel, useReactTable } from "@tanstack/react-table";
 import {
   AlertTriangle,
   Check,
+  Eye,
+  EyeOff,
   Key,
   KeyRound,
   Lock,
@@ -75,12 +77,39 @@ type Props = {
   ) => void;
 };
 
+function validatePassword(password: string): {
+  isValid: boolean;
+  errors: string[];
+} {
+  const errors: string[] = [];
+
+  if (password.length < 8) {
+    errors.push("At least 8 characters");
+  }
+  if (!/[a-z]/.test(password)) {
+    errors.push("One lowercase letter");
+  }
+  if (!/[A-Z]/.test(password)) {
+    errors.push("One uppercase letter");
+  }
+  if (!/[0-9]/.test(password)) {
+    errors.push("One number");
+  }
+
+  return {
+    isValid: errors.length === 0,
+    errors,
+  };
+}
+
 export default function SettingsDialog({ user, notes, onUpdate }: Props) {
   const [firstName, setFirstName] = useState(user?.firstName || "");
   const [lastName, setLastName] = useState(user?.lastName || "");
   const [avatar, setAvatar] = useState(user?.avatar || null);
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const { apiKey, setApiKey } = useApiKey();
   const [apiKeySaved, setApiKeySaved] = useState<boolean>(false);
   const [selectedNotes, setSelectedNotes] = useState<string[]>([]);
@@ -103,6 +132,9 @@ export default function SettingsDialog({ user, notes, onUpdate }: Props) {
     useActionHandler(updatePasswordAction);
   const { setNotes } = useNote();
   const router = useRouter();
+
+  const passwordValidation = validatePassword(password);
+  const isPasswordValid = passwordValidation.isValid;
 
   useEffect(() => {
     const fetchApiKey = async () => {
@@ -327,9 +359,9 @@ export default function SettingsDialog({ user, notes, onUpdate }: Props) {
             </TabsTrigger>
           </TabsList>
 
-          <div className="min-h-0 flex-1">
+          <div className="min-h-0 flex-1 overflow-y-auto">
             <TabsContent
-              className="mt-2 flex min-h-full items-center justify-center"
+              className="flex min-h-[calc(100%-0.5rem)] items-center justify-center py-2"
               value="profile"
             >
               <div className="flex w-full items-center justify-center">
@@ -424,7 +456,7 @@ export default function SettingsDialog({ user, notes, onUpdate }: Props) {
             </TabsContent>
 
             <TabsContent
-              className="mt-2 flex min-h-full items-center justify-center"
+              className="flex min-h-[calc(100%-0.5rem)] items-center justify-center py-2"
               value="password"
             >
               <div className="flex w-full items-center justify-center">
@@ -440,25 +472,88 @@ export default function SettingsDialog({ user, notes, onUpdate }: Props) {
                     <div className="flex w-full flex-col gap-4">
                       <div className="flex flex-col gap-2">
                         <Label htmlFor="password">New Password</Label>
-                        <Input
-                          type="password"
-                          value={password}
-                          onChange={(e) => setPassword(e.target.value)}
-                          placeholder="Enter new password"
-                          disabled={isUpdatingPassword}
-                        />
+                        <div className="relative">
+                          <Input
+                            type={showPassword ? "text" : "password"}
+                            id="password"
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                            placeholder="Enter new password"
+                            disabled={isUpdatingPassword}
+                            className="pr-10"
+                          />
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="icon"
+                            className="absolute top-1/2 right-1 h-7 w-7 -translate-y-1/2 rounded-full p-1.5 hover:bg-transparent"
+                            onClick={() => setShowPassword(!showPassword)}
+                            disabled={isUpdatingPassword}
+                            aria-label={
+                              showPassword ? "Hide password" : "Show password"
+                            }
+                          >
+                            {showPassword ? (
+                              <EyeOff className="text-muted-foreground h-4 w-4" />
+                            ) : (
+                              <Eye className="text-muted-foreground h-4 w-4" />
+                            )}
+                          </Button>
+                        </div>
+                        {password && !isPasswordValid && (
+                          <div className="text-muted-foreground text-xs">
+                            <p className="mb-1 font-medium">
+                              Password must contain:
+                            </p>
+                            <ul className="ml-4 list-disc space-y-0.5">
+                              {passwordValidation.errors.map((error, index) => (
+                                <li key={index}>{error}</li>
+                              ))}
+                            </ul>
+                          </div>
+                        )}
                       </div>
                       <div className="flex flex-col gap-2">
                         <Label htmlFor="confirmPassword">
                           Confirm Password
                         </Label>
-                        <Input
-                          type="password"
-                          value={confirmPassword}
-                          onChange={(e) => setConfirmPassword(e.target.value)}
-                          placeholder="Confirm new password"
-                          disabled={isUpdatingPassword}
-                        />
+                        <div className="relative">
+                          <Input
+                            type={showConfirmPassword ? "text" : "password"}
+                            id="confirmPassword"
+                            value={confirmPassword}
+                            onChange={(e) => setConfirmPassword(e.target.value)}
+                            placeholder="Confirm new password"
+                            disabled={isUpdatingPassword}
+                            className="pr-10"
+                          />
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="icon"
+                            className="absolute top-1/2 right-1 h-7 w-7 -translate-y-1/2 rounded-full p-1.5 hover:bg-transparent"
+                            onClick={() =>
+                              setShowConfirmPassword(!showConfirmPassword)
+                            }
+                            disabled={isUpdatingPassword}
+                            aria-label={
+                              showConfirmPassword
+                                ? "Hide password"
+                                : "Show password"
+                            }
+                          >
+                            {showConfirmPassword ? (
+                              <EyeOff className="text-muted-foreground h-4 w-4" />
+                            ) : (
+                              <Eye className="text-muted-foreground h-4 w-4" />
+                            )}
+                          </Button>
+                        </div>
+                        {confirmPassword && password !== confirmPassword && (
+                          <p className="text-muted-foreground text-xs">
+                            Passwords do not match
+                          </p>
+                        )}
                       </div>
                     </div>
                     <Button
@@ -466,8 +561,10 @@ export default function SettingsDialog({ user, notes, onUpdate }: Props) {
                       className="w-[50%]"
                       disabled={
                         isUpdatingPassword ||
+                        !isPasswordValid ||
                         password.length === 0 ||
-                        confirmPassword.length === 0
+                        confirmPassword.length === 0 ||
+                        password !== confirmPassword
                       }
                     >
                       {isUpdatingPassword ? "Saving..." : "Save Password"}
@@ -478,7 +575,7 @@ export default function SettingsDialog({ user, notes, onUpdate }: Props) {
             </TabsContent>
 
             <TabsContent
-              className="mt-2 flex min-h-full items-center justify-center"
+              className="flex min-h-[calc(100%-0.5rem)] items-center justify-center py-2"
               value="integrations"
             >
               <div className="flex w-full items-center justify-center">
@@ -550,7 +647,7 @@ export default function SettingsDialog({ user, notes, onUpdate }: Props) {
             </TabsContent>
 
             <TabsContent
-              className="mt-2 flex min-h-full items-center justify-center"
+              className="flex min-h-[calc(100%-0.5rem)] items-center justify-center py-2"
               value="notes"
             >
               <div className="flex w-full items-center justify-center">
@@ -703,7 +800,7 @@ export default function SettingsDialog({ user, notes, onUpdate }: Props) {
             </TabsContent>
 
             <TabsContent
-              className="mt-2 flex min-h-full items-center justify-center"
+              className="flex min-h-[calc(100%-0.5rem)] items-center justify-center py-2"
               value="danger-zone"
             >
               <div className="flex w-full items-center justify-center">
