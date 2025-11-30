@@ -29,14 +29,14 @@ export default function ResetPasswordConfirmPage() {
               Password Reset Successful
             </h1>
             <p className="text-muted-foreground text-sm">
-              Your password has been successfully reset. You can now sign in
-              with your new password.
+              Your password has been successfully reset. You can now log in with
+              your new password.
             </p>
           </div>
 
           <div className="mt-6">
             <Button asChild className="w-full">
-              <Link href="/login">Sign In</Link>
+              <Link href="/login">Log In</Link>
             </Button>
           </div>
         </div>

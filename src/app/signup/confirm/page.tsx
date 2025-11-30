@@ -48,7 +48,7 @@ export default function SignUpConfirmPage() {
 
           <div className="mt-6">
             <Button asChild className="w-full">
-              <Link href="/login">Back to Sign In</Link>
+              <Link href="/login">Back to Log In</Link>
             </Button>
           </div>
         </div>
@@ -57,7 +57,7 @@ export default function SignUpConfirmPage() {
           <p className="text-accent-foreground text-center text-sm">
             Already verified?
             <Button asChild variant="link" className="px-2">
-              <Link href="/login">Sign In</Link>
+              <Link href="/login">Log In</Link>
             </Button>
           </p>
         </div>

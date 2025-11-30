@@ -100,7 +100,7 @@ function ForgotPasswordPage() {
           <p className="text-accent-foreground text-center text-sm">
             Remembered your password?
             <Button asChild variant="link" className="px-2">
-              <Link href="/login">Sign In</Link>
+              <Link href="/login">Log In</Link>
             </Button>
           </p>
         </div>

@@ -23,7 +23,7 @@ export default function Content() {
               </Button>
               <Button asChild variant="link" className="-ml-3">
                 <Link href="/login">
-                  Already have an account? Sign in &rarr;
+                  Already have an account? Log in &rarr;
                 </Link>
               </Button>
             </div>

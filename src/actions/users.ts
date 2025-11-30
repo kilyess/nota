@@ -53,14 +53,29 @@ export const signUpAction = async (
     const userId = data.user?.id;
     if (!userId) throw new Error("Error signing up.");
 
-    await prisma.user.create({
-      data: {
-        id: userId,
-        email,
-        firstName,
-        lastName,
-      },
-    });
+    try {
+      await prisma.user.create({
+        data: {
+          id: userId,
+          email,
+          firstName,
+          lastName,
+        },
+      });
+    } catch (dbError) {
+      // If user already exists in database, it means they signed up before
+      // but the Supabase auth might have been reset. Handle gracefully.
+      const errorString = String(dbError);
+      if (
+        errorString.includes("Unique constraint") ||
+        errorString.includes("duplicate key")
+      ) {
+        throw new Error(
+          "An account with this email already exists. Please log in instead.",
+        );
+      }
+      throw dbError;
+    }
 
     const content = `
       <h1>Welcome to nota! 🎉</h1>
@@ -99,7 +114,7 @@ export const signUpAction = async (
             <a
               target="_blank"
               rel="noopener noreferrer nofollow"
-              class="text-ring hover:!underline hover:text-ring/80 cursor-pointer !no-underline"
+              class="text-ring hover:underline! hover:text-ring/80 cursor-pointer no-underline!"
               href="https://github.com/kilyess"
             >kilyess</a>
           </p>
@@ -110,7 +125,7 @@ export const signUpAction = async (
             <a
               target="_blank"
               rel="noopener noreferrer nofollow"
-              class="text-ring hover:!underline hover:text-ring/80 cursor-pointer !no-underline"
+              class="text-ring hover:underline! hover:text-ring/80 cursor-pointer no-underline!"
               href="https://linkedin.com/in/ilyass-krichi"
             >Ilyass Krichi</a>
           </p>
@@ -121,7 +136,7 @@ export const signUpAction = async (
             <a
               target="_blank"
               rel="noopener noreferrer nofollow"
-              class="text-ring hover:!underline hover:text-ring/80 cursor-pointer !no-underline"
+              class="text-ring hover:underline! hover:text-ring/80 cursor-pointer no-underline!"
               href="mailto:personal.ilyasskrichi@gmail.com"
             >personal.ilyasskrichi@gmail.com</a>
           </p>
@@ -183,18 +198,59 @@ export const resetPasswordAction = async (password: string) => {
   }
 };
 
-export const updatePasswordAction = async (password: string) => {
+export const updatePasswordAction = async (
+  oldPassword: string,
+  newPassword: string,
+) => {
   try {
     const user = await getUser();
 
     if (!user)
-      throw new Error("Please login or sign up to update your password");
+      throw new Error("Please log in or sign up to update your password");
 
     const { auth } = await createClient();
 
-    const { error } = await auth.updateUser({ password, email: user.email });
+    // Verify old password by attempting to sign in
+    const { error: signInError } = await auth.signInWithPassword({
+      email: user.email!,
+      password: oldPassword,
+    });
 
-    if (error) throw error;
+    if (signInError) {
+      const errorMessage = signInError.message.toLowerCase();
+      if (
+        errorMessage.includes("invalid") ||
+        errorMessage.includes("incorrect") ||
+        errorMessage.includes("wrong")
+      ) {
+        throw new Error("Current password is incorrect. Please try again.");
+      }
+      throw signInError;
+    }
+
+    // Update to new password
+    const { error } = await auth.updateUser({
+      password: newPassword,
+      email: user.email,
+    });
+
+    if (error) {
+      const errorMessage = error.message.toLowerCase();
+      if (errorMessage.includes("same") || errorMessage.includes("identical")) {
+        throw new Error(
+          "New password cannot be the same as your current password.",
+        );
+      }
+      if (
+        errorMessage.includes("weak") ||
+        errorMessage.includes("password should")
+      ) {
+        throw new Error(
+          "Password is too weak. Please use a stronger password with at least 8 characters, including uppercase, lowercase, numbers, and special characters.",
+        );
+      }
+      throw error;
+    }
 
     return { errorMessage: null };
   } catch (error) {
@@ -209,7 +265,7 @@ export const deleteAccountAction = async () => {
     const user = await getUser();
 
     if (!user)
-      throw new Error("Please login or sign up to delete your account");
+      throw new Error("Please log in or sign up to delete your account");
 
     const { error: authError } = await auth.admin.deleteUser(user.id);
     if (authError) throw authError;
@@ -242,7 +298,7 @@ export const getDecryptedApiKeyAction = async () => {
   try {
     const user = await getUser();
 
-    if (!user) throw new Error("Please login or sign up to get your API key");
+    if (!user) throw new Error("Please log in or sign up to get your API key");
 
     const result = await prisma.user.findUnique({
       where: { id: user.id },
@@ -266,7 +322,7 @@ export const uploadAvatarAction = async (formData: FormData) => {
 
     const user = await getUser();
 
-    if (!user) throw new Error("Please login or sign up to upload an avatar");
+    if (!user) throw new Error("Please log in or sign up to upload an avatar");
 
     const avatar = formData.get("avatar") as File;
 
@@ -304,7 +360,8 @@ export const updateAvatarAction = async (formData: FormData) => {
   try {
     const user = await getUser();
 
-    if (!user) throw new Error("Please login or sign up to update your avatar");
+    if (!user)
+      throw new Error("Please log in or sign up to update your avatar");
 
     let newAvatarUrl: string | null = null;
 
@@ -336,7 +393,8 @@ export const deleteAvatarAction = async (url: string) => {
 
     const user = await getUser();
 
-    if (!user) throw new Error("Please login or sign up to delete your avatar");
+    if (!user)
+      throw new Error("Please log in or sign up to delete your avatar");
 
     const { data: existingAvatar, error: listError } = await storage
       .from("avatars")
@@ -364,7 +422,7 @@ export const updateUserAction = async (
     const user = await getUser();
 
     if (!user)
-      throw new Error("Please login or sign up to update your profile");
+      throw new Error("Please log in or sign up to update your profile");
 
     await prisma.user.update({
       where: { id: user.id },
@@ -385,7 +443,7 @@ export const updateApiKeyAction = async (apiKey: string) => {
     const user = await getUser();
 
     if (!user)
-      throw new Error("Please login or sign up to update your API key");
+      throw new Error("Please log in or sign up to update your API key");
 
     if (apiKey.length === 0) {
       await prisma.user.update({

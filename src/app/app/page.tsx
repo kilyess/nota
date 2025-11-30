@@ -34,7 +34,7 @@ async function HomePage() {
             <h2 className="text-3xl font-semibold">
               {user
                 ? `Hi ${firstName}, How can I help?`
-                : "Hey there, please login or sign up to create notes!"}
+                : "Hey there, please log in or sign up to create notes!"}
             </h2>
             <div className="flex flex-row gap-2.5 max-sm:flex-col max-sm:justify-evenly">
               <NewNoteButton type="home" />

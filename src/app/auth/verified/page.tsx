@@ -29,14 +29,14 @@ export default function EmailVerifiedPage() {
               Email Verified!
             </h1>
             <p className="text-muted-foreground text-sm">
-              Your email has been successfully verified. You can now sign in to
+              Your email has been successfully verified. You can now log in to
               your account.
             </p>
           </div>
 
           <div className="mt-6">
             <Button asChild className="w-full">
-              <Link href="/login">Sign In</Link>
+              <Link href="/login">Log In</Link>
             </Button>
           </div>
         </div>

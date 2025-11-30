@@ -43,7 +43,7 @@ function LoginPage() {
         },
         error: (error) => {
           return {
-            message: "Login failed",
+            message: "Log in failed",
             description: error.message,
           };
         },
@@ -68,8 +68,8 @@ function LoginPage() {
                 style={{ display: "inline-block" }}
               />
             </Link>
-            <h1 className="mt-4 mb-1 text-xl font-semibold">Sign In to nota</h1>
-            <p className="text-sm">Welcome back! Sign in to continue</p>
+            <h1 className="mt-4 mb-1 text-xl font-semibold">Log In to nota</h1>
+            <p className="text-sm">Welcome back! Log in to continue</p>
           </div>
 
           <div className="mt-6 space-y-6">
@@ -129,7 +129,7 @@ function LoginPage() {
             </div>
 
             <Button className="w-full" disabled={isPending} type="submit">
-              {isPending ? "Signing In..." : "Sign In"}
+              {isPending ? "Logging In..." : "Log In"}
             </Button>
           </div>
 

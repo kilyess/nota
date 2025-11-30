@@ -82,7 +82,7 @@ export default function HeroSection() {
                     size="lg"
                     className="rounded-full"
                   >
-                    <Link href="/login">Sign In</Link>
+                    <Link href="/login">Log In</Link>
                   </Button>
                 </div>
 

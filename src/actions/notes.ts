@@ -43,7 +43,7 @@ export const createNoteAction = async (title: string = "New Note") => {
     const user = await getUser();
 
     if (!user) {
-      throw new Error("Please login or sign up to create a new note.");
+      throw new Error("Please log in or sign up to create a new note.");
     }
 
     const encryptedTitle = await encryptString(title);
@@ -70,7 +70,7 @@ export const getDecryptedNoteAction = async (noteId: string) => {
     const user = await getUser();
 
     if (!user) {
-      throw new Error("Please login or sign up to get a note");
+      throw new Error("Please log in or sign up to get a note");
     }
 
     const note = await prisma.note.findUnique({
@@ -100,7 +100,7 @@ export const deleteNoteAction = async (noteId: string) => {
     const user = await getUser();
 
     if (!user) {
-      throw new Error("Please login or sign up to delete a note");
+      throw new Error("Please log in or sign up to delete a note");
     }
 
     await prisma.note.delete({
@@ -118,7 +118,7 @@ export const deleteSelectedNotesAction = async (noteIds: string[]) => {
     const user = await getUser();
 
     if (!user) {
-      throw new Error("Please login or sign up to delete notes");
+      throw new Error("Please log in or sign up to delete notes");
     }
 
     await prisma.note.deleteMany({
@@ -136,7 +136,7 @@ export const togglePinNoteAction = async (noteId: string, pinned: boolean) => {
     const user = await getUser();
 
     if (!user) {
-      throw new Error("Please login or sign up to pin a note");
+      throw new Error("Please log in or sign up to pin a note");
     }
 
     await prisma.note.update({
@@ -157,7 +157,7 @@ export const askAIAboutNotesAction = async (
   const user = await getUser();
 
   if (!user) {
-    throw new Error("Please login or sign up to ask AI about your notes");
+    throw new Error("Please log in or sign up to ask AI about your notes");
   }
 
   const { apiKey, errorMessage } = await getDecryptedApiKeyAction();

@@ -52,7 +52,7 @@ export default function AuthCodeErrorPage() {
               <Link href="/signup">Sign Up Again</Link>
             </Button>
             <Button asChild variant="outline" className="w-full">
-              <Link href="/login">Back to Sign In</Link>
+              <Link href="/login">Back to Log In</Link>
             </Button>
           </div>
         </div>

@@ -106,10 +106,10 @@ export default function SettingsDialog({ user, notes, onUpdate }: Props) {
   const [firstName, setFirstName] = useState(user?.firstName || "");
   const [lastName, setLastName] = useState(user?.lastName || "");
   const [avatar, setAvatar] = useState(user?.avatar || null);
+  const [oldPassword, setOldPassword] = useState("");
   const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
+  const [showOldPassword, setShowOldPassword] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const { apiKey, setApiKey } = useApiKey();
   const [apiKeySaved, setApiKeySaved] = useState<boolean>(false);
   const [selectedNotes, setSelectedNotes] = useState<string[]>([]);
@@ -162,17 +162,28 @@ export default function SettingsDialog({ user, notes, onUpdate }: Props) {
   };
 
   const handleUpdatePassword = async () => {
-    if (password !== confirmPassword) {
-      toast.error("Passwords do not match");
+    if (!oldPassword) {
+      toast.error("Please enter your current password");
       return;
     }
+
+    if (oldPassword === password) {
+      toast.error("New password cannot be the same as the current password");
+      return;
+    }
+
     updatePassword(
       {
         loadingMessage: "Updating password...",
         successMessage: "Password updated successfully",
         successDescription: "Your password has been updated successfully.",
         errorMessage: "Failed to update password",
+        onSuccess: () => {
+          setOldPassword("");
+          setPassword("");
+        },
       },
+      oldPassword,
       password,
     );
   };
@@ -471,6 +482,39 @@ export default function SettingsDialog({ user, notes, onUpdate }: Props) {
                   >
                     <div className="flex w-full flex-col gap-4">
                       <div className="flex flex-col gap-2">
+                        <Label htmlFor="oldPassword">Current Password</Label>
+                        <div className="relative">
+                          <Input
+                            type={showOldPassword ? "text" : "password"}
+                            id="oldPassword"
+                            value={oldPassword}
+                            onChange={(e) => setOldPassword(e.target.value)}
+                            placeholder="Enter current password"
+                            disabled={isUpdatingPassword}
+                            className="pr-10"
+                          />
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="icon"
+                            className="absolute top-1/2 right-1 h-7 w-7 -translate-y-1/2 rounded-full p-1.5 hover:bg-transparent"
+                            onClick={() => setShowOldPassword(!showOldPassword)}
+                            disabled={isUpdatingPassword}
+                            aria-label={
+                              showOldPassword
+                                ? "Hide password"
+                                : "Show password"
+                            }
+                          >
+                            {showOldPassword ? (
+                              <EyeOff className="text-muted-foreground h-4 w-4" />
+                            ) : (
+                              <Eye className="text-muted-foreground h-4 w-4" />
+                            )}
+                          </Button>
+                        </div>
+                      </div>
+                      <div className="flex flex-col gap-2">
                         <Label htmlFor="password">New Password</Label>
                         <div className="relative">
                           <Input
@@ -513,48 +557,6 @@ export default function SettingsDialog({ user, notes, onUpdate }: Props) {
                           </div>
                         )}
                       </div>
-                      <div className="flex flex-col gap-2">
-                        <Label htmlFor="confirmPassword">
-                          Confirm Password
-                        </Label>
-                        <div className="relative">
-                          <Input
-                            type={showConfirmPassword ? "text" : "password"}
-                            id="confirmPassword"
-                            value={confirmPassword}
-                            onChange={(e) => setConfirmPassword(e.target.value)}
-                            placeholder="Confirm new password"
-                            disabled={isUpdatingPassword}
-                            className="pr-10"
-                          />
-                          <Button
-                            type="button"
-                            variant="ghost"
-                            size="icon"
-                            className="absolute top-1/2 right-1 h-7 w-7 -translate-y-1/2 rounded-full p-1.5 hover:bg-transparent"
-                            onClick={() =>
-                              setShowConfirmPassword(!showConfirmPassword)
-                            }
-                            disabled={isUpdatingPassword}
-                            aria-label={
-                              showConfirmPassword
-                                ? "Hide password"
-                                : "Show password"
-                            }
-                          >
-                            {showConfirmPassword ? (
-                              <EyeOff className="text-muted-foreground h-4 w-4" />
-                            ) : (
-                              <Eye className="text-muted-foreground h-4 w-4" />
-                            )}
-                          </Button>
-                        </div>
-                        {confirmPassword && password !== confirmPassword && (
-                          <p className="text-muted-foreground text-xs">
-                            Passwords do not match
-                          </p>
-                        )}
-                      </div>
                     </div>
                     <Button
                       type="submit"
@@ -563,8 +565,7 @@ export default function SettingsDialog({ user, notes, onUpdate }: Props) {
                         isUpdatingPassword ||
                         !isPasswordValid ||
                         password.length === 0 ||
-                        confirmPassword.length === 0 ||
-                        password !== confirmPassword
+                        oldPassword.length === 0
                       }
                     >
                       {isUpdatingPassword ? "Saving..." : "Save Password"}
