@@ -58,8 +58,8 @@ function ForgotPasswordPage() {
             <Link href="/" aria-label="go home" className="mx-auto block w-fit">
               <Image
                 src="/favicon.ico"
-                width={32}
-                height={32}
+                width={48}
+                height={48}
                 alt="nota"
                 style={{ display: "inline-block" }}
               />
