@@ -4,21 +4,24 @@ import { loginAction } from "@/actions/users";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Eye, EyeOff } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useTransition } from "react";
+import { useState, useTransition } from "react";
 import { toast } from "sonner";
 
 function LoginPage() {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
 
-  const handleSubmit = (formData: FormData) => {
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
     startTransition(async () => {
-      const email = formData.get("email") as string;
-      const password = formData.get("pwd") as string;
-
       const promise = new Promise<{ errorMessage: string | null }>(
         async (resolve, reject) => {
           const result = await loginAction(email, password);
@@ -51,7 +54,7 @@ function LoginPage() {
   return (
     <section className="bg-background flex min-h-screen px-4 py-16 md:py-32">
       <form
-        action={handleSubmit}
+        onSubmit={handleSubmit}
         className="bg-muted/50 m-auto h-fit w-full max-w-sm overflow-hidden rounded-[calc(var(--radius)+.125rem)] border shadow-md shadow-zinc-950/5"
       >
         <div className="bg-card -m-px rounded-[calc(var(--radius)+.125rem)] border p-8 pb-6">
@@ -59,8 +62,8 @@ function LoginPage() {
             <Link href="/" aria-label="go home" className="mx-auto block w-fit">
               <Image
                 src="/favicon.ico"
-                width={32}
-                height={32}
+                width={48}
+                height={48}
                 alt="nota"
                 style={{ display: "inline-block" }}
               />
@@ -74,7 +77,14 @@ function LoginPage() {
               <Label htmlFor="email" className="block text-sm">
                 Email
               </Label>
-              <Input type="email" required name="email" id="email" />
+              <Input
+                type="email"
+                required
+                name="email"
+                id="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+              />
             </div>
 
             <div className="space-y-0.5">
@@ -91,16 +101,34 @@ function LoginPage() {
                   </Link>
                 </Button>
               </div>
-              <Input
-                type="password"
-                required
-                name="pwd"
-                id="pwd"
-                className="input sz-md variant-mixed"
-              />
+              <div className="relative">
+                <Input
+                  type={showPassword ? "text" : "password"}
+                  required
+                  name="pwd"
+                  id="pwd"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="input sz-md variant-mixed pr-10"
+                />
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon"
+                  className="absolute top-1/2 right-1 h-7 w-7 -translate-y-1/2 rounded-full p-1.5 hover:bg-transparent"
+                  onClick={() => setShowPassword(!showPassword)}
+                  aria-label={showPassword ? "Hide password" : "Show password"}
+                >
+                  {showPassword ? (
+                    <EyeOff className="text-muted-foreground h-4 w-4" />
+                  ) : (
+                    <Eye className="text-muted-foreground h-4 w-4" />
+                  )}
+                </Button>
+              </div>
             </div>
 
-            <Button className="w-full" disabled={isPending}>
+            <Button className="w-full" disabled={isPending} type="submit">
               {isPending ? "Signing In..." : "Sign In"}
             </Button>
           </div>

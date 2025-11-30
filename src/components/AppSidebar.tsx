@@ -7,6 +7,7 @@ import {
   SidebarFooter,
   SidebarHeader,
 } from "@/components/ui/sidebar";
+import { useIsMobile } from "@/hooks/use-mobile";
 import useNote from "@/hooks/use-note";
 import { useScrollFade } from "@/hooks/use-scroll-fade";
 import { Note, User } from "@prisma/client";
@@ -18,7 +19,7 @@ import NewNoteButton from "./NewNoteButton";
 import SidebarGroupContent from "./SidebarGroupContent";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
-
+import { useSidebar } from "./ui/sidebar";
 type NoteWithBody = Pick<
   Note,
   "id" | "title" | "pinned" | "updatedAt" | "createdAt" | "authorId"
@@ -36,6 +37,8 @@ function AppSidebar({
   isLoggedIn,
   ...props
 }: React.ComponentProps<typeof Sidebar> & Props) {
+  const { setOpenMobile } = useSidebar();
+  const isMobile = useIsMobile();
   const { notes, setNotes } = useNote();
   const [searchValue, setSearchValue] = useState("");
   const sidebarContentRef = useRef<HTMLDivElement>(null);
@@ -57,7 +60,14 @@ function AppSidebar({
   return (
     <Sidebar variant="inset" {...props}>
       <SidebarHeader className="flex h-36 w-full flex-col items-center justify-center gap-4 pt-4">
-        <Link href="/">
+        <Link
+          onClick={() => {
+            if (isMobile) {
+              setOpenMobile(false);
+            }
+          }}
+          href="/"
+        >
           <Logo className="h-4 w-auto" />
         </Link>
         <NewNoteButton type="sidebar" />

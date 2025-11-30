@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 
 const links = [
@@ -16,12 +17,13 @@ export default function FooterSection() {
     <footer className="py-16 md:py-32">
       <div className="mx-auto max-w-5xl px-6">
         <Link href="/" aria-label="go home" className="mx-auto block size-fit">
-          <img
+          <Image
             src="/favicon.ico"
             width={64}
             height={64}
             alt="nota"
-            className="h-16 w-16"
+            style={{ display: "inline-block" }}
+            priority
           />
         </Link>
 
