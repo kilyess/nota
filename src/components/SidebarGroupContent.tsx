@@ -20,10 +20,16 @@ import {
 import {
   SidebarGroupContent as SidebarGroupContentBase,
   SidebarGroupLabel,
+  useSidebar,
 } from "./ui/sidebar";
 
+type NoteWithBody = Pick<
+  Note,
+  "id" | "title" | "pinned" | "updatedAt" | "createdAt" | "authorId"
+> & { body: string };
+
 type Props = {
-  notes: Note[];
+  notes: NoteWithBody[];
   showTopFade: boolean;
   showBottomFade: boolean;
 };
@@ -33,6 +39,7 @@ function SidebarGroupContent({ notes, showTopFade, showBottomFade }: Props) {
   const [pinnedCollapsed, setPinnedCollapsed] = useState(false);
   const [disabledNoteId, setDisabledNoteId] = useState<string[]>([]);
   const { noteTitle, updateNote } = useNote();
+  const { isMobile, setOpenMobile } = useSidebar();
 
   useEffect(() => {
     const collapsed = localStorage.getItem("pinnedCollapsed");
@@ -76,7 +83,7 @@ function SidebarGroupContent({ notes, showTopFade, showBottomFade }: Props) {
     <div className="relative">
       <div
         aria-hidden
-        className={`from-sidebar pointer-events-none sticky top-0 z-[70] -mt-4 h-3 bg-gradient-to-b to-transparent transition-opacity duration-150 ${showTopFade ? "opacity-100" : "opacity-0"}`}
+        className={`from-sidebar pointer-events-none sticky top-0 z-70 -mt-4 h-3 bg-linear-to-b to-transparent transition-opacity duration-150 ${showTopFade ? "opacity-100" : "opacity-0"}`}
       />
 
       {Object.entries(groupedNotes).map(([label, notes]) =>
@@ -113,7 +120,12 @@ function SidebarGroupContent({ notes, showTopFade, showBottomFade }: Props) {
                     <ContextMenuTrigger>
                       <Link
                         className={`group/link relative flex w-full cursor-pointer items-center overflow-hidden rounded-lg px-3 py-2 text-left text-sm font-medium transition ${note.id === currentNoteId ? "bg-sidebar-accent text-accent-foreground" : ""} hover:bg-sidebar-accent hover:text-sidebar-accent-foreground ${disabledNoteId.includes(note.id) ? "pointer-events-none opacity-50" : ""}`}
-                        href={`/note/${note.id}`}
+                        href={`/app/note/${note.id}`}
+                        onClick={() => {
+                          if (isMobile) {
+                            setOpenMobile(false);
+                          }
+                        }}
                       >
                         <div className="w-full truncate">
                           {(note.id === currentNoteId
@@ -121,7 +133,7 @@ function SidebarGroupContent({ notes, showTopFade, showBottomFade }: Props) {
                             : note.title) || "New Note"}
                         </div>
                         <div className="text-muted-foreground group-hover/link:bg-sidebar-accent pointer-events-none absolute top-0 right-1 bottom-0 z-50 flex items-center justify-end opacity-0 transition-opacity group-hover/link:pointer-events-auto group-hover/link:opacity-100">
-                          <div className="from-sidebar-accent pointer-events-none absolute top-0 right-full h-full w-8 bg-gradient-to-l to-transparent group-hover/link:opacity-100"></div>
+                          <div className="from-sidebar-accent pointer-events-none absolute top-0 right-full h-full w-8 bg-linear-to-l to-transparent group-hover/link:opacity-100"></div>
                           <Button
                             variant="ghost"
                             className="size-7 rounded-md p-1.5"
@@ -172,7 +184,7 @@ function SidebarGroupContent({ notes, showTopFade, showBottomFade }: Props) {
 
       <div
         aria-hidden
-        className={`from-sidebar pointer-events-none sticky bottom-0 z-[70] -mb-4 h-3 bg-gradient-to-t to-transparent transition-opacity duration-150 ${showBottomFade ? "opacity-100" : "opacity-0"}`}
+        className={`from-sidebar pointer-events-none sticky bottom-0 z-70 -mb-4 h-3 bg-linear-to-t to-transparent transition-opacity duration-150 ${showBottomFade ? "opacity-100" : "opacity-0"}`}
       />
     </div>
   );

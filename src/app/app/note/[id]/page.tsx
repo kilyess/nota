@@ -1,7 +1,20 @@
 import { getDecryptedNoteAction } from "@/actions/notes";
-import NotFound from "@/app/not-found";
 import { getUser } from "@/utils/supabase/server";
+import { Metadata } from "next";
+import { redirect } from "next/navigation";
 import NoteEditor from "./editor";
+import NoteNotFound from "./not-found";
+
+export async function generateMetadata({
+  params,
+}: PageProps): Promise<Metadata> {
+  const { id: noteId } = await params;
+  const { title } = await getDecryptedNoteAction(noteId);
+
+  return {
+    title: `${title} - nota`,
+  };
+}
 
 type PageProps = {
   params: Promise<{
@@ -15,13 +28,13 @@ async function NotePage({ params }: PageProps) {
   const user = await getUser();
 
   if (!user) {
-    return <NotFound isLoggedIn={false} />;
+    redirect("/login");
   }
 
   const { title, body, errorMessage } = await getDecryptedNoteAction(noteId);
 
   if (errorMessage) {
-    return <NotFound isLoggedIn={!!user} />;
+    return <NoteNotFound />;
   }
 
   return <NoteEditor id={noteId} title={title} content={body} user={user} />;

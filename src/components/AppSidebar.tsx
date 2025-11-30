@@ -1,5 +1,6 @@
 "use client";
 
+import { Logo } from "@/components/Logo";
 import {
   Sidebar,
   SidebarContent,
@@ -18,8 +19,13 @@ import SidebarGroupContent from "./SidebarGroupContent";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 
+type NoteWithBody = Pick<
+  Note,
+  "id" | "title" | "pinned" | "updatedAt" | "createdAt" | "authorId"
+> & { body: string };
+
 type Props = {
-  notes: Note[];
+  notes: NoteWithBody[];
   user: User | null;
   isLoggedIn: boolean;
 };
@@ -50,16 +56,16 @@ function AppSidebar({
 
   return (
     <Sidebar variant="inset" {...props}>
-      <SidebarHeader className="flex h-36 w-full flex-col items-center justify-center gap-2.5">
+      <SidebarHeader className="flex h-36 w-full flex-col items-center justify-center gap-4 pt-4">
         <Link href="/">
-          <h1 className="text-2xl font-semibold">nota</h1>
+          <Logo className="h-4 w-auto" />
         </Link>
         <NewNoteButton type="sidebar" />
         <div className="border-sidebar-ring-accent w-full border-b px-2">
           <div className="flex items-center">
             <SearchIcon className="size-4 min-w-4" />
             <Input
-              className="!text-foreground placeholder:!text-muted-foreground/50 !w-full !border-none !bg-transparent py-2 !text-sm font-semibold placeholder:select-none focus:!ring-0"
+              className="text-foreground! placeholder:text-muted-foreground/50! w-full! border-none! bg-transparent! py-2 text-sm! font-semibold placeholder:select-none focus:ring-0!"
               placeholder="Search your notes..."
               value={searchValue}
               onChange={(e) => handleSearchChange(e.target.value)}

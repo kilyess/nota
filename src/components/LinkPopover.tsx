@@ -25,14 +25,12 @@ export function LinkPopover({ editor }: Props) {
   const setLink = () => {
     if (!editor) return;
 
-    // If URL is empty, remove the link
     if (url === "") {
       editor.chain().focus().extendMarkRange("link").unsetLink().run();
       setIsOpen(false);
       return;
     }
 
-    // Update or set the link
     editor.chain().focus().extendMarkRange("link").setLink({ href: url }).run();
 
     setIsOpen(false);

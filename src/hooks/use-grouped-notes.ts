@@ -26,9 +26,14 @@ const getNoteGroup = (noteDate: Date): string => {
   return "Older";
 };
 
-export const useGroupedNotes = (notes: Note[]) => {
+type NoteWithBody = Pick<
+  Note,
+  "id" | "title" | "pinned" | "updatedAt" | "createdAt" | "authorId"
+> & { body: string };
+
+export const useGroupedNotes = (notes: NoteWithBody[]) => {
   return useMemo(() => {
-    const groups: { [label: string]: Note[] } = {
+    const groups: { [label: string]: NoteWithBody[] } = {
       Pinned: [],
       Today: [],
       Yesterday: [],

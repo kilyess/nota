@@ -17,8 +17,13 @@ import {
   CommandList,
 } from "./ui/command";
 
+type NoteWithBody = Pick<
+  Note,
+  "id" | "title" | "pinned" | "updatedAt" | "createdAt" | "authorId"
+> & { body: string };
+
 type Props = {
-  notes: Note[];
+  notes: NoteWithBody[];
 };
 
 export default function CommandMenu({ notes: initialNotes }: Props) {
@@ -94,7 +99,7 @@ export default function CommandMenu({ notes: initialNotes }: Props) {
             description: "You can now view and edit your new note.",
             action: {
               label: "View Note",
-              onClick: () => router.push(`/note/${note.id}`),
+              onClick: () => router.push(`/app/note/${note.id}`),
             },
           };
         },
@@ -136,7 +141,7 @@ export default function CommandMenu({ notes: initialNotes }: Props) {
               key={note.id}
               asChild
             >
-              <Link href={`/note/${note.id}`}>
+              <Link href={`/app/note/${note.id}`}>
                 {note.id === noteId ? noteTitle : note.title || "New Note"}
               </Link>
             </CommandItem>

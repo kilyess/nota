@@ -2,19 +2,12 @@
 
 import { resetPasswordAction } from "@/actions/users";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useActionHandler } from "@/hooks/use-action-handler";
 import { createClient } from "@/utils/supabase/client";
 import { Loader2 } from "lucide-react";
+import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -83,41 +76,52 @@ export default function ResetPasswordPage() {
 
   if (status === "invalid") {
     return (
-      <div className="mt-20 flex flex-1 flex-col items-center max-sm:mx-auto max-sm:max-w-sm">
-        <Card className="w-full max-w-md">
-          <CardHeader>
-            <CardTitle className="text-destructive text-center text-2xl">
-              Invalid Link
-            </CardTitle>
-            <CardDescription className="text-center">
-              This password reset link is either invalid or has expired.
-            </CardDescription>
-          </CardHeader>
-          <CardFooter>
-            <Button asChild className="w-full">
-              <Link href="/forgot-password">Request a New Link</Link>
-            </Button>
-          </CardFooter>
-        </Card>
-      </div>
+      <section className="bg-background flex min-h-screen px-4 py-16 md:py-32">
+        <div className="bg-muted/50 m-auto h-fit w-full max-w-sm overflow-hidden rounded-[calc(var(--radius)+.125rem)] border shadow-md shadow-zinc-950/5">
+          <div className="bg-card -m-px rounded-[calc(var(--radius)+.125rem)] border p-8 pb-6">
+            <div className="text-center">
+              <h1 className="text-destructive mb-4 text-xl font-semibold">
+                Invalid Link
+              </h1>
+              <p className="text-muted-foreground text-sm">
+                This password reset link is either invalid or has expired.
+              </p>
+            </div>
+            <div className="mt-6">
+              <Button asChild className="w-full">
+                <Link href="/forgot-password">Request a New Link</Link>
+              </Button>
+            </div>
+          </div>
+        </div>
+      </section>
     );
   }
 
   return (
-    <form action={handleResetPassword}>
-      <div className="mt-20 flex flex-1 flex-col items-center max-sm:mx-auto max-sm:max-w-sm">
-        <Card className="w-full max-w-md">
-          <CardHeader className="mb-1">
-            <CardTitle className="text-center text-3xl">
-              Reset Password
-            </CardTitle>
-            <CardDescription className="text-center">
-              Please enter your new password below.
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
+    <section className="bg-background flex min-h-screen px-4 py-16 md:py-32">
+      <form
+        action={handleResetPassword}
+        className="bg-muted/50 m-auto h-fit w-full max-w-sm overflow-hidden rounded-[calc(var(--radius)+.125rem)] border shadow-md shadow-zinc-950/5"
+      >
+        <div className="bg-card -m-px rounded-[calc(var(--radius)+.125rem)] border p-8 pb-6">
+          <div className="text-center">
+            <Link href="/" aria-label="go home" className="mx-auto block w-fit">
+              <Image
+                src="/favicon.ico"
+                width={32}
+                height={32}
+                alt="nota"
+                style={{ display: "inline-block" }}
+              />
+            </Link>
+            <h1 className="mt-4 mb-1 text-xl font-semibold">Reset Password</h1>
+            <p className="text-sm">Please enter your new password below</p>
+          </div>
+
+          <div className="mt-6 space-y-6">
             <div className="flex flex-col gap-4">
-              <div className="grid gap-2">
+              <div className="space-y-2">
                 <Label htmlFor="password">New Password</Label>
                 <Input
                   id="password"
@@ -128,7 +132,7 @@ export default function ResetPasswordPage() {
                   disabled={isResettingPassword}
                 />
               </div>
-              <div className="grid gap-2">
+              <div className="space-y-2">
                 <Label htmlFor="confirmPassword">Confirm Password</Label>
                 <Input
                   id="confirmPassword"
@@ -140,8 +144,7 @@ export default function ResetPasswordPage() {
                 />
               </div>
             </div>
-          </CardContent>
-          <CardFooter className="flex items-center justify-center">
+
             <Button
               type="submit"
               disabled={isResettingPassword}
@@ -149,9 +152,9 @@ export default function ResetPasswordPage() {
             >
               {isResettingPassword ? "Resetting..." : "Reset Password"}
             </Button>
-          </CardFooter>
-        </Card>
-      </div>
-    </form>
+          </div>
+        </div>
+      </form>
+    </section>
   );
 }

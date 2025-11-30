@@ -13,7 +13,6 @@ function DarkModeToggle() {
     <Button
       variant="ghost"
       size="icon"
-      className="fixed top-4 right-4 z-50"
       onClick={() => setTheme(theme === "light" ? "dark" : "light")}
     >
       <Sun className="absolute size-4 scale-0 -rotate-90 transition-all duration-200 dark:scale-100 dark:rotate-0" />

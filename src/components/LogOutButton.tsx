@@ -27,7 +27,7 @@ function LogOutButton() {
       toast.promise(promise, {
         loading: "Logging out...",
         success: () => {
-          router.replace("/login");
+          router.replace("/");
           return {
             message: "Logged out",
             description: "You have been succesfully logged out.",

@@ -2,79 +2,110 @@
 
 import { sendResetPasswordEmailAction } from "@/actions/users";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useActionHandler } from "@/hooks/use-action-handler";
+import Image from "next/image";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useTransition } from "react";
+import { toast } from "sonner";
 
 function ForgotPasswordPage() {
-  const [email, setEmail] = useState("");
-  const {
-    handler: sendResetPasswordEmail,
-    isPending: isSendingResetPasswordEmail,
-  } = useActionHandler(sendResetPasswordEmailAction);
   const router = useRouter();
+  const [isPending, startTransition] = useTransition();
 
-  const handleResetPassword = async () => {
-    sendResetPasswordEmail(
-      {
-        onSuccess: () => {
-          router.replace("/");
+  const handleSubmit = (formData: FormData) => {
+    startTransition(async () => {
+      const email = formData.get("email") as string;
+
+      const promise = new Promise<{ errorMessage: string | null }>(
+        async (resolve, reject) => {
+          const result = await sendResetPasswordEmailAction(email);
+          if (result.errorMessage) {
+            reject(new Error(result.errorMessage));
+          } else {
+            resolve(result);
+          }
         },
-        loadingMessage: "Sending reset password email...",
-        successMessage: "Reset password email sent successfully",
-        successDescription:
-          "Your reset password email has been sent successfully.",
-        errorMessage: "Failed to send reset password email",
-      },
-      email,
-    );
+      );
+      toast.promise(promise, {
+        loading: "Sending reset link...",
+        success: () => {
+          router.replace("/");
+          return {
+            message: "Email sent",
+            description: "Check your email for the password reset link.",
+          };
+        },
+        error: (error) => {
+          return {
+            message: "Failed to send email",
+            description: error.message,
+          };
+        },
+      });
+    });
   };
 
   return (
-    <form action={handleResetPassword}>
-      <div className="mt-20 flex flex-1 flex-col items-center max-sm:mx-auto max-sm:max-w-sm">
-        <Card className="w-full max-w-md">
-          <CardHeader className="mb-1">
-            <CardTitle className="text-center text-3xl">
-              Forgot Password
-            </CardTitle>
-            <CardDescription className="text-center">
-              Please enter your email below to reset your password.
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="grid gap-2">
-              <Label htmlFor="email">Email</Label>
+    <section className="bg-background flex min-h-screen px-4 py-16 md:py-32">
+      <form
+        action={handleSubmit}
+        className="bg-muted/50 m-auto h-fit w-full max-w-sm overflow-hidden rounded-[calc(var(--radius)+.125rem)] border shadow-md shadow-zinc-950/5"
+      >
+        <div className="bg-card -m-px rounded-[calc(var(--radius)+.125rem)] border p-8 pb-6">
+          <div className="text-center">
+            <Link href="/" aria-label="go home" className="mx-auto block w-fit">
+              <Image
+                src="/favicon.ico"
+                width={32}
+                height={32}
+                alt="nota"
+                style={{ display: "inline-block" }}
+              />
+            </Link>
+            <h1 className="mt-4 mb-1 text-xl font-semibold">
+              Recover Password
+            </h1>
+            <p className="text-sm">Enter your email to receive a reset link</p>
+          </div>
+
+          <div className="mt-6 space-y-6">
+            <div className="space-y-2">
+              <Label htmlFor="email" className="block text-sm">
+                Email
+              </Label>
               <Input
-                id="email"
                 type="email"
-                placeholder="Enter your email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                disabled={isSendingResetPasswordEmail}
+                required
+                name="email"
+                id="email"
+                placeholder="name@example.com"
               />
             </div>
-          </CardContent>
-          <CardFooter className="flex items-center justify-center">
-            <Button type="submit" disabled={isSendingResetPasswordEmail}>
-              {isSendingResetPasswordEmail
-                ? "Sending..."
-                : "Send Reset Password Email"}
+
+            <Button className="w-full" disabled={isPending}>
+              {isPending ? "Sending..." : "Send Reset Link"}
             </Button>
-          </CardFooter>
-        </Card>
-      </div>
-    </form>
+          </div>
+
+          <div className="mt-6 text-center">
+            <p className="text-muted-foreground text-sm">
+              We'll send you a link to reset your password.
+            </p>
+          </div>
+        </div>
+
+        <div className="p-3">
+          <p className="text-accent-foreground text-center text-sm">
+            Remembered your password?
+            <Button asChild variant="link" className="px-2">
+              <Link href="/login">Sign In</Link>
+            </Button>
+          </p>
+        </div>
+      </form>
+    </section>
   );
 }
 

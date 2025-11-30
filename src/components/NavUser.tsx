@@ -7,9 +7,14 @@ import { useState } from "react";
 import LogOutButton from "./LogOutButton";
 import Settings from "./Settings";
 
+type NoteWithBody = Pick<
+  Note,
+  "id" | "title" | "pinned" | "updatedAt" | "createdAt" | "authorId"
+> & { body: string };
+
 type Props = {
   user: User | null;
-  notes: Note[];
+  notes: NoteWithBody[];
 };
 
 export function NavUser({ user, notes }: Props) {

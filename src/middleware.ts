@@ -43,22 +43,20 @@ export async function updateSession(request: NextRequest) {
     request.nextUrl.pathname === "/login" ||
     request.nextUrl.pathname === "/signup";
 
-  const isProtectedRoute =
-    request.nextUrl.pathname.startsWith("/note/") ||
-    request.nextUrl.pathname === "/";
+  const isRootRoute = request.nextUrl.pathname === "/";
+
+  const isProtectedRoute = request.nextUrl.pathname.startsWith("/app");
 
   const {
     data: { user },
   } = await supabase.auth.getUser();
 
-  // Redirect authenticated users away from auth pages
-  if (isAuthRoute && user) {
+  if ((isAuthRoute && user) || (isRootRoute && user)) {
     return NextResponse.redirect(
-      new URL("/", process.env.NEXT_PUBLIC_BASE_URL!),
+      new URL("/app", process.env.NEXT_PUBLIC_BASE_URL!),
     );
   }
 
-  // Redirect unauthenticated users from protected routes to login
   if (isProtectedRoute && !user) {
     return NextResponse.redirect(
       new URL("/login", process.env.NEXT_PUBLIC_BASE_URL!),

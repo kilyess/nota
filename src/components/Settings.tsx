@@ -60,9 +60,14 @@ import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 
+type NoteWithBody = Pick<
+  Note,
+  "id" | "title" | "pinned" | "updatedAt" | "createdAt" | "authorId"
+> & { body: string };
+
 type Props = {
   user: User | null;
-  notes: Note[];
+  notes: NoteWithBody[];
   onUpdate: (
     avatar: string | null,
     firstName: string,

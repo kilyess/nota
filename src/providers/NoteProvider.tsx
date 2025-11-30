@@ -3,14 +3,19 @@
 import { Note } from "@prisma/client";
 import { createContext, useState } from "react";
 
+type NoteWithBody = Pick<
+  Note,
+  "id" | "title" | "pinned" | "updatedAt" | "createdAt" | "authorId"
+> & { body: string };
+
 type NoteProviderContextType = {
   noteTitle: string;
   setNoteTitle: (noteTitle: string) => void;
-  notes: Note[];
-  setNotes: (notes: Note[]) => void;
-  addNote: (note: Note) => void;
-  updateNote: (note: Note) => void;
-  deleteNote: (note: Note) => void;
+  notes: NoteWithBody[];
+  setNotes: (notes: NoteWithBody[]) => void;
+  addNote: (note: NoteWithBody) => void;
+  updateNote: (note: NoteWithBody) => void;
+  deleteNote: (note: NoteWithBody) => void;
 };
 
 export const NoteProviderContext = createContext<NoteProviderContextType>({
@@ -25,13 +30,13 @@ export const NoteProviderContext = createContext<NoteProviderContextType>({
 
 const NoteProvider = ({ children }: { children: React.ReactNode }) => {
   const [noteTitle, setNoteTitle] = useState<string>("");
-  const [notes, setNotes] = useState<Note[]>([]);
+  const [notes, setNotes] = useState<NoteWithBody[]>([]);
 
-  const addNote = (note: Note) => {
+  const addNote = (note: NoteWithBody) => {
     setNotes([note, ...notes]);
   };
 
-  const updateNote = (note: Note) => {
+  const updateNote = (note: NoteWithBody) => {
     setNotes(
       notes
         .map((n) => (n.id === note.id ? note : n))
@@ -39,7 +44,7 @@ const NoteProvider = ({ children }: { children: React.ReactNode }) => {
     );
   };
 
-  const deleteNote = (note: Note) => {
+  const deleteNote = (note: NoteWithBody) => {
     setNotes(notes.filter((n) => n.id !== note.id));
   };
   return (

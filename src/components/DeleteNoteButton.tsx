@@ -50,10 +50,11 @@ function DeleteNoteButton({
         onSuccess: () => {
           const note = notes.find((note) => note.id === noteId);
           if (note) {
+            // @ts-expect-error - NoteWithBody is not assignable to Note but id is sufficient for deletion
             deleteNote(note);
           }
           if (noteId === currentNoteId) {
-            router.replace("/");
+            router.replace("/app");
           }
           onDisable?.(noteId, false);
         },

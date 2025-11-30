@@ -65,7 +65,7 @@ function AskAIButton({ user, type }: Props) {
 
   const handleOnOpenChange = (isOpen: boolean) => {
     if (!user) {
-      router.push("/login");
+      router.replace("/login");
     } else {
       if (isOpen) {
         setQuestionText("");
@@ -117,7 +117,6 @@ function AskAIButton({ user, type }: Props) {
         setResponses((prev) => [...prev, response]);
         setTimeout(ScrollToBottom, 100);
       }
-      textAreaRef.current?.focus();
     });
   };
 
@@ -154,7 +153,10 @@ function AskAIButton({ user, type }: Props) {
           </Button>
         )}
       </DialogTrigger>
-      <DialogContent className="flex h-[75vh] !max-w-4xl flex-col max-sm:!max-w-sm">
+      <DialogContent
+        className="flex h-[75vh] !max-w-4xl flex-col max-sm:!max-w-sm"
+        onInteractOutside={(e) => e.preventDefault()}
+      >
         <DialogHeader>
           <DialogTitle className="font-bold">
             Ask AI about your notes
@@ -170,7 +172,6 @@ function AskAIButton({ user, type }: Props) {
               showTopFade ? "opacity-100" : "opacity-0"
             }`}
           />
-
           <div className="h-full overflow-y-auto px-2" ref={contentRef}>
             <div className="flex flex-col gap-8">
               {questions.map((question, index) => (

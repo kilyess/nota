@@ -82,7 +82,7 @@ export default function FloatingActions() {
             description: "You can now view and edit your new note.",
             action: {
               label: "View Note",
-              onClick: () => router.push(`/note/${note.id}`),
+              onClick: () => router.push(`/app/note/${note.id}`),
             },
           };
         },
