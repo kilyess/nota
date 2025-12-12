@@ -7,8 +7,21 @@ if (process.env.NODE_ENV === "production") {
 }
 
 import path from "node:path";
-import type { PrismaConfig } from "prisma";
+import { defineConfig } from "prisma/config";
 
-export default {
+const DATABASE_URL = process.env.DATABASE_URL;
+if (!DATABASE_URL) {
+  throw new Error(
+    "DATABASE_URL is not set. Define it in .env/.env.local or your environment before running Prisma commands.",
+  );
+}
+
+const DIRECT_URL = process.env.DIRECT_URL;
+
+export default defineConfig({
   schema: path.join("src", "db", "schema.prisma"),
-} satisfies PrismaConfig;
+  datasource: {
+    url: DATABASE_URL,
+    ...(DIRECT_URL ? { directUrl: DIRECT_URL } : {}),
+  },
+});

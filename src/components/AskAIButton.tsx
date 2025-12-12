@@ -17,7 +17,14 @@ import { User } from "@supabase/supabase-js";
 import { ArrowUp, KeyRound, Loader2, Settings, Sparkles } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Fragment, useEffect, useRef, useState, useTransition } from "react";
+import {
+  Fragment,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+  useTransition,
+} from "react";
 import { toast } from "sonner";
 import { Textarea } from "./ui/textarea";
 
@@ -69,7 +76,7 @@ function AskAIButton({ user, type }: Props) {
     };
   }, [questions, responses]);
 
-  const checkApiKey = async () => {
+  const checkApiKey = useCallback(async () => {
     setIsCheckingApiKey(true);
     try {
       if (apiKey) {
@@ -89,13 +96,13 @@ function AskAIButton({ user, type }: Props) {
     } finally {
       setIsCheckingApiKey(false);
     }
-  };
+  }, [apiKey, setApiKey]);
 
   useEffect(() => {
     if (open && user) {
       checkApiKey();
     }
-  }, [open, user]);
+  }, [open, user, checkApiKey]);
 
   const handleOnOpenChange = (isOpen: boolean) => {
     if (!user) {
